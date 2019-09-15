@@ -8,9 +8,10 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/APermission" />
+            <option value="$PROJECT_DIR$/BaseLibrary" />
             <option value="$PROJECT_DIR$/MultipleItem" />
             <option value="$PROJECT_DIR$/Navigation" />
-            <option value="$PROJECT_DIR$/Permission" />
             <option value="$PROJECT_DIR$/SpanCreator" />
             <option value="$PROJECT_DIR$/app" />
           </set>

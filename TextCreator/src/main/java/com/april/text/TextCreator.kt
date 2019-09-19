@@ -17,7 +17,7 @@ import androidx.core.content.ContextCompat
 
 /*
 
-        tv?.multiText(
+        tv?.richText(
             TextCreator("hello world !", textColor = R.color.colorAccent),
             NewLine(),
             TextCreator("hello world !", backgroundColor = R.color.colorPrimary),
@@ -45,7 +45,7 @@ import androidx.core.content.ContextCompat
 /**
  * TextView 设置富文本样式
  */
-fun <T : TextCreator> TextView.multiText(vararg creators: T) {
+fun <T : TextCreator> TextView.richText(vararg creators: T) {
     val builder = SpannableStringBuilder()
     creators.forEach {
         val start = builder.length

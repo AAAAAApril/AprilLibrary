@@ -7,7 +7,7 @@ import androidx.fragment.app.FragmentManager
 /**
  * 和生命周期绑定的倒计时工具
  *
- * 这个功能暂时不写，更好的方式是用 LiveData 结合 Kotlin 协程做
+ * FIXME 这个功能暂时不写，更好的方式可能是用 LiveData 结合 Kotlin 协程做
  */
 class CountDownHelper : Fragment() {
     companion object {
@@ -41,6 +41,7 @@ class CountDownHelper : Fragment() {
     //是否正在倒计时
     private var isRunning: Boolean = false
 
-    fun startCountDown(totalSeconds: Int = countDownTotalSeconds) {}
+    fun startCountDown(totalSeconds: Int = countDownTotalSeconds) {
+    }
 
 }

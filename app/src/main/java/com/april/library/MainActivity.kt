@@ -90,11 +90,11 @@ class MainActivity : AppCompatActivity() {
             toast("拒绝了权限")
         }?.request()
 
-        watchTextChange()
-            .addView(textView0, 9, 31)
-            .addView(textView1, -1, 99)
-            .addView(button, 8, -1)
-            .watch {
+        listenTextLengthChange()
+            .withView(textView0, 9, 31)
+            .withView(textView1, -1, 99)
+            .withView(button, 8, -1)
+            .listen {
 
             }
 
@@ -102,11 +102,13 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        DataManager.INSTANCE.compare<MainActivity> { new, old ->
+        RuntimeDataManager.compare<MainActivity> { new, old ->
             return@compare new != old
         }
-        DataListenerImpl.get<MainActivity>(this).listen { new, old ->
+        RuntimeDataManager.listen(true, object : RuntimeDataListener<MainActivity> {
+            override fun onDataNotify(new: MainActivity?, old: MainActivity?) {
 
-        }
+            }
+        })
     }
 }

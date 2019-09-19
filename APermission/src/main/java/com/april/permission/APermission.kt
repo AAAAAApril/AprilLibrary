@@ -79,8 +79,7 @@ class APermission {
  */
 class Promoter : Fragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    init {
         retainInstance = true
     }
 

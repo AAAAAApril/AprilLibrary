@@ -11,21 +11,21 @@ import androidx.lifecycle.ViewModelProviders
 
 /*
 
-        watchTextChange()
-            .addView(textView0, 9, 31)
-            .addView(textView1, -1, 99)
-            .addView(button, 8, -1)
-            .watch { allWithinConstraints: Boolean ->
+        listenTextLengthChange()
+            .withView(textView0, 9, 31)
+            .withView(textView1, -1, 99)
+            .withView(button, 8, -1)
+            .listen { allWithinConstraints: Boolean ->
 
             }
 
  */
 
-fun Fragment.watchTextChange(): TextLengthWatcher {
+fun Fragment.listenTextLengthChange(): TextLengthWatcher {
     return ViewModelProviders.of(this).get(TextLengthWatcher::class.java)
 }
 
-fun FragmentActivity.watchTextChange(): TextLengthWatcher {
+fun FragmentActivity.listenTextLengthChange(): TextLengthWatcher {
     return ViewModelProviders.of(this).get(TextLengthWatcher::class.java)
 }
 
@@ -44,7 +44,7 @@ class TextLengthWatcher internal constructor(application: Application) :
      * [minCount] 约束的最小字符长度（包含，默认 -1，表示不限制）
      * [maxCount] 约束的最大字符长度（包含，默认 -1，表示不限制）
      */
-    fun addView(
+    fun withView(
         view: TextView,
         minCount: Int = -1,
         maxCount: Int = -1
@@ -61,7 +61,7 @@ class TextLengthWatcher internal constructor(application: Application) :
      * [block] 监听回调
      * [Boolean] 是否全部被监听的文字都满足了设置的字符数条件
      */
-    fun watch(block: ((allWithinConstraints: Boolean) -> Unit)) {
+    fun listen(block: ((allWithinConstraints: Boolean) -> Unit)) {
         textChange = block
         //手动检测一次
         textChange?.apply {

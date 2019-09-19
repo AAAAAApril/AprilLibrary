@@ -13,7 +13,7 @@ import androidx.core.view.setPadding
 import com.april.develop.helper.*
 import com.april.develop.ui.startContractIntent
 import com.april.develop.watcher.*
-import com.april.permission.Permission
+import com.april.permission.APermission
 import com.april.text.*
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -58,12 +58,13 @@ class MainActivity : AppCompatActivity() {
                     textColorRes(R.color.colorAccent)
                     setPadding(30)
                 })
-                addChild(child = FrameLayout(context).apply {
-                    addChild(child = createTextView {
-                        textView1 = this
-                        text = "中间文字控件"
-                    }, gravity = Gravity.CENTER)
-                }, width = 0,
+                addChild(
+                    child = FrameLayout(context).apply {
+                        addChild(child = createTextView {
+                            textView1 = this
+                            text = "中间文字控件"
+                        }, gravity = Gravity.CENTER)
+                    }, width = 0,
                     height = ViewGroup.LayoutParams.MATCH_PARENT,
                     weight = 1f
                 )
@@ -79,7 +80,7 @@ class MainActivity : AppCompatActivity() {
             }
         )
 
-        Permission.permissions(
+        APermission.permissions(
             Manifest.permission.CAMERA,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -89,7 +90,7 @@ class MainActivity : AppCompatActivity() {
             toast("拒绝了权限")
         }?.request()
 
-        TextStateWatcher.newInstance(supportFragmentManager)
+        watchTextChange()
             .addView(textView0, 9, 31)
             .addView(textView1, -1, 99)
             .addView(button, 8, -1)

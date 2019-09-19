@@ -16,7 +16,7 @@ fun Fragment.toast(message: CharSequence?, longToast: Boolean = false) {
 /**
  * 避免重复弹出的 Toast
  */
-internal class ToastHelper {
+private class ToastHelper {
     companion object {
         private var toast: Toast? = null
 

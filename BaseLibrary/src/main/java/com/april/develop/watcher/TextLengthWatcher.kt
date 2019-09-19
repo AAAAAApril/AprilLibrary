@@ -1,29 +1,39 @@
 package com.april.develop.watcher
 
+import android.app.Application
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModelProviders
+
+/*
+
+        watchTextChange()
+            .addView(textView0, 9, 31)
+            .addView(textView1, -1, 99)
+            .addView(button, 8, -1)
+            .watch { allWithinConstraints: Boolean ->
+
+            }
+
+ */
+
+fun Fragment.watchTextChange(): TextLengthWatcher {
+    return ViewModelProviders.of(this).get(TextLengthWatcher::class.java)
+}
+
+fun FragmentActivity.watchTextChange(): TextLengthWatcher {
+    return ViewModelProviders.of(this).get(TextLengthWatcher::class.java)
+}
 
 /**
- * 对 TextView 极其子类的文字进行监听
+ * 对 TextView 极其子类的文字长度进行监听
  */
-class TextStateWatcher : Fragment(), TextChange {
-
-    companion object {
-        fun newInstance(manager: FragmentManager, TAG: String = "StateControllerTAG"): TextStateWatcher {
-            var controller = manager.findFragmentByTag(TAG) as? TextStateWatcher
-            if (controller == null) {
-                controller = TextStateWatcher()
-                manager.beginTransaction()
-                    .add(controller, TAG)
-                    .commitAllowingStateLoss()
-                manager.executePendingTransactions()
-            }
-            return controller
-        }
-    }
+class TextLengthWatcher internal constructor(application: Application) :
+    AndroidViewModel(application), TextChange {
 
     //被监听的控件
     private val watcherSet = mutableSetOf<Watcher>()
@@ -34,17 +44,22 @@ class TextStateWatcher : Fragment(), TextChange {
      * [minCount] 约束的最小字符长度（包含，默认 -1，表示不限制）
      * [maxCount] 约束的最大字符长度（包含，默认 -1，表示不限制）
      */
-    fun addView(view: TextView,
-                minCount: Int = -1,
-                maxCount: Int = -1): TextStateWatcher {
-        watcherSet.add(Watcher(
-            view, minCount, maxCount, this
-        ))
+    fun addView(
+        view: TextView,
+        minCount: Int = -1,
+        maxCount: Int = -1
+    ): TextLengthWatcher {
+        watcherSet.add(
+            Watcher(
+                view, minCount, maxCount, this
+            )
+        )
         return this
     }
 
     /**
      * [block] 监听回调
+     * [Boolean] 是否全部被监听的文字都满足了设置的字符数条件
      */
     fun watch(block: ((allWithinConstraints: Boolean) -> Unit)) {
         textChange = block
@@ -80,10 +95,12 @@ class TextStateWatcher : Fragment(), TextChange {
 
 }
 
-private class Watcher(private val view: TextView,//被监听的文字控件或者其子类
-                      private val minCount: Int = -1,//约束的最小字符长度（包含，默认 -1，表示不限制）
-                      private val maxCount: Int = -1,//约束的最大字符长度（包含，默认 -1，表示不限制）
-                      private val textChange: TextChange) : TextWatcher {
+private class Watcher(
+    private val view: TextView,//被监听的文字控件或者其子类
+    private val minCount: Int = -1,//约束的最小字符长度（包含，默认 -1，表示不限制）
+    private val maxCount: Int = -1,//约束的最大字符长度（包含，默认 -1，表示不限制）
+    private val textChange: TextChange
+) : TextWatcher {
     //是否在约束条件内
     internal var withinConstraints: Boolean = false
 

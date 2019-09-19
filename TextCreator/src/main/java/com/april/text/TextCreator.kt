@@ -15,6 +15,33 @@ import androidx.annotation.*
 import androidx.annotation.IntRange
 import androidx.core.content.ContextCompat
 
+/*
+
+        tv?.multiText(
+            TextCreator("hello world !", textColor = R.color.colorAccent),
+            NewLine(),
+            TextCreator("hello world !", backgroundColor = R.color.colorPrimary),
+            NewLine(),
+            TextCreator("hello ", textSizeDP = 18),
+            ImageCreator(
+                R.drawable.ic_launcher_foreground,
+                vertical = true,
+                onClick = {
+                    toast("picture clicked !")
+                }),
+            TextCreator(" world !", textSizeDP = 18),
+            NewLine(),
+            TextCreator("hello world !",
+                textType = TextCreatorType.Serif,
+                highLightColor = R.color.colorAccent,
+                onClick = {
+                    toast("hello world !")
+                }
+            )
+        )
+
+ */
+
 /**
  * TextView 设置富文本样式
  */

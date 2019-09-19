@@ -14,7 +14,7 @@ import com.april.develop.helper.*
 import com.april.develop.ui.startContractIntent
 import com.april.develop.watcher.*
 import com.april.permission.Permission
-import com.april.span.*
+import com.april.text.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -26,19 +26,22 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        tv?.spanText(
-            SpanStyle("hello world !", textColor = R.color.colorAccent),
+        tv?.multiText(
+            TextCreator("hello world !", textColor = R.color.colorAccent),
             NewLine(),
-            SpanStyle("hello world !", backgroundColor = R.color.colorPrimary),
+            TextCreator("hello world !", backgroundColor = R.color.colorPrimary),
             NewLine(),
-            SpanStyle("hello ", textSizeDP = 18),
-            ImageStyle(R.drawable.ic_launcher_foreground, vertical = true, onClick = {
-                toast("picture clicked !")
-            }),
-            SpanStyle(" world !", textSizeDP = 18),
+            TextCreator("hello ", textSizeDP = 18),
+            ImageCreator(
+                R.drawable.ic_launcher_foreground,
+                vertical = true,
+                onClick = {
+                    toast("picture clicked !")
+                }),
+            TextCreator(" world !", textSizeDP = 18),
             NewLine(),
-            SpanStyle("hello world !",
-                textType = SpanTextType.Serif,
+            TextCreator("hello world !",
+                textType = TextCreatorType.Serif,
                 highLightColor = R.color.colorAccent,
                 onClick = {
                     toast("hello world !")

@@ -13,10 +13,24 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 
 
+/*
+
+        APermission.permissions(
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )?.granted {
+            toast("通过了权限")
+        }?.denied {
+            toast("拒绝了权限")
+        }?.request()
+
+ */
+
 /**
  * 权限请求是依附与每一个 Activity 而言的，如果不存在任何一个 Activity 存活，则不能发起权限请求
  */
-class Permission {
+class APermission {
 
     companion object {
 
@@ -24,6 +38,8 @@ class Permission {
         private val watcher = TopActivityWatcher()
 
         /**
+         * （记得一定要先初始化，之后才能使用。由于 初始化 不是 耗时 操作，所以最好是放在 Application 里面进行。）
+         *
          * [application] 初始化权限请求框架
          */
         fun init(application: Application) {
@@ -63,8 +79,7 @@ class Permission {
  */
 class Promoter : Fragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    init {
         retainInstance = true
     }
 
@@ -123,9 +138,11 @@ class Promoter : Fragment() {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<out String>,
-                                            grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode != this.requestCode) {
             return
@@ -147,11 +164,15 @@ class Promoter : Fragment() {
      *
      * [permissions] 需要检测的权限
      */
-    private fun getDeniedPermissions(context: Context, permissions: Array<out String>): Array<String> {
+    private fun getDeniedPermissions(
+        context: Context,
+        permissions: Array<out String>
+    ): Array<String> {
         val deniedPermissions = mutableListOf<String>().apply {
             for (permission in permissions) {
                 if (PackageManager.PERMISSION_DENIED ==
-                    context.checkPermission(permission, Process.myPid(), Process.myUid())) {
+                    context.checkPermission(permission, Process.myPid(), Process.myUid())
+                ) {
                     add(permission)
                 }
             }

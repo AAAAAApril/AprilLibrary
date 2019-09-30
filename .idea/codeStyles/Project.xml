@@ -5,7 +5,6 @@
     </JetCodeStyleSettings>
     <codeStyleSettings language="XML">
       <indentOptions>
-        <option name="INDENT_SIZE" value="2" />
         <option name="CONTINUATION_INDENT_SIZE" value="4" />
       </indentOptions>
       <arrangement>

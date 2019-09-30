@@ -12,11 +12,12 @@
             <option value="$PROJECT_DIR$/BaseLibrary" />
             <option value="$PROJECT_DIR$/MultipleItem" />
             <option value="$PROJECT_DIR$/Navigation" />
-            <option value="$PROJECT_DIR$/SpanCreator" />
+            <option value="$PROJECT_DIR$/TextCreator" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
+        <option name="testRunner" value="PLATFORM" />
       </GradleProjectSettings>
     </option>
   </component>

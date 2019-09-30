@@ -13,8 +13,8 @@ import androidx.core.view.setPadding
 import com.april.develop.helper.*
 import com.april.develop.ui.startContractIntent
 import com.april.develop.watcher.*
-import com.april.permission.Permission
-import com.april.span.*
+import com.april.permission.APermission
+import com.april.text.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -26,19 +26,22 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        tv?.spanText(
-            SpanStyle("hello world !", textColor = R.color.colorAccent),
+        tv?.richText(
+            TextCreator("hello world !", textColor = R.color.colorAccent),
             NewLine(),
-            SpanStyle("hello world !", backgroundColor = R.color.colorPrimary),
+            TextCreator("hello world !", backgroundColor = R.color.colorPrimary),
             NewLine(),
-            SpanStyle("hello ", textSizeDP = 18),
-            ImageStyle(R.drawable.ic_launcher_foreground, vertical = true, onClick = {
-                toast("picture clicked !")
-            }),
-            SpanStyle(" world !", textSizeDP = 18),
+            TextCreator("hello ", textSizeDP = 18),
+            ImageCreator(
+                R.drawable.ic_launcher_foreground,
+                vertical = true,
+                onClick = {
+                    toast("picture clicked !")
+                }),
+            TextCreator(" world !", textSizeDP = 18),
             NewLine(),
-            SpanStyle("hello world !",
-                textType = SpanTextType.Serif,
+            TextCreator("hello world !",
+                textType = TextCreatorType.Serif,
                 highLightColor = R.color.colorAccent,
                 onClick = {
                     toast("hello world !")
@@ -55,12 +58,13 @@ class MainActivity : AppCompatActivity() {
                     textColorRes(R.color.colorAccent)
                     setPadding(30)
                 })
-                addChild(child = FrameLayout(context).apply {
-                    addChild(child = createTextView {
-                        textView1 = this
-                        text = "中间文字控件"
-                    }, gravity = Gravity.CENTER)
-                }, width = 0,
+                addChild(
+                    child = FrameLayout(context).apply {
+                        addChild(child = createTextView {
+                            textView1 = this
+                            text = "中间文字控件"
+                        }, gravity = Gravity.CENTER)
+                    }, width = 0,
                     height = ViewGroup.LayoutParams.MATCH_PARENT,
                     weight = 1f
                 )
@@ -76,7 +80,7 @@ class MainActivity : AppCompatActivity() {
             }
         )
 
-        Permission.permissions(
+        APermission.permissions(
             Manifest.permission.CAMERA,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -86,11 +90,11 @@ class MainActivity : AppCompatActivity() {
             toast("拒绝了权限")
         }?.request()
 
-        TextStateWatcher.newInstance(supportFragmentManager)
-            .addView(textView0, 9, 31)
-            .addView(textView1, -1, 99)
-            .addView(button, 8, -1)
-            .watch {
+        listenTextLengthChange()
+            .withView(textView0, 9, 31)
+            .withView(textView1, -1, 99)
+            .withView(button, 8, -1)
+            .listen {
 
             }
 
@@ -98,11 +102,13 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        DataManager.INSTANCE.compare<MainActivity> { new, old ->
+        RuntimeDataManager.compare<MainActivity> { new, old ->
             return@compare new != old
         }
-        DataListenerImpl.get<MainActivity>(this).listen { new, old ->
+        RuntimeDataManager.listen(true, object : RuntimeDataListener<MainActivity> {
+            override fun onDataNotify(new: MainActivity?, old: MainActivity?) {
 
-        }
+            }
+        })
     }
 }

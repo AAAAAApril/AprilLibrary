@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        tv?.multiText(
+        tv?.richText(
             TextCreator("hello world !", textColor = R.color.colorAccent),
             NewLine(),
             TextCreator("hello world !", backgroundColor = R.color.colorPrimary),

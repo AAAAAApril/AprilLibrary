@@ -72,17 +72,13 @@ abstract class SupportDialogFragment : DialogFragment() {
     @CallSuper
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        //背景透明（这个好像没有效果...）
-        if (defaultBackgroundTransparent()) {
-            dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        }
-    }
 
-    @CallSuper
-    override fun onStart() {
-        super.onStart()
-        //宽度占比
         dialog?.window?.apply {
+            //背景透明（这个好像没有效果...）
+            if (defaultBackgroundTransparent()) {
+                setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }
+            //宽度占比
             val dm = DisplayMetrics()
             windowManager?.defaultDisplay?.getMetrics(dm)
             setLayout(

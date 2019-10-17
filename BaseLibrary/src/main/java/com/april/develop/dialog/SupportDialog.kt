@@ -44,12 +44,12 @@ abstract class SupportDialogFragment : DialogFragment() {
     }
 
     /**
-     * 宽度占窗口宽度的百分比例
+     * 宽度、高度占窗口宽度、高度的百分比例
      *
      * 返回 null 表示自适应
      */
-    protected open fun widthPercent(): Float? {
-        return 0.8f
+    protected open fun widthAndHeightPercent(): Array<Float?> {
+        return arrayOf(0.8f, null)
     }
 
     @CallSuper
@@ -81,13 +81,21 @@ abstract class SupportDialogFragment : DialogFragment() {
             //宽度占比
             val dm = DisplayMetrics()
             windowManager?.defaultDisplay?.getMetrics(dm)
+            //宽高比数据
+            val widthAndHeight = widthAndHeightPercent()
             setLayout(
-                if (widthPercent() != null) {
-                    (dm.widthPixels * widthPercent()!!).toInt()
+                //宽度
+                if (widthAndHeight[0] != null) {
+                    (dm.widthPixels * widthAndHeight[0]!!).toInt()
                 } else {
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 },
-                ViewGroup.LayoutParams.WRAP_CONTENT
+                //高度
+                if (widthAndHeight[1] != null) {
+                    (dm.heightPixels * widthAndHeight[1]!!).toInt()
+                } else {
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                }
             )
         }
     }

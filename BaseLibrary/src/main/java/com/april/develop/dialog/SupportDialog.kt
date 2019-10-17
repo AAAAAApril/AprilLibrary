@@ -29,7 +29,7 @@ abstract class SupportDialogFragment : DialogFragment() {
     /**
      * 设置样式和主题
      */
-    protected open fun setStyleAndTheme(): Array<Int> {
+    protected open fun setStyleAndTheme(): Array<Int?> {
         //弹窗时，调整宽度为默认。否则可能宽度过窄。
         return arrayOf(
             STYLE_NO_TITLE,
@@ -57,7 +57,11 @@ abstract class SupportDialogFragment : DialogFragment() {
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(setStyleAndTheme()[0], setStyleAndTheme()[1])
+        val style = setStyleAndTheme()[0]
+        val theme = setStyleAndTheme()[1]
+        if (style != null && theme != null) {
+            setStyle(style, theme)
+        }
     }
 
     @CallSuper

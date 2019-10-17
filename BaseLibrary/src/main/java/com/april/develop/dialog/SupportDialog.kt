@@ -26,6 +26,17 @@ abstract class SupportDialogFragment : DialogFragment() {
     abstract override fun onViewCreated(view: View, savedInstanceState: Bundle?)
 
     /**
+     * 设置样式和主题
+     */
+    protected open fun setStyleAndTheme(): Array<Int> {
+        //弹窗时，调整宽度为默认。否则可能宽度过窄。
+        return arrayOf(
+            STYLE_NO_TITLE,
+            android.R.style.Theme_Material_Dialog_MinWidth
+        )
+    }
+
+    /**
      *  默认的背景是否透明
      */
     protected open fun defaultBackgroundTransparent(): Boolean {
@@ -44,8 +55,7 @@ abstract class SupportDialogFragment : DialogFragment() {
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //弹窗时，调整宽度为默认。否则可能宽度过窄。
-        setStyle(STYLE_NO_TITLE, android.R.style.Theme_Material_Dialog_MinWidth)
+        setStyle(setStyleAndTheme()[0], setStyleAndTheme()[1])
     }
 
     @CallSuper

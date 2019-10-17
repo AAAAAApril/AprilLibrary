@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.annotation.CallSuper
+import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
 import androidx.annotation.NonNull
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -37,10 +38,11 @@ abstract class SupportDialogFragment : DialogFragment() {
     }
 
     /**
-     *  默认的背景是否透明
+     *  窗口透明度（黑色遮罩的阴暗程度，系统默认的在 0.7 左右）
      */
-    protected open fun defaultBackgroundTransparent(): Boolean {
-        return true
+    @FloatRange(from = 0.0, to = 1.0)
+    protected open fun windowDarkFrameAlpha(): Float {
+        return 0.6f
     }
 
     /**
@@ -74,10 +76,9 @@ abstract class SupportDialogFragment : DialogFragment() {
         super.onActivityCreated(savedInstanceState)
 
         dialog?.window?.apply {
-            //背景透明（这个好像没有效果...）
-            if (defaultBackgroundTransparent()) {
-                setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            }
+            //背景透明
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setDimAmount(windowDarkFrameAlpha())
             //宽度占比
             val dm = DisplayMetrics()
             windowManager?.defaultDisplay?.getMetrics(dm)
@@ -110,10 +111,11 @@ abstract class SupportBottomSheetDialogFragment : BottomSheetDialogFragment() {
     abstract override fun onViewCreated(view: View, savedInstanceState: Bundle?)
 
     /**
-     *  默认的背景是否透明
+     *  窗口透明度（黑色遮罩的阴暗程度，系统默认的在 0.7 左右）
      */
-    protected open fun defaultBackgroundTransparent(): Boolean {
-        return true
+    @FloatRange(from = 0.0, to = 1.0)
+    protected open fun windowDarkFrameAlpha(): Float {
+        return 0.6f
     }
 
     /**
@@ -159,9 +161,8 @@ abstract class SupportBottomSheetDialogFragment : BottomSheetDialogFragment() {
         dialog?.window?.let { window ->
             window.findViewById<View>(R.id.design_bottom_sheet)?.let { rootView ->
                 //背景透明
-                if (defaultBackgroundTransparent()) {
-                    rootView.setBackgroundResource(android.R.color.transparent)
-                }
+                rootView.setBackgroundResource(android.R.color.transparent)
+                window.setDimAmount(windowDarkFrameAlpha())
                 //固定死高度
                 if (fixedHeightPercent() != null) {
                     rootView.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT

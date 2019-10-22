@@ -3,7 +3,6 @@ package com.april.multiple
 import android.content.Context
 import android.graphics.Rect
 import android.view.View
-import androidx.core.util.containsValue
 import androidx.recyclerview.widget.RecyclerView
 
 /**
@@ -17,29 +16,59 @@ import androidx.recyclerview.widget.RecyclerView
  * ——  by  April丶
  */
 open class GridSpanDecoration(
-
-    context: Context,
-    //横向上的间隔（单位 dp）
-    mHorizontalSpacingDP: Int = 0,
-    //纵向上的间隔（单位 dp）
-    mVerticalSpacingDP: Int = 0,
-    //网格每行（竖向展示）或者每列（横向展示）展示的个数
-    private val mSpanCount: Int = 1,
-    //布局方向
-    @RecyclerView.Orientation
-    private val mOrientation: Int = RecyclerView.VERTICAL,
-    //是否包含边缘（如果为 false，则 item 与 RecyclerView 布局接触的地方不会出现边距，否则会出现）
-    private val mIncludeEdge: Boolean = true
-
+    private val context: Context
 ) : RecyclerView.ItemDecoration() {
 
-    //横向间隔（PX）
-    private val mHorizontalSpacing by lazy {
-        context.dp2px(mHorizontalSpacingDP)
+    //换算种子
+    private val seed by lazy {
+        context.resources.displayMetrics.density + 0.5f
     }
+
+    //网格每行（竖向展示）或者每列（横向展示）展示的个数
+    private var mSpanCount: Int = 1
+    //布局方向
+    @RecyclerView.Orientation
+    private var mOrientation: Int = RecyclerView.VERTICAL
+    //横向间隔（PX）
+    private var mHorizontalSpacing = 0
     //纵向间隔（PX）
-    private val mVerticalSpacing by lazy {
-        context.dp2px(mVerticalSpacingDP)
+    private var mVerticalSpacing = 0
+    //是否包含边缘（如果为 false，则 item 与 RecyclerView 布局接触的地方不会出现边距，否则会出现）
+    private var mIncludeEdge: Boolean = true
+
+    /**
+     * 设置每一行或者列展示的个数
+     */
+    fun setSpanCount(spanCount: Int) {
+        mSpanCount = spanCount
+    }
+
+    /**
+     * 设置布局方向
+     */
+    fun setOrientation(@RecyclerView.Orientation orientation: Int) {
+        mOrientation = orientation
+    }
+
+    /**
+     * 设置横向偏移量
+     */
+    fun setHorizontalSpacing(horizontalSpacingDP: Int) {
+        mHorizontalSpacing = dp2px(horizontalSpacingDP)
+    }
+
+    /**
+     * 设置纵向偏移量
+     */
+    fun setVerticalSpacing(verticalSpacingDP: Int) {
+        mVerticalSpacing = dp2px(verticalSpacingDP)
+    }
+
+    /**
+     * 设置是否包含边缘
+     */
+    fun setIncludeEdge(includeEdge: Boolean) {
+        mIncludeEdge = includeEdge
     }
 
     override fun getItemOffsets(
@@ -50,17 +79,53 @@ open class GridSpanDecoration(
     ) {
         // item position
         val position = parent.getChildAdapterPosition(view)
+        val spanCount = getSpanCount(view, position) ?: return
         // item column
-        val column = position % mSpanCount
+        val column = position % spanCount
         // orientation
         when (mOrientation) {
             RecyclerView.VERTICAL -> {
-                verticalOrientation(outRect, position, column)
+                verticalOrientation(
+                    outRect,
+                    position,
+                    column,
+                    spanCount,
+                    getHorizontalSpacing(view, position),
+                    getVerticalSpacing(view, position),
+                    getIncludeEdge(view, position)
+                )
             }
             RecyclerView.HORIZONTAL -> {
-                horizontalOrientation(outRect, position, column)
+                horizontalOrientation(
+                    outRect,
+                    position,
+                    column,
+                    spanCount,
+                    getHorizontalSpacing(view, position),
+                    getVerticalSpacing(view, position),
+                    getIncludeEdge(view, position)
+                )
             }
         }
+    }
+
+    /**
+     * 返回 SpanCount，如果为 null，则不处理偏移
+     */
+    protected open fun getSpanCount(itemView: View, position: Int): Int? {
+        return mSpanCount
+    }
+
+    protected open fun getHorizontalSpacing(itemView: View, position: Int): Int {
+        return mHorizontalSpacing
+    }
+
+    protected open fun getVerticalSpacing(itemView: View, position: Int): Int {
+        return mVerticalSpacing
+    }
+
+    protected open fun getIncludeEdge(itemView: View, position: Int): Boolean {
+        return mIncludeEdge
     }
 
     /**
@@ -69,7 +134,11 @@ open class GridSpanDecoration(
     private fun verticalOrientation(
         outRect: Rect,
         position: Int,
-        column: Int
+        column: Int,
+        mSpanCount: Int,
+        mHorizontalSpacing: Int,
+        mVerticalSpacing: Int,
+        mIncludeEdge: Boolean
     ) {
         if (mIncludeEdge) {
             // spacing - column * ((1f / spanCount) * spacing)
@@ -98,7 +167,11 @@ open class GridSpanDecoration(
     private fun horizontalOrientation(
         outRect: Rect,
         position: Int,
-        column: Int
+        column: Int,
+        mSpanCount: Int,
+        mHorizontalSpacing: Int,
+        mVerticalSpacing: Int,
+        mIncludeEdge: Boolean
     ) {
         if (mIncludeEdge) {
             outRect.top = mVerticalSpacing - column * mVerticalSpacing / mSpanCount
@@ -116,55 +189,8 @@ open class GridSpanDecoration(
         }
     }
 
-}
-
-
-/**
- * 使用 MultipleAdapter 时，最好是使用这个  Decoration
- * 它可以避免因为 header 和 footer 以及 placeholder 的特殊性而导致边距设置异常
- */
-class MultipleGridSpanDecoration(
-
-    context: Context,
-    private val support: HeaderFooterSupport,
-    //横向上的间隔（单位 dp）
-    mHorizontalSpacingDP: Int = 0,
-    //纵向上的间隔（单位 dp）
-    mVerticalSpacingDP: Int = 0,
-    //网格每行（竖向展示）或者每列（横向展示）展示的个数
-    mSpanCount: Int = 1,
-    //布局方向
-    @RecyclerView.Orientation
-    mOrientation: Int = RecyclerView.VERTICAL,
-    //是否包含边缘（如果为 false，则 item 与 RecyclerView 布局接触的地方不会出现边距，否则会出现）
-    mIncludeEdge: Boolean = true
-
-) : GridSpanDecoration(
-    context,
-    mHorizontalSpacingDP,
-    mVerticalSpacingDP,
-    mSpanCount,
-    mOrientation,
-    mIncludeEdge
-) {
-    override fun getItemOffsets(
-        outRect: Rect,
-        view: View,
-        parent: RecyclerView,
-        state: RecyclerView.State
-    ) {
-        //头布局不处理
-        if (!support.headerArray.containsValue(view)
-            //尾布局不处理
-            && !support.footerArray.containsValue(view)
-            //占位布局也不处理
-            && view != support.placeholderView
-        ) {
-            super.getItemOffsets(outRect, view, parent, state)
-        }
+    protected fun dp2px(dp: Int): Int {
+        return (dp * seed).toInt()
     }
-}
 
-private fun Context.dp2px(dp: Int): Int {
-    return (dp * resources.displayMetrics.density + 0.5f).toInt()
 }

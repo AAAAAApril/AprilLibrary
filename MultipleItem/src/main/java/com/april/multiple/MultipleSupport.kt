@@ -1,6 +1,7 @@
 package com.april.multiple
 
 import android.util.SparseArray
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
@@ -20,12 +21,13 @@ open class MultipleSupport {
     internal val itemDelegateArray = SparseArray<ItemDelegate<*, *>>()
 
     //空视图占位布局
-    internal var placeholderItemDelegate: CrossLineItemDelegate? = null
+    internal var placeholderView: View? = null
+    internal var placeholderViewType = -1
 
     //==============================================================================================
 
     internal open fun getItemCount(): Int {
-        return if (dataList.isEmpty() && placeholderItemDelegate != null) {
+        return if (dataList.isEmpty() && placeholderView != null) {
             1
         } else {
             dataList.size
@@ -34,8 +36,8 @@ open class MultipleSupport {
 
     internal open fun getItemViewType(position: Int): Int {
         //占位视图
-        if (dataList.isEmpty() && placeholderItemDelegate != null) {
-            return placeholderItemDelegate!!.viewType
+        if (dataList.isEmpty() && placeholderView != null) {
+            return placeholderViewType
         }
         val itemBean = dataList[position]
         return managerArray.valueAt(
@@ -55,10 +57,10 @@ open class MultipleSupport {
         parent: ViewGroup,
         viewType: Int
     ): RecyclerView.ViewHolder {
-        return if (placeholderItemDelegate != null
-            && viewType == placeholderItemDelegate!!.viewType
+        return if (placeholderView != null
+            && viewType == placeholderViewType
         ) {
-            placeholderItemDelegate!!.createViewHolder(parent)
+            object :RecyclerView.ViewHolder(placeholderView!!){}
         } else {
             itemDelegateArray.get(viewType).createViewHolder(parent)
         }
@@ -81,8 +83,8 @@ open class MultipleSupport {
      * [Boolean] item 是否跨行或者跨列
      */
     internal open fun itemCrossRowOrColumn(position: Int): Boolean {
-        return if (dataList.isEmpty() && placeholderItemDelegate != null) {
-            placeholderItemDelegate!!.crossRowWhenGridLayout()
+        return if (dataList.isEmpty() && placeholderView != null) {
+            true
         } else {
             itemDelegateArray.get(getItemViewType(position)).crossRowWhenGridLayout()
         }

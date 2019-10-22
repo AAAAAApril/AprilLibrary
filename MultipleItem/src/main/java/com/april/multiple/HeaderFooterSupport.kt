@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 /**
  * 支持头尾布局
  */
-class HeaderFooterSupport : MultipleSupport() {
+open class HeaderFooterSupport : MultipleSupport() {
 
     private var viewType = this.hashCode()
 

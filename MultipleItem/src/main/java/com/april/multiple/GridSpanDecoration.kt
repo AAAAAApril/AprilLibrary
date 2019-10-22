@@ -3,6 +3,7 @@ package com.april.multiple
 import android.content.Context
 import android.graphics.Rect
 import android.view.View
+import androidx.core.util.containsValue
 import androidx.recyclerview.widget.RecyclerView
 
 /**
@@ -15,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
  *
  * ——  by  April丶
  */
-class GridSpanDecoration(
+open class GridSpanDecoration(
 
     context: Context,
     //横向上的间隔（单位 dp）
@@ -115,6 +116,53 @@ class GridSpanDecoration(
         }
     }
 
+}
+
+
+/**
+ * 使用 MultipleAdapter 时，最好是使用这个  Decoration
+ * 它可以避免因为 header 和 footer 以及 placeholder 的特殊性而导致边距设置异常
+ */
+class MultipleGridSpanDecoration(
+
+    context: Context,
+    private val support: HeaderFooterSupport,
+    //横向上的间隔（单位 dp）
+    mHorizontalSpacingDP: Int = 0,
+    //纵向上的间隔（单位 dp）
+    mVerticalSpacingDP: Int = 0,
+    //网格每行（竖向展示）或者每列（横向展示）展示的个数
+    mSpanCount: Int = 1,
+    //布局方向
+    @RecyclerView.Orientation
+    mOrientation: Int = RecyclerView.VERTICAL,
+    //是否包含边缘（如果为 false，则 item 与 RecyclerView 布局接触的地方不会出现边距，否则会出现）
+    mIncludeEdge: Boolean = true
+
+) : GridSpanDecoration(
+    context,
+    mHorizontalSpacingDP,
+    mVerticalSpacingDP,
+    mSpanCount,
+    mOrientation,
+    mIncludeEdge
+) {
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    ) {
+        //头布局不处理
+        if (!support.headerArray.containsValue(view)
+            //尾布局不处理
+            && !support.footerArray.containsValue(view)
+            //占位布局也不处理
+            && view != support.placeholderView
+        ) {
+            super.getItemOffsets(outRect, view, parent, state)
+        }
+    }
 }
 
 private fun Context.dp2px(dp: Int): Int {

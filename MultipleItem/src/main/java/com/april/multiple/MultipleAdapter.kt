@@ -6,8 +6,10 @@ import androidx.recyclerview.widget.RecyclerView
 /**
  * 多样式 Adapter
  */
-class MultipleAdapter(val support: HeaderFooterSupport = HeaderFooterSupport()) :
+open class MultipleAdapter :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    val support = HeaderFooterSupport()
 
     override fun getItemViewType(position: Int): Int {
         return support.getItemViewType(position)

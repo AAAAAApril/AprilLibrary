@@ -82,19 +82,16 @@ fun MultipleAdapter.attachGridLayoutManager(manager: GridLayoutManager) {
  *
  * @return 创建出的占位布局
  */
-fun MultipleAdapter.placeholder(
+fun MultipleAdapter.setPlaceholder(
     targetRecyclerView: RecyclerView,
     @LayoutRes placeholderViewResId: Int
 ): View {
-    support.placeholderItemDelegate = CrossLineItemDelegate(placeholderViewResId)
-    return support.placeholderItemDelegate!!.createItemView(targetRecyclerView)
-}
-
-/**
- * 从占位布局 item 代理添加
- */
-fun MultipleAdapter.placeholder(placeholderItemDelegate: CrossLineItemDelegate) {
-    support.placeholderItemDelegate = placeholderItemDelegate
+    val placeholderView = LayoutInflater.from(targetRecyclerView.context).inflate(
+        placeholderViewResId, targetRecyclerView, false
+    )
+    support.placeholderView = placeholderView
+    support.placeholderViewType = placeholderView.javaClass.hashCode()
+    return placeholderView
 }
 
 /**
@@ -110,6 +107,7 @@ fun MultipleAdapter.addHeader(
     val headerView = LayoutInflater.from(recyclerView.context)
         .inflate(headerLayoutRes, recyclerView, false)
     support.addHeader(headerView)
+    notifyItemInserted(support.headerArray.indexOfValue(headerView))
     return headerView
 }
 
@@ -119,15 +117,6 @@ fun MultipleAdapter.addHeader(
 fun MultipleAdapter.removeHeader(headerView: View) {
     val index = support.headerArray.indexOfValue(headerView)
     support.headerArray.removeAt(index)
-    notifyItemRemoved(index)
-}
-
-/**
- * 移除 FooterView
- */
-fun MultipleAdapter.removeFooter(footerView: View) {
-    val index = support.adapterPositionOfFooter(footerView)
-    support.footerArray.removeAt(support.footerArray.indexOfValue(footerView))
     notifyItemRemoved(index)
 }
 
@@ -144,7 +133,17 @@ fun MultipleAdapter.addFooter(
     val footerView = LayoutInflater.from(recyclerView.context)
         .inflate(footerLayoutRes, recyclerView, false)
     support.addFooter(footerView)
+    notifyItemInserted(support.adapterPositionOfFooter(footerView))
     return footerView
+}
+
+/**
+ * 移除 FooterView
+ */
+fun MultipleAdapter.removeFooter(footerView: View) {
+    val index = support.adapterPositionOfFooter(footerView)
+    support.footerArray.removeAt(support.footerArray.indexOfValue(footerView))
+    notifyItemRemoved(index)
 }
 
 /**

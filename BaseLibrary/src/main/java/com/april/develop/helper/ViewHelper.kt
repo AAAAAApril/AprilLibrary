@@ -58,6 +58,34 @@ fun View.backgroundTintListValueOfColorRes(@ColorRes colorRes: Int) {
     backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
 }
 
+/**
+ * @return 是否可以向上滑动
+ */
+fun View.canScrollUp(): Boolean {
+    return canScrollVertically(1)
+}
+
+/**
+ * @return 是否可以向下滑动
+ */
+fun View.canScrollDown(): Boolean {
+    return canScrollVertically(-1)
+}
+
+/**
+ * @return 是否可以向左滑动
+ */
+fun View.canScrollStart(): Boolean {
+    return canScrollHorizontally(-1)
+}
+
+/**
+ * @return 是否可以向右滑动
+ */
+fun View.canScrollEnd(): Boolean {
+    return canScrollHorizontally(1)
+}
+
 fun TextView.trimString(): String {
     return text.toString().trim()
 }

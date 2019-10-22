@@ -119,7 +119,7 @@ class LoadMoreAdapter : MultipleAdapter() {
      *
      * @param loading 是否正在加载，否则加载停止
      */
-    fun loadingMore(loading: Boolean) {
+    fun setLoadingMore(loading: Boolean) {
         isLoadingMore = loading
     }
 

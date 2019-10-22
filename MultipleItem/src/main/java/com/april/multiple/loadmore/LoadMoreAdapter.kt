@@ -22,22 +22,14 @@ class LoadMoreAdapter : MultipleAdapter() {
     private var loadMoreListener: LoadMoreListener? = null
 
     //RecyclerView 滚动监听
-    private val recyclerViewScrollListener = RecyclerViewListener {
+    private val recyclerViewScrollListener = RecyclerViewLoadMoreListener {
         //正在加载更多，不处理
         if (isLoadingMore()) {
-            return@RecyclerViewListener
+            return@RecyclerViewLoadMoreListener
         }
         //不能加载更多了，不处理
         if (!canLoadMore()) {
-            return@RecyclerViewListener
-        }
-        /*
-            recyclerView.canScrollVertically(1) ，true 表示还可以向上滚动，还没到 底部，false 表示 已经到底部了
-            recyclerView.canScrollVertically(-1) ，true 表示还可以向下滚动，还没到 顶部，false 表示 已经到顶部了
-         */
-        //还能再向上滚动，表示还没到底部
-        if (it.canScrollVertically(1)) {
-            return@RecyclerViewListener
+            return@RecyclerViewLoadMoreListener
         }
         //已经到底部了
         loadMoreListener?.onShouldLoadMore(this)

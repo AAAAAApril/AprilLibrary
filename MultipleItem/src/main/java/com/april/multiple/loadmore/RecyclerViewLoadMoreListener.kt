@@ -3,9 +3,9 @@ package com.april.multiple.loadmore
 import androidx.recyclerview.widget.RecyclerView
 
 /**
- * RecyclerView 监听器
+ * RecyclerView 滚动监听器
  */
-internal class RecyclerViewListener(private val block: (RecyclerView) -> Unit) :
+class RecyclerViewLoadMoreListener(private val loadMoreAction: (RecyclerView) -> Unit) :
     RecyclerView.OnScrollListener() {
 
     private var isSwipeUp = false
@@ -18,7 +18,15 @@ internal class RecyclerViewListener(private val block: (RecyclerView) -> Unit) :
             if (!isSwipeUp) {
                 return
             }
-            block.invoke(recyclerView)
+            /*
+                recyclerView.canScrollVertically(1) ，true 表示还可以向上滚动，还没到 底部，false 表示 已经到底部了
+                recyclerView.canScrollVertically(-1) ，true 表示还可以向下滚动，还没到 顶部，false 表示 已经到顶部了
+            */
+            //还能再向上滚动，表示还没到底部
+            if (recyclerView.canScrollVertically(1)) {
+                return
+            }
+            loadMoreAction.invoke(recyclerView)
         }
     }
 

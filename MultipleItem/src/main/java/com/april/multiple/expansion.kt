@@ -3,7 +3,6 @@ package com.april.multiple
 import android.view.LayoutInflater
 import android.view.View
 import androidx.annotation.LayoutRes
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 fun MultipleAdapter.getData(position: Int): Any {
@@ -67,15 +66,6 @@ fun MultipleAdapter.clearDataList() {
 }
 
 //==================================================================================================
-
-/**
- * 关联 GridLayoutManager
- *
- * @param manager 设置给 RecyclerView 的 网格布局管理器
- */
-fun MultipleAdapter.attachGridLayoutManager(manager: GridLayoutManager) {
-    manager.spanSizeLookup = CrossSpanSizeLookUp(support, manager.spanCount)
-}
 
 /**
  * 从布局资源文件添加
@@ -206,19 +196,33 @@ inline fun <reified T> MultipleAdapter.obtainManager(): Manager<T> {
 //==================================================================================================
 
 /**
- * 在
- * [GridLayoutManager.setSpanSizeLookup(GridLayoutManager.SpanSizeLookup)]
- * 函数调用，为某些位置上的 item 实现跨行或者跨列展示
+ * 获取最小公倍数
  */
-private class CrossSpanSizeLookUp(
-    private val support: MultipleSupport,
-    private val spanCount: Int
-) : GridLayoutManager.SpanSizeLookup() {
-    override fun getSpanSize(position: Int): Int {
-        return if (support.itemCrossRowOrColumn(position)) {
-            spanCount
-        } else {
-            1
+fun getLeastCommonMultiple(int: IntArray): Int {
+    var max = 0
+    int.forEach {
+        if (it > max) {
+            max = it
         }
     }
+    var s = 1
+    var i = 2
+    while (i <= max) {
+        var b = false
+        for (j in int.indices) {
+            if (int[j] % i == 0) {
+                int[j] = int[j] / i
+                b = true
+            }
+        }
+        if (b) {
+            s *= i
+            i--
+        }
+        i++
+    }
+    int.forEach {
+        s *= it
+    }
+    return s
 }

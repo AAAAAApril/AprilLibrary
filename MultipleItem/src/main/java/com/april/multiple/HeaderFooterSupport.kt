@@ -148,16 +148,17 @@ open class HeaderFooterSupport : MultipleSupport() {
     }
 
     /**
-     * 限定头尾布局为拉通展示
+     * [position] item 位置
+     * [Int] 在 GridLayoutManager 里面的时候，这个位置上的 item 占据的宽度
      */
-    override fun itemCrossRowOrColumn(position: Int): Boolean {
+    override fun getItemSpanSizeInGridLayoutManager(position: Int, spanCount: Int): Int {
         //是头部
         if (isHeaderPosition(position)) {
-            return true
+            return spanCount
         }
         //是尾部
         return if (isFooterPosition(position)) {
-            true
+            spanCount
         }
         //中间数据
         else {
@@ -165,7 +166,7 @@ open class HeaderFooterSupport : MultipleSupport() {
                     注意：这里传递给父类的是 position，
                     而不像 getItemViewType() 函数里面那样返回 adjPosition
             */
-            super.itemCrossRowOrColumn(position)
+            super.getItemSpanSizeInGridLayoutManager(position, spanCount)
         }
     }
 

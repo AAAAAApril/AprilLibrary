@@ -13,6 +13,36 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
  */
 abstract class ItemDelegate<T, VH : RecyclerView.ViewHolder> {
 
+    //想要占据的个数
+    private var spanSizeInGridLayoutManager: Int = 1
+    //适配之后的个数
+    private var adaptedTimesInGridLayoutManager: Int = 1
+
+    internal fun getSpanSizeInGridLayoutManager(): Int {
+        return spanSizeInGridLayoutManager
+    }
+
+    /**
+     * 设置在 GridLayoutManager 里面的时候，这种类型的 item 占据的单位个数
+     *
+     * 注意：如果想要这个设置的值生效，需要将  crossRowWhenGridLayout  函数返回  false
+     *
+     * FIXME 这个设置和 GridSpanDecoration 类的相关功能不适配，请谨慎使用
+     */
+    fun setSpanSizeInGridLayoutManager(spanSize: Int) {
+        spanSizeInGridLayoutManager = spanSize
+    }
+
+    internal fun setAdaptedTimesInGridLayoutManager(adaptedTimes: Int) {
+        adaptedTimesInGridLayoutManager = adaptedTimes * spanSizeInGridLayoutManager
+    }
+
+    internal fun getAdaptedSpanSizeInGridLayoutManager(): Int {
+        return adaptedTimesInGridLayoutManager
+    }
+
+    //==============================================================================================
+
     /**
      * 内部使用，用于转换类型
      */

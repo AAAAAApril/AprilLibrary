@@ -4,13 +4,12 @@ import android.view.View
 import androidx.annotation.LayoutRes
 import androidx.core.util.containsValue
 import androidx.recyclerview.widget.RecyclerView
-import com.april.multiple.MultipleAdapter
-import com.april.multiple.removeFooter
+import com.april.multiple.*
 
 /**
  * 加载更多 Adapter
  */
-class LoadMoreAdapter : MultipleAdapter() {
+class LoadMoreAdapter : HeaderFooterAdapter() {
 
     //是否可以加载更多
     private var canLoadMore = false
@@ -29,6 +28,10 @@ class LoadMoreAdapter : MultipleAdapter() {
         }
         //不能加载更多了，不处理
         if (!canLoadMore()) {
+            return@RecyclerViewLoadMoreListener
+        }
+        //空数据列的时候，应该做的操作是刷新，而不是加载更多
+        if (support.dataList.isEmpty()) {
             return@RecyclerViewLoadMoreListener
         }
         //已经到底部了

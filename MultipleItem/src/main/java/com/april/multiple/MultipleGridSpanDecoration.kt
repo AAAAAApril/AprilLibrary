@@ -1,67 +1,95 @@
 package com.april.multiple
 
 import android.content.Context
+import android.graphics.Rect
 import android.view.View
-import androidx.core.util.containsValue
-
 
 /**
  * 使用 MultipleAdapter 时，最好是使用这个  Decoration
- * 它可以避免因为 header 和 footer 以及 placeholder 的特殊性而导致边距设置异常
  *
- * TODO 还有优化空间，优化集中在 HeaderFooterSupport，主要是优化判断是否是头尾布局
+ * 它可以避免因为 header 和 footer 以及 placeholder 的特殊性而导致边距设置异常
  */
-class MultipleGridSpanDecoration(context: Context) : GridSpanDecoration(context) {
+class MultipleGridSpanDecoration(
+    context: Context,
+    private val support: HeaderFooterSupport
+) : GridSpanDecoration(context) {
 
-    private var support: HeaderFooterSupport? = null
-    private var mIncludeSpecial: Boolean = false
+    private var mSpecialItemHorizontalSpacing: Int? = null
+    private var mSpecialItemVerticalSpacing: Int? = null
+    private var mSpecialItemNeedOffsets = false
 
-    fun setHeaderFooterSupport(support: HeaderFooterSupport) {
-        this.support = support
+    /**
+     * 设置特殊 item 横向上的偏移量 （单位：DP）
+     *
+     * 如果没有设置偏移量，但是又需要做偏移，则使用默认的值
+     */
+    fun setSpecialItemHorizontalSpacing(specialItemHorizontalSpacingDP: Int) {
+        mSpecialItemHorizontalSpacing = dp2px(specialItemHorizontalSpacingDP)
     }
 
     /**
-     * 是否包括特殊的 Item，比如 头、尾，以及占位布局
+     * 设置特殊 item 纵向上的偏移量 （单位：DP）
+     *
+     * 如果没有设置偏移量，但是又需要做偏移，则使用默认的值
      */
-    fun setIncludeSpecial(includeSpecial: Boolean) {
-        mIncludeSpecial = includeSpecial
+    fun setSpecialItemVerticalSpacing(specialItemVerticalSpacingDP: Int) {
+        mSpecialItemVerticalSpacing = dp2px(specialItemVerticalSpacingDP)
     }
 
-    override fun getSpanCount(itemView: View, position: Int): Int? {
-        return when {
-            /*
-                头部、尾部，以及占位布局，都返回 1，这样在给它们做偏移时，就正常了
-                这是因为在这个库中，头、尾、占位三种类型的布局都是拉通展示的，
-                如果设置为不包括特殊布局，那么返回 null，表示不处理这些布局的偏移
-             */
-            support?.headerArray?.containsValue(itemView) == true -> return if (mIncludeSpecial) {
-                1
-            } else {
-                null
+    /**
+     * 设置特殊 item 布局是否应用偏移量
+     */
+    fun setSpecialItemNeedOffsets(specialItemNeedOffsets: Boolean) {
+        mSpecialItemNeedOffsets = specialItemNeedOffsets
+    }
+
+    override fun onItemOffsets(
+        mOrientation: Int,
+        mOutRect: Rect,
+        mItemView: View,
+        mPosition: Int,
+        mSpanCount: Int,
+        mHorizontalSpacing: Int,
+        mVerticalSpacing: Int,
+        mIncludeEdge: Boolean
+    ) {
+
+        var spanCount = mSpanCount
+        var horizontalSpacing = mHorizontalSpacing
+        var verticalSpacing = mVerticalSpacing
+
+        //头尾、占位布局单独设置
+        if (support.isHeaderPosition(mPosition)
+            || support.isFooterPosition(mPosition)
+            || mItemView == support.placeholderView
+        ) {
+            // 头部、尾部，以及占位布局，都返回 1，这样在给它们做偏移时，就正常了
+            spanCount = 1
+            //这些不需要做偏移
+            if (!mSpecialItemNeedOffsets) {
+                horizontalSpacing = 0
+                verticalSpacing = 0
             }
-            support?.footerArray?.containsValue(itemView) == true -> return if (mIncludeSpecial) {
-                1
-            } else {
-                null
+            //需要做偏移
+            else {
+                /*
+                    如果没有设置偏移量，但是又需要做偏移，则使用默认的值
+                 */
+                horizontalSpacing = mSpecialItemHorizontalSpacing ?: mHorizontalSpacing
+                verticalSpacing = mSpecialItemVerticalSpacing ?: mVerticalSpacing
             }
-            itemView == support?.placeholderView -> return if (mIncludeSpecial) {
-                1
-            } else {
-                null
-            }
-            else -> super.getSpanCount(itemView, position)
         }
+
+        super.onItemOffsets(
+            mOrientation,
+            mOutRect,
+            mItemView,
+            mPosition,
+            spanCount,
+            horizontalSpacing,
+            verticalSpacing,
+            mIncludeEdge
+        )
     }
 
-    override fun getHorizontalSpacing(itemView: View, position: Int): Int {
-        return super.getHorizontalSpacing(itemView, position)
-    }
-
-    override fun getVerticalSpacing(itemView: View, position: Int): Int {
-        return super.getVerticalSpacing(itemView, position)
-    }
-
-    override fun getIncludeEdge(itemView: View, position: Int): Boolean {
-        return super.getIncludeEdge(itemView, position)
-    }
 }

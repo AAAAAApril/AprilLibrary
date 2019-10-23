@@ -84,6 +84,7 @@ open class MultipleSupport {
      */
     internal open fun itemCrossRowOrColumn(position: Int): Boolean {
         return if (dataList.isEmpty() && placeholderView != null) {
+            //限定占位布局为拉通展示
             true
         } else {
             itemDelegateArray.get(getItemViewType(position)).crossRowWhenGridLayout()

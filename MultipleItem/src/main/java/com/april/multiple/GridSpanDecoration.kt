@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
  * ——  by  April丶
  */
 open class GridSpanDecoration(
-    private val context: Context
+    context: Context
 ) : RecyclerView.ItemDecoration() {
 
     //换算种子
@@ -77,116 +77,102 @@ open class GridSpanDecoration(
         parent: RecyclerView,
         state: RecyclerView.State
     ) {
-        // item position
-        val position = parent.getChildAdapterPosition(view)
-        val spanCount = getSpanCount(view, position) ?: return
-        // item column
+        onItemOffsets(
+            mOrientation,
+            outRect,
+            view,
+            parent.getChildAdapterPosition(view),
+            mSpanCount,
+            mHorizontalSpacing,
+            mVerticalSpacing,
+            mIncludeEdge
+        )
+    }
+
+    protected open fun onItemOffsets(
+        //布局方向
+        @RecyclerView.Orientation
+        mOrientation: Int,
+        mOutRect: Rect,
+        mItemView: View,
+        //item position
+        mPosition: Int,
+        //每行或者每列的个数
+        mSpanCount: Int,
+        //横向边距
+        mHorizontalSpacing: Int,
+        //纵向边距
+        mVerticalSpacing: Int,
+        //是否在 RecyclerView 边界位置应用偏移量
+        mIncludeEdge: Boolean
+    ) {
+        createItemOffsets(
+            mOrientation,
+            mOutRect,
+            mPosition,
+            mSpanCount,
+            mHorizontalSpacing,
+            mVerticalSpacing,
+            mIncludeEdge
+        )
+    }
+
+    /**
+     * 绘制偏移量
+     */
+    private fun createItemOffsets(
+        @RecyclerView.Orientation
+        orientation: Int,
+        outRect: Rect,
+        position: Int,
+        spanCount: Int,
+        horizontalSpacing: Int,
+        verticalSpacing: Int,
+        includeEdge: Boolean
+    ) {
         val column = position % spanCount
-        // orientation
-        when (mOrientation) {
+        when (orientation) {
+            //纵向
             RecyclerView.VERTICAL -> {
-                verticalOrientation(
-                    outRect,
-                    position,
-                    column,
-                    spanCount,
-                    getHorizontalSpacing(view, position),
-                    getVerticalSpacing(view, position),
-                    getIncludeEdge(view, position)
-                )
+                if (includeEdge) {
+                    // spacing - column * ((1f / spanCount) * spacing)
+                    outRect.left = horizontalSpacing - column * horizontalSpacing / spanCount
+                    // (column + 1) * ((1f / spanCount) * spacing)
+                    outRect.right = (column + 1) * horizontalSpacing / spanCount
+                    // top edge
+                    if (position < spanCount) {
+                        outRect.top = verticalSpacing
+                    }
+                    outRect.bottom = verticalSpacing // item bottom
+                } else {
+                    // column * ((1f / spanCount) * spacing)
+                    outRect.left = column * horizontalSpacing / spanCount
+                    // spacing - (column + 1) * ((1f / spanCount) * spacing)
+                    outRect.right = horizontalSpacing - (column + 1) * horizontalSpacing / spanCount
+                    if (position >= spanCount) {
+                        outRect.top = verticalSpacing // item top
+                    }
+                }
             }
+            //横向
             RecyclerView.HORIZONTAL -> {
-                horizontalOrientation(
-                    outRect,
-                    position,
-                    column,
-                    spanCount,
-                    getHorizontalSpacing(view, position),
-                    getVerticalSpacing(view, position),
-                    getIncludeEdge(view, position)
-                )
+                if (includeEdge) {
+                    outRect.top = verticalSpacing - column * verticalSpacing / spanCount
+                    outRect.bottom = (column + 1) * verticalSpacing / spanCount
+                    if (position < spanCount) {
+                        outRect.left = horizontalSpacing
+                    }
+                    outRect.right = horizontalSpacing
+                } else {
+                    outRect.top = column * verticalSpacing / spanCount
+                    outRect.bottom = verticalSpacing - (column + 1) * verticalSpacing / spanCount
+                    if (position >= spanCount) {
+                        outRect.left = horizontalSpacing
+                    }
+                }
             }
         }
-    }
 
-    /**
-     * 返回 SpanCount，如果为 null，则不处理偏移
-     */
-    protected open fun getSpanCount(itemView: View, position: Int): Int? {
-        return mSpanCount
-    }
-
-    protected open fun getHorizontalSpacing(itemView: View, position: Int): Int {
-        return mHorizontalSpacing
-    }
-
-    protected open fun getVerticalSpacing(itemView: View, position: Int): Int {
-        return mVerticalSpacing
-    }
-
-    protected open fun getIncludeEdge(itemView: View, position: Int): Boolean {
-        return mIncludeEdge
-    }
-
-    /**
-     * 纵向
-     */
-    private fun verticalOrientation(
-        outRect: Rect,
-        position: Int,
-        column: Int,
-        mSpanCount: Int,
-        mHorizontalSpacing: Int,
-        mVerticalSpacing: Int,
-        mIncludeEdge: Boolean
-    ) {
-        if (mIncludeEdge) {
-            // spacing - column * ((1f / spanCount) * spacing)
-            outRect.left = mHorizontalSpacing - column * mHorizontalSpacing / mSpanCount
-            // (column + 1) * ((1f / spanCount) * spacing)
-            outRect.right = (column + 1) * mHorizontalSpacing / mSpanCount
-
-            if (position < mSpanCount) { // top edge
-                outRect.top = mVerticalSpacing
-            }
-            outRect.bottom = mVerticalSpacing // item bottom
-        } else {
-            // column * ((1f / spanCount) * spacing)
-            outRect.left = column * mHorizontalSpacing / mSpanCount
-            // spacing - (column + 1) * ((1f / spanCount) * spacing)
-            outRect.right = mHorizontalSpacing - (column + 1) * mHorizontalSpacing / mSpanCount
-            if (position >= mSpanCount) {
-                outRect.top = mVerticalSpacing // item top
-            }
-        }
-    }
-
-    /**
-     * 横向
-     */
-    private fun horizontalOrientation(
-        outRect: Rect,
-        position: Int,
-        column: Int,
-        mSpanCount: Int,
-        mHorizontalSpacing: Int,
-        mVerticalSpacing: Int,
-        mIncludeEdge: Boolean
-    ) {
-        if (mIncludeEdge) {
-            outRect.top = mVerticalSpacing - column * mVerticalSpacing / mSpanCount
-            outRect.bottom = (column + 1) * mVerticalSpacing / mSpanCount
-            if (position < mSpanCount) {
-                outRect.left = mHorizontalSpacing
-            }
-            outRect.right = mHorizontalSpacing
-        } else {
-            outRect.top = column * mVerticalSpacing / mSpanCount
-            outRect.bottom = mVerticalSpacing - (column + 1) * mVerticalSpacing / mSpanCount
-            if (position >= mSpanCount) {
-                outRect.left = mHorizontalSpacing
-            }
-        }
     }
 
     protected fun dp2px(dp: Int): Int {

@@ -51,9 +51,30 @@ open class HeaderFooterSupport : MultipleSupport() {
      * @param footerView
      */
     fun adapterPositionOfFooter(footerView: View): Int {
-        val index = footerArray.indexOfValue(footerView)
-        return headerCount() + dataList.size + index
+        return headerCount() + dataList.size + footerArray.indexOfValue(footerView)
     }
+
+    /**
+     * 这个位置是否是头部
+     */
+    fun isHeaderPosition(position: Int): Boolean {
+        if (headerArray.size() == 0) {
+            return false
+        }
+        return position < headerCount()
+    }
+
+    /**
+     * 这个位置是否是尾部
+     */
+    fun isFooterPosition(position: Int): Boolean {
+        if (footerArray.size() == 0) {
+            return false
+        }
+        return (position - headerCount()) >= super.getItemCount()
+    }
+
+    //==============================================================================================
 
     override fun getItemCount(): Int {
         //头部数量
@@ -66,7 +87,7 @@ open class HeaderFooterSupport : MultipleSupport() {
 
     override fun getItemViewType(position: Int): Int {
         //头部
-        if (position < headerCount()) {
+        if (isHeaderPosition(position)) {
             return headerArray.keyAt(position)
         }
         //中间数据
@@ -117,7 +138,7 @@ open class HeaderFooterSupport : MultipleSupport() {
         position: Int,
         payloads: MutableList<Any>
     ) {
-        if (position < headerCount()) {
+        if (isHeaderPosition(position)) {
             return
         }
         val adjPosition = position - headerCount()
@@ -126,22 +147,25 @@ open class HeaderFooterSupport : MultipleSupport() {
         }
     }
 
+    /**
+     * 限定头尾布局为拉通展示
+     */
     override fun itemCrossRowOrColumn(position: Int): Boolean {
         //是头部
-        if (position < headerCount()) {
+        if (isHeaderPosition(position)) {
             return true
         }
-        //中间数据
-        return if (position - headerCount() < super.getItemCount()) {
-            /*
-                注意：这里传递给父类的是 position，
-                而不像 getItemViewType() 函数里面那样返回 adjPosition
-             */
-            super.itemCrossRowOrColumn(position)
-        }
         //是尾部
-        else {
+        return if (isFooterPosition(position)) {
             true
+        }
+        //中间数据
+        else {
+            /*
+                    注意：这里传递给父类的是 position，
+                    而不像 getItemViewType() 函数里面那样返回 adjPosition
+            */
+            super.itemCrossRowOrColumn(position)
         }
     }
 

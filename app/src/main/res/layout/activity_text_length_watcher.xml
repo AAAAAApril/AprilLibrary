@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/atlw_3_7"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入3-7个字符"
+        android:maxLines="1"
+        android:padding="16dp"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/atlw_6_9"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入6-9个字符"
+        android:maxLines="1"
+        android:padding="16dp"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/atlw_7"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入7个字符"
+        android:maxLines="1"
+        android:padding="16dp"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/atlw_2_5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入2-5个字符"
+        android:maxLines="1"
+        android:padding="16dp"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/atlw_9_11"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入9-11个字符"
+        android:maxLines="1"
+        android:padding="16dp"
+        android:singleLine="true" />
+
+    <Button
+        android:id="@+id/atlw_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:enabled="false"
+        android:text="满足条件后就可以点击了" />
+
+</LinearLayout>

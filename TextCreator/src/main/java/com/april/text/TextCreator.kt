@@ -40,12 +40,21 @@ import androidx.core.content.ContextCompat
             )
         )
 
+
+        有时候会需要在同一个 TextView 内展示一些花里胡哨的东西，
+        比如不一样的颜色的字，比如插入一个图标等
+
+        注意：给某一段文字设置的点击事件会被 TextView 整个的点击事件覆盖掉！
+
  */
 
 /**
  * TextView 设置富文本样式
  */
-fun <T : TextCreator> TextView.richText(vararg creators: T) {
+fun <T : TextCreator> TextView.richText(
+    vararg creators: T,
+    @ColorInt highLightColor: Int = 0X00000000
+) {
     val builder = SpannableStringBuilder()
     creators.forEach {
         val start = builder.length
@@ -62,7 +71,6 @@ fun <T : TextCreator> TextView.richText(vararg creators: T) {
                     builder.setSpan(
                         OnClickSpan(
                             this,
-                            it.highLightColor,
                             it.underLine ?: false,
                             click
                         ),
@@ -186,7 +194,6 @@ fun <T : TextCreator> TextView.richText(vararg creators: T) {
                     builder.setSpan(
                         OnClickSpan(
                             this,
-                            it.highLightColor,
                             it.underLine ?: false,
                             click
                         ),
@@ -199,6 +206,7 @@ fun <T : TextCreator> TextView.richText(vararg creators: T) {
         }
     }
     text = builder
+    highlightColor = highLightColor
 }
 
 /**
@@ -210,11 +218,6 @@ open class TextCreator(
     //文字颜色
     @ColorRes
     val textColor: Int? = null,
-    //TextView 被点击时，响应范围内的高亮背景色。
-    //这个值对整个 TextView 生效。
-    //如果设置为 null，则默认颜色为全透明。
-    @ColorRes
-    val highLightColor: Int? = null,
     //文字背景色
     @ColorRes
     val backgroundColor: Int? = null,
@@ -324,19 +327,12 @@ annotation class TextCreatorType {
  */
 private class OnClickSpan(
     textView: TextView,
-    @ColorRes
-    val highLightColor: Int?,
     val showUnderLine: Boolean,
     val onClick: ((View) -> Unit)?
 ) : ClickableSpan() {
 
     init {
         textView.movementMethod = LinkMovementMethod.getInstance()
-        textView.highlightColor = if (highLightColor == null) {
-            0X00000000
-        } else {
-            ContextCompat.getColor(textView.context, highLightColor)
-        }
     }
 
     override fun updateDrawState(ds: TextPaint) {

@@ -15,7 +15,6 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.NonNull
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.DialogFragment
-import com.april.develop.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -35,6 +34,13 @@ abstract class SupportDialogFragment : DialogFragment() {
             STYLE_NO_TITLE,
             android.R.style.Theme_Material_Dialog_MinWidth
         )
+    }
+
+    /**
+     * 默认背景是否透明（透明之后才能看清自己给布局设置的背景）
+     */
+    protected open fun backgroundTransparent(): Boolean {
+        return false
     }
 
     /**
@@ -78,10 +84,11 @@ abstract class SupportDialogFragment : DialogFragment() {
     @CallSuper
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         dialog?.window?.apply {
             //背景透明
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            if (backgroundTransparent()) {
+                setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }
             setDimAmount(windowDarkFrameAlpha())
             //宽度占比
             val dm = DisplayMetrics()
@@ -120,6 +127,13 @@ abstract class SupportBottomSheetDialogFragment : BottomSheetDialogFragment() {
     @FloatRange(from = 0.0, to = 1.0)
     protected open fun windowDarkFrameAlpha(): Float {
         return 0.6f
+    }
+
+    /**
+     * 默认背景是否透明（透明之后才能看清自己给布局设置的背景）
+     */
+    protected open fun backgroundTransparent(): Boolean {
+        return false
     }
 
     /**
@@ -163,20 +177,24 @@ abstract class SupportBottomSheetDialogFragment : BottomSheetDialogFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         dialog?.window?.let { window ->
-            window.findViewById<View>(R.id.design_bottom_sheet)?.let { rootView ->
+            //窗口阴影
+            window.setDimAmount(windowDarkFrameAlpha())
+            (view?.parent as? ViewGroup)?.let { parent ->
                 //背景透明
-                rootView.setBackgroundResource(android.R.color.transparent)
-                window.setDimAmount(windowDarkFrameAlpha())
+                if (backgroundTransparent()) {
+                    parent.setBackgroundResource(android.R.color.transparent)
+                }
                 //固定死高度
                 if (fixedHeightPercent() != null) {
-                    rootView.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-                    rootView.post {
-                        mBottomSheetBehavior?.setBottomSheetCallback(mBottomSheetBehaviorCallback)
-                        //设置高度
-                        val point = Point()
-                        window.windowManager.defaultDisplay.getSize(point)
-                        mBottomSheetBehavior?.peekHeight =
-                            ((point.y) * fixedHeightPercent()!!).toInt()
+                    parent.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                    parent.post {
+                        mBottomSheetBehavior?.let { behavior ->
+                            behavior.setBottomSheetCallback(mBottomSheetBehaviorCallback)
+                            //设置高度
+                            val point = Point()
+                            window.windowManager.defaultDisplay.getSize(point)
+                            behavior.peekHeight = ((point.y) * fixedHeightPercent()!!).toInt()
+                        }
                     }
                 }
             }

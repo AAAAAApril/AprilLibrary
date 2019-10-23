@@ -1,17 +1,15 @@
 package com.april.develop.watcher
 
-import android.app.Application
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.FragmentManager
 
 /*
 
-        listenTextLengthChange()
+        listenTextViewChange()
             .withView(textView0, 9, 31)
             .withView(textView1, -1, 99)
             .withView(button, 8, -1)
@@ -19,21 +17,39 @@ import androidx.lifecycle.ViewModelProviders
 
             }
 
+
+        当一堆 TextView 的文字长度可以决定另一个 Button 是否可以操作的时候。这个功能会很好用。
+
  */
 
-fun Fragment.listenTextLengthChange(): TextLengthWatcher {
-    return ViewModelProviders.of(this).get(TextLengthWatcher::class.java)
+fun Fragment.listenTextViewChange(TAG: String = this.javaClass.name): TextLengthWatcher {
+    return obtainWatcher(childFragmentManager, TAG)
 }
 
-fun FragmentActivity.listenTextLengthChange(): TextLengthWatcher {
-    return ViewModelProviders.of(this).get(TextLengthWatcher::class.java)
+fun FragmentActivity.listenTextViewChange(TAG: String = this.javaClass.name): TextLengthWatcher {
+    return obtainWatcher(supportFragmentManager, TAG)
+}
+
+private fun obtainWatcher(manager: FragmentManager, TAG: String): TextLengthWatcher {
+    var watcher = (manager.findFragmentByTag(TAG) as? TextLengthWatcher)
+    if (watcher == null) {
+        watcher = TextLengthWatcher()
+        manager.beginTransaction()
+            .add(watcher, TAG)
+            .commitAllowingStateLoss()
+        manager.executePendingTransactions()
+    }
+    return watcher
 }
 
 /**
  * 对 TextView 极其子类的文字长度进行监听
  */
-class TextLengthWatcher internal constructor(application: Application) :
-    AndroidViewModel(application), TextChange {
+class TextLengthWatcher : Fragment(), TextChange {
+
+    init {
+        retainInstance = true
+    }
 
     //被监听的控件
     private val watcherSet = mutableSetOf<Watcher>()
@@ -101,6 +117,11 @@ private class Watcher(
     private val maxCount: Int = -1,//约束的最大字符长度（包含，默认 -1，表示不限制）
     private val textChange: TextChange
 ) : TextWatcher {
+
+    init {
+        view.addTextChangedListener(this)
+    }
+
     //是否在约束条件内
     internal var withinConstraints: Boolean = false
 

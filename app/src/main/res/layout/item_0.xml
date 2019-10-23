@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/i0_tv"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_white_radius_4"
+    android:elevation="1dp"
+    android:gravity="center"
+    android:padding="10dp"
+    android:textColor="@color/colorAccent"
+    android:textSize="20sp"
+    android:textStyle="bold"
+    tools:text="@string/app_name" />

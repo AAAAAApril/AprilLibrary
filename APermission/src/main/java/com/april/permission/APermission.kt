@@ -25,6 +25,8 @@ import androidx.fragment.app.FragmentManager
             toast("拒绝了权限")
         }?.request()
 
+        可以在任何地方发起权限请求，只要在请求的时候，有任何一个 Activity 存活
+
  */
 
 /**

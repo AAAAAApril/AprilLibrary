@@ -7,19 +7,31 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import kotlin.random.Random
 
-fun FragmentActivity.startContractIntent(intent: Intent,
-                                         result: (resultCode: Int, data: Intent?) -> Unit) {
+/*
+
+    让跳转和带值返回变得更方便
+
+ */
+
+fun FragmentActivity.startContractIntent(
+    intent: Intent,
+    result: ((resultCode: Int, data: Intent?) -> Unit)? = null
+) {
     startContractIntent(supportFragmentManager, intent, result)
 }
 
-fun Fragment.startContractIntent(intent: Intent,
-                                 result: (resultCode: Int, data: Intent?) -> Unit) {
-    startContractIntent(childFragmentManager,intent, result)
+fun Fragment.startContractIntent(
+    intent: Intent,
+    result: ((resultCode: Int, data: Intent?) -> Unit)? = null
+) {
+    startContractIntent(childFragmentManager, intent, result)
 }
 
-fun startContractIntent(manager: FragmentManager,
-                        intent: Intent,
-                        result: (resultCode: Int, data: Intent?) -> Unit) {
+fun startContractIntent(
+    manager: FragmentManager,
+    intent: Intent,
+    result: ((resultCode: Int, data: Intent?) -> Unit)? = null
+) {
     ContractController.getInstance(manager).startContractIntent(intent, result)
 }
 
@@ -31,7 +43,8 @@ class ContractController : Fragment() {
         private const val TAG = "ContractControllerTAG"
 
         internal fun getInstance(manager: FragmentManager): ContractController {
-            var controller: ContractController? = manager.findFragmentByTag(TAG) as? ContractController
+            var controller: ContractController? =
+                manager.findFragmentByTag(TAG) as? ContractController
             if (controller == null) {
                 controller = ContractController()
                 manager.beginTransaction()
@@ -46,9 +59,11 @@ class ContractController : Fragment() {
     private var contractRequestCode: Int? = null
     private var contractResultListener: ((resultCode: Int, data: Intent?) -> Unit)? = null
 
-    fun startContractIntent(intent: Intent,
-                            resultListener: (resultCode: Int, data: Intent?) -> Unit) {
-        contractRequestCode = Random.Default.nextInt()
+    fun startContractIntent(
+        intent: Intent,
+        resultListener: ((resultCode: Int, data: Intent?) -> Unit)? = null
+    ) {
+        contractRequestCode = 0X101
         contractResultListener = resultListener
         startActivityForResult(intent, contractRequestCode!!)
     }
@@ -56,8 +71,8 @@ class ContractController : Fragment() {
     @CallSuper
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        contractResultListener?.apply {
-            if (requestCode == contractRequestCode) {
+        if (requestCode == contractRequestCode) {
+            contractResultListener?.apply {
                 invoke(requestCode, data)
             }
         }

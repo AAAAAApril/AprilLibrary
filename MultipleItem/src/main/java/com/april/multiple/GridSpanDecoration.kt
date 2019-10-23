@@ -53,14 +53,14 @@ open class GridSpanDecoration(
     /**
      * 设置横向偏移量
      */
-    fun setHorizontalSpacing(horizontalSpacingDP: Int) {
+    fun setHorizontalSpacingDP(horizontalSpacingDP: Int) {
         mHorizontalSpacing = dp2px(horizontalSpacingDP)
     }
 
     /**
      * 设置纵向偏移量
      */
-    fun setVerticalSpacing(verticalSpacingDP: Int) {
+    fun setVerticalSpacingDP(verticalSpacingDP: Int) {
         mVerticalSpacing = dp2px(verticalSpacingDP)
     }
 

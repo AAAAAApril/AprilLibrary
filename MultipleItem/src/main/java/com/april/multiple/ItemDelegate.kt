@@ -157,6 +157,6 @@ abstract class ItemDelegate<T, VH : RecyclerView.ViewHolder> {
      * [holder] viewHolder
      * [t] item 数据实体
      */
-    protected abstract fun onBindViewHolder(holder: VH, t: T)
+    protected abstract fun onBindViewHolder(holder: VH, bean: T)
 
 }

@@ -23,7 +23,7 @@ class MultipleGridSpanDecoration(
      *
      * 如果没有设置偏移量，但是又需要做偏移，则使用默认的值
      */
-    fun setSpecialItemHorizontalSpacing(specialItemHorizontalSpacingDP: Int) {
+    fun setSpecialItemHorizontalSpacingDP(specialItemHorizontalSpacingDP: Int) {
         mSpecialItemHorizontalSpacing = dp2px(specialItemHorizontalSpacingDP)
     }
 
@@ -32,7 +32,7 @@ class MultipleGridSpanDecoration(
      *
      * 如果没有设置偏移量，但是又需要做偏移，则使用默认的值
      */
-    fun setSpecialItemVerticalSpacing(specialItemVerticalSpacingDP: Int) {
+    fun setSpecialItemVerticalSpacingDP(specialItemVerticalSpacingDP: Int) {
         mSpecialItemVerticalSpacing = dp2px(specialItemVerticalSpacingDP)
     }
 

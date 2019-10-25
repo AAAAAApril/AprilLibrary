@@ -6,17 +6,23 @@ import android.content.pm.PackageManager
 import android.net.Uri
 
 /**
- * [dp] [Int] dp 转 px
+ * [dp] [Float] dp 转 px
  */
-fun Context.dp2px(dp: Int): Int {
-    return (dp * (resources.displayMetrics.density) + 0.5f).toInt()
+fun Context.dp2px(dp: Float): Float {
+    if (dp <= 0) {
+        return 0.0f
+    }
+    return dp * (resources.displayMetrics.density) + 0.5f
 }
 
 /**
- * [px] [Int] px 转 dp
+ * [px] [Float] px 转 dp
  */
-fun Context.px2dp(px: Int): Int {
-    return (px / (resources.displayMetrics.density) + 0.5f).toInt()
+fun Context.px2dp(px: Float): Float {
+    if (px <= 0) {
+        return 0.0f
+    }
+    return px / (resources.displayMetrics.density) + 0.5f
 }
 
 /**
@@ -39,9 +45,11 @@ fun Context.statusBarHeight(): Int {
  * [url] 用系统浏览器加载链接
  */
 fun Context.loadWebUrl(url: String) {
-    startActivity(Intent(
-        Intent.ACTION_VIEW, Uri.parse(url)
-    ))
+    startActivity(
+        Intent(
+            Intent.ACTION_VIEW, Uri.parse(url)
+        )
+    )
 }
 
 /**
@@ -64,9 +72,11 @@ fun Context.isPackageAvailable(packageName: String): Boolean {
  * [phone] 系统拨号盘，拨打电话
  */
 fun Context.dial(phone: String) {
-    startActivity(Intent(
-        Intent.ACTION_DIAL, Uri.parse("tel:$phone")
-    ))
+    startActivity(
+        Intent(
+            Intent.ACTION_DIAL, Uri.parse("tel:$phone")
+        )
+    )
 }
 
 /**

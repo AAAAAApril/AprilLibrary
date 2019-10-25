@@ -85,7 +85,7 @@ class FragmentHelper(
 class FragmentAdapter(
     manager: FragmentManager,
     private val destroyItem: Boolean = false
-) : FragmentPagerAdapter(manager) {
+) : FragmentPagerAdapter(manager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     private val titleList: MutableList<CharSequence> = mutableListOf()
     private val fragmentList: MutableList<Fragment> = mutableListOf()
@@ -97,7 +97,7 @@ class FragmentAdapter(
      * [fragment] Fragment
      */
     fun addFragment(title: CharSequence? = null, fragment: Fragment): FragmentAdapter {
-        title?.let { titleList.add(it) }
+        titleList.add(title ?: "")
         fragmentList.add(fragment)
         return this
     }

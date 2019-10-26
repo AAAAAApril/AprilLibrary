@@ -61,7 +61,7 @@ abstract class ItemDelegate<T, VH : RecyclerView.ViewHolder> {
      * 内部使用，用于转换类型
      *
      * [holder]   viewHolder
-     * [any]      item数据实体（在某些情况下，传递过来的数据可能为 null）
+     * [any]      item数据实体
      */
     internal fun bindViewHolder(holder: RecyclerView.ViewHolder, any: Any, payloads: List<Any>) {
         if (payloads.isEmpty()) {

@@ -121,7 +121,7 @@ open class MultipleSupport {
             spanCount
         } else {
             val delegate = itemDelegateArray.get(getItemViewType(position))
-            if (delegate.crossRowWhenGridLayout()) {
+            if (delegate.isCrossRowWhenGridLayout()) {
                 spanCount
             } else {
                 //获取适配过的 spanSize
@@ -150,7 +150,8 @@ open class MultipleSupport {
  * 第三种 item 想占 5 个位置
  * 第四种 item 想占 7 个位置
  *
- * 这时候，就需要求出这些数的最小公倍数，并将其赋值给 spanCount
+ * 这时候，就需要求出这些数的最小公倍数，并将其赋值给 spanCount，
+ * 同时，除了最大的那个数，其他所有的数都需要乘以最小公倍数和最大那个数的比值
  */
 private class CrossSpanSizeLookUp(
     private val support: MultipleSupport,

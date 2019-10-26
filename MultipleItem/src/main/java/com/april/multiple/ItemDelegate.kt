@@ -95,14 +95,14 @@ abstract class ItemDelegate<T, VH : RecyclerView.ViewHolder> {
      * [Boolean] 在 [androidx.recyclerview.widget.GridLayoutManager]
      * 的布局管理器下，此类型的 item 是否通行展示
      */
-    open fun crossRowWhenGridLayout(): Boolean {
+    open fun isCrossRowWhenGridLayout(): Boolean {
         return false
     }
 
     /**
      * [Boolean] 在 [androidx.recyclerview.widget.StaggeredGridLayoutManager] 布局管理器模式下，此类型的 item 是否通行展示
      */
-    open fun crossRowWhenStaggeredGridLayout(): Boolean {
+    open fun isCrossRowWhenStaggeredGridLayout(): Boolean {
         return false
     }
 
@@ -134,9 +134,9 @@ abstract class ItemDelegate<T, VH : RecyclerView.ViewHolder> {
      * 注：源码中可以看到，传入的 parent 其实就是绑定的 RecyclerView 本身。
      * [VH] viewHolder
      */
-    fun createViewHolder(parent: ViewGroup): VH {
+    internal fun createViewHolder(parent: ViewGroup): VH {
         val itemView = onCreateItemView(parent)
-        setCrossRowWhenStaggeredGridLayout(itemView, crossRowWhenStaggeredGridLayout())
+        setCrossRowWhenStaggeredGridLayout(itemView, isCrossRowWhenStaggeredGridLayout())
         return onCreateViewHolder(parent, itemView)
     }
 

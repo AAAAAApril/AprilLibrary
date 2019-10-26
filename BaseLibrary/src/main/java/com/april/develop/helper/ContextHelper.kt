@@ -8,17 +8,17 @@ import android.net.Uri
 /**
  * [dp] [Float] dp 转 px
  */
-fun Context.dp2px(dp: Float): Float {
+fun Context.dp2px(dp: Float): Int {
     if (dp <= 0) {
-        return 0.0f
+        return 0
     }
-    return dp * (resources.displayMetrics.density) + 0.5f
+    return (dp * (resources.displayMetrics.density) + 0.5f).toInt()
 }
 
 /**
  * [px] [Float] px 转 dp
  */
-fun Context.px2dp(px: Float): Float {
+fun Context.px2dp(px: Int): Float {
     if (px <= 0) {
         return 0.0f
     }

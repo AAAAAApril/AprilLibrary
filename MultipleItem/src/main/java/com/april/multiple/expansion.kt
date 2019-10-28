@@ -7,11 +7,11 @@ package com.april.multiple
  */
 inline fun <reified T> AbsAdapter.only(itemDelegate: ItemDelegate<T, *>) {
     createManager<T>(T::class.java.hashCode(), support).setItemDelegates(
-        Array(1) { itemDelegate },
-        object : Recognizer<T> {
+        itemDelegate,
+        recognizer = object : Recognizer<T> {
             override fun recognize(
                 classes: Array<Class<out ItemDelegate<out T, *>>>,
-                t: T,
+                bean: T,
                 position: Int
             ): Class<out ItemDelegate<out T, *>> {
                 return classes.first()
@@ -30,20 +30,20 @@ inline fun <reified T> AbsAdapter.many(
         //添加的同数据类型的所有 item 样式代理
         classes: Array<Class<out ItemDelegate<out T, *>>>,
         //数据实例
-        t: T,
+        bean: T,
         //所在位置
         position: Int
     ) -> Class<out ItemDelegate<out T, *>>
 ) {
     createManager<T>(T::class.java.hashCode(), support).setItemDelegates(
-        Array(delegate.size) { index -> delegate[index] },
-        object : Recognizer<T> {
+        *delegate,
+        recognizer = object : Recognizer<T> {
             override fun recognize(
                 classes: Array<Class<out ItemDelegate<out T, *>>>,
-                t: T,
+                bean: T,
                 position: Int
             ): Class<out ItemDelegate<out T, *>> {
-                return recognizer.invoke(classes, t, position)
+                return recognizer.invoke(classes, bean, position)
             }
         })
 }

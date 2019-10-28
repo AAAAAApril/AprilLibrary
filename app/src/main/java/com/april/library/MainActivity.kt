@@ -2,11 +2,14 @@ package com.april.library
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.april.develop.ui.startContractIntent
-import com.april.multiple.*
+import com.april.multiple.DefaultItemDelegate
+import com.april.multiple.GridSpanDecoration
+import com.april.multiple.MultipleAdapter
+import com.april.multiple.only
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.item_0.view.*
 
@@ -24,10 +27,11 @@ class MainActivity : AppCompatActivity() {
             setIncludeEdge(true)
         })
         am_rv.adapter = adapter
-        adapter.only(object : AbsItemDelegate<ItemBean>(R.layout.item_0) {
-            override fun onBindViewHolder(holder: RecyclerView.ViewHolder, bean: ItemBean) {
-                holder.itemView.i0_tv.text = bean.text
-                holder.itemView.setOnClickListener {
+        adapter.only(object : DefaultItemDelegate<ItemBean>(R.layout.item_0) {
+            override fun onBindItemView(itemView: View, bean: ItemBean, itemAdapterPosition: Int) {
+                super.onBindItemView(itemView, bean, itemAdapterPosition)
+                itemView.i0_tv.text = bean.text
+                itemView.setOnClickListener {
                     bean.onClick.invoke(bean)
                 }
             }
@@ -50,49 +54,6 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-//        frame.addChild(
-//            child = createLinearLayout(false, childrenGravity = Gravity.CENTER).apply {
-//                backgroundColorRes(R.color.colorPrimary)
-//                addChild(child = createTextView {
-//                    textView0 = this
-//                    text = "左侧文字控件"
-//                    textColorRes(R.color.colorAccent)
-//                    setPadding(30)
-//                })
-//                addChild(
-//                    child = FrameLayout(context).apply {
-//                        addChild(child = createTextView {
-//                            textView1 = this
-//                            text = "中间文字控件"
-//                        }, gravity = Gravity.CENTER)
-//                    }, width = 0,
-//                    height = ViewGroup.LayoutParams.MATCH_PARENT,
-//                    weight = 1f
-//                )
-//                addChild(child = createButton {
-//                    button = this
-//                    text = "右侧按钮控件"
-//                    backgroundTintListValueOfColorRes(R.color.colorAccent)
-//                    textColorRes(R.color.colorPrimaryDark)
-//                    setOnClickListener {
-//                        toast("点击了右侧按钮")
-//                    }
-//                })
-//            }
-//        )
-
-//        startContractIntent(Intent()) { _, _ ->
-//
-//        }
-
-//        RuntimeDataManager.compare<MainActivity> { new, old ->
-//            return@compare new != old
-//        }
-//        RuntimeDataManager.listen(true, object : RuntimeDataListener<MainActivity> {
-//            override fun onDataNotify(new: MainActivity?, old: MainActivity?) {
-//
-//            }
-//        })
     }
 }
 

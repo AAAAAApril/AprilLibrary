@@ -56,7 +56,7 @@ class Manager<T> internal constructor(
      * [recognizer] 识别器
      */
     fun setItemDelegates(
-        itemDelegate: Array<ItemDelegate<out T, *>>,
+        vararg itemDelegate: ItemDelegate<out T, *>,
         recognizer: Recognizer<T>
     ) {
         this.recognizer = recognizer
@@ -81,7 +81,7 @@ interface Recognizer<T> {
         //添加的同数据类型的所有 item 样式代理
         classes: Array<Class<out ItemDelegate<out T, *>>>,
         //数据实例
-        t: T,
+        bean: T,
         //所在位置
         position: Int
     ):

@@ -139,25 +139,28 @@ open class HeaderFooterAdapter : MultipleAdapter() {
         notifyItemRemoved(index)
     }
 
+    fun headerCount(): Int = support.headerCount()
+
+    fun footerCount(): Int = support.footerCount()
 
     override fun addData(any: Any) {
         support.dataList.add(any)
         notifyItemInserted(
-            support.dataList.lastIndex + support.headerCount()
+            support.dataList.lastIndex + headerCount()
         )
     }
 
     override fun insertData(any: Any, position: Int) {
         support.dataList.add(position, any)
         notifyItemInserted(
-            position + support.headerCount()
+            position + headerCount()
         )
     }
 
     override fun removeData(position: Int) {
         support.dataList.removeAt(position)
         notifyItemRemoved(
-            position + support.headerCount()
+            position + headerCount()
         )
     }
 
@@ -165,7 +168,7 @@ open class HeaderFooterAdapter : MultipleAdapter() {
         val index = support.dataList.lastIndex
         support.dataList.removeAt(index)
         notifyItemRemoved(
-            index + support.headerCount()
+            index + headerCount()
         )
     }
 
@@ -176,7 +179,7 @@ open class HeaderFooterAdapter : MultipleAdapter() {
         val index = dataList.size
         support.dataList.addAll(dataList)
         notifyItemRangeInserted(
-            index + support.headerCount(),
+            index + headerCount(),
             dataList.size
         )
     }

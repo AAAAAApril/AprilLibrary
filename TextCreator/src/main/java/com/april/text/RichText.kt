@@ -45,6 +45,8 @@ import androidx.core.content.ContextCompat
  */
 fun <T : TextCreator> TextView.richText(
     vararg creators: T,
+    //是否是设置给 hint
+    forHint: Boolean = false,
     @ColorRes highLightColor: Int = android.R.color.transparent
 ): TextView {
     val builder = SpannableStringBuilder()
@@ -197,7 +199,11 @@ fun <T : TextCreator> TextView.richText(
             }
         }
     }
-    text = builder
+    if (forHint) {
+        hint = builder
+    } else {
+        text = builder
+    }
     highlightColor = ContextCompat.getColor(context, highLightColor)
 
     return this

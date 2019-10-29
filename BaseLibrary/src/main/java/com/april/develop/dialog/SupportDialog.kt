@@ -21,7 +21,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 abstract class SupportDialogFragment : DialogFragment() {
 
     @LayoutRes
-    abstract fun setDialogLayoutRes(): Int
+    protected abstract fun setDialogLayoutRes(): Int
 
     abstract override fun onViewCreated(view: View, savedInstanceState: Bundle?)
 
@@ -117,7 +117,7 @@ abstract class SupportDialogFragment : DialogFragment() {
 abstract class SupportBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     @LayoutRes
-    abstract fun setDialogLayoutRes(): Int
+    protected abstract fun setDialogLayoutRes(): Int
 
     abstract override fun onViewCreated(view: View, savedInstanceState: Bundle?)
 

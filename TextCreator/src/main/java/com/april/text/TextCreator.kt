@@ -11,7 +11,7 @@ import androidx.annotation.IntRange
  */
 open class TextCreator(
     //文字
-    val text: CharSequence,
+    val text: String,
     //文字颜色
     @ColorRes
     val textColor: Int? = null,
@@ -40,10 +40,10 @@ open class TextCreator(
     val asSubscript: Boolean? = null,
     /**
      * 该位置上添加点击事件
-     *
+     *  [String] 被点击的这个段文字，如果是点击的图片，那么这里返回空字符串   ""
      * 注意：如果是给单独一行上的文字设置这个点击效果，那么，响应范围将是这一整行，而不仅仅是文字绘制区域
      */
-    val onClick: ((View) -> Unit)? = null,
+    val onClick: ((View, String) -> Unit)? = null,
     //编辑框时，在该位置前面插入文字是否应用该样式（如有需要，可以选择公开此属性）
     private val includeStart: Boolean = false,
     //编辑框时，在该位置后面插入文字是否应用该样式（如有需要，可以选择公开此属性）

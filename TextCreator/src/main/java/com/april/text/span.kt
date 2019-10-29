@@ -18,7 +18,8 @@ import androidx.annotation.DrawableRes
 internal class OnClickSpan(
     textView: TextView,
     private val showUnderLine: Boolean,
-    private val onClick: ((View) -> Unit)?
+    private val text: String = "",
+    private val onClick: ((View, String) -> Unit)?
 ) : ClickableSpan() {
 
     init {
@@ -30,7 +31,7 @@ internal class OnClickSpan(
     }
 
     override fun onClick(widget: View) {
-        onClick?.invoke(widget)
+        onClick?.invoke(widget, text)
     }
 }
 

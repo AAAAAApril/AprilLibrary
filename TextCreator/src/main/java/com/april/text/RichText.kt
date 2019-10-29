@@ -66,6 +66,7 @@ fun <T : TextCreator> TextView.richText(
                         OnClickSpan(
                             this,
                             it.underLine ?: false,
+                            "",
                             click
                         ),
                         start,
@@ -189,6 +190,7 @@ fun <T : TextCreator> TextView.richText(
                         OnClickSpan(
                             this,
                             it.underLine ?: false,
+                            it.text,
                             click
                         ),
                         start,

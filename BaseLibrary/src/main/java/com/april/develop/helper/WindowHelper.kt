@@ -5,9 +5,6 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
-import androidx.core.content.ContextCompat
-
 
 /**
  * 5.0 以上所有
@@ -15,13 +12,14 @@ import androidx.core.content.ContextCompat
  * 如果设置全屏，需要自己在布局中处理布局问题
  */
 fun Window.fitSystemStatusBar_up5All(
-    @ColorInt backgroundColor: Int = 0X44000000,
+    @ColorInt backgroundColor: Int = 0X33000000,
     fullScreen: Boolean = false
 ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         if (fullScreen) {
             decorView.systemUiVisibility =
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            fitSoftInput()
         }
         statusBarColor = backgroundColor
     }
@@ -33,7 +31,7 @@ fun Window.fitSystemStatusBar_up5All(
  * 如果设置全屏，需要自己在布局中处理布局问题
  */
 fun Window.fitSystemStatusBar_5to6(
-    @ColorInt backgroundColor: Int = 0X44000000,
+    @ColorInt backgroundColor: Int = 0X33000000,
     fullScreen: Boolean = false
 ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
@@ -64,12 +62,20 @@ fun Window.fitSystemStatusBar_up6All(
                 } else {
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 }
+            fitSoftInput()
         } else {
             if (fullScreen) {
                 decorView.systemUiVisibility =
                     View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                fitSoftInput()
             }
         }
         statusBarColor = backgroundColor
     }
+}
+
+private fun Window.fitSoftInput() {
+    setSoftInputMode(
+        WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN
+    )
 }

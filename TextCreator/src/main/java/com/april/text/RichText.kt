@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.style.*
+import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
@@ -57,7 +58,9 @@ fun <T : TextCreator> TextView.richText(
     } else {
         text = builder
     }
-    movementMethod = LinkMovementMethod.getInstance()
+    if (this !is EditText) {
+        movementMethod = LinkMovementMethod.getInstance()
+    }
     highlightColor = ContextCompat.getColor(context, highLightColor)
     return this
 }

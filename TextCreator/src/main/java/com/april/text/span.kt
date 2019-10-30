@@ -16,15 +16,10 @@ import androidx.annotation.DrawableRes
  * 自定义点击
  */
 internal class OnClickSpan(
-    textView: TextView,
     private val showUnderLine: Boolean,
     private val text: String = "",
     private val onClick: ((View, String) -> Unit)?
 ) : ClickableSpan() {
-
-    init {
-        textView.movementMethod = LinkMovementMethod.getInstance()
-    }
 
     override fun updateDrawState(ds: TextPaint) {
         ds.isUnderlineText = showUnderLine

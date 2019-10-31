@@ -9,6 +9,7 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.text.method.ScrollingMovementMethod
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -90,6 +91,42 @@ fun View.canScrollStart(): Boolean {
  */
 fun View.canScrollEnd(): Boolean {
     return canScrollHorizontally(1)
+}
+
+
+/**
+ * 设置 margin
+ */
+fun View.setMargin(
+    startDP: Int? = null,
+    topDP: Int? = null,
+    endDP: Int? = null,
+    bottomDP: Int? = null
+) {
+    (layoutParams as? ViewGroup.MarginLayoutParams)?.let { params ->
+        params.setMargins(
+            if (startDP == null) {
+                params.leftMargin
+            } else {
+                context.dp2px(startDP.toFloat())
+            },
+            if (topDP == null) {
+                params.topMargin
+            } else {
+                context.dp2px(topDP.toFloat())
+            },
+            if (endDP == null) {
+                params.rightMargin
+            } else {
+                context.dp2px(endDP.toFloat())
+            },
+            if (bottomDP == null) {
+                params.bottomMargin
+            } else {
+                context.dp2px(bottomDP.toFloat())
+            }
+        )
+    }
 }
 
 fun TextView.trimString(): String {

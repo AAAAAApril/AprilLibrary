@@ -29,8 +29,8 @@ open class MultipleAdapter : AbsAdapter() {
         return placeholderView
     }
 
-    open fun getData(position: Int): Any {
-        return support.dataList[position]
+    open fun getData(adapterPosition: Int): Any {
+        return support.dataList[adapterPosition]
     }
 
     fun getDataList(): MutableList<Any> {
@@ -53,14 +53,19 @@ open class MultipleAdapter : AbsAdapter() {
         notifyItemInserted(support.dataList.lastIndex)
     }
 
-    open fun insertData(any: Any, position: Int) {
-        support.dataList.add(position, any)
-        notifyItemInserted(position)
+    open fun insertData(any: Any, adapterPosition: Int) {
+        support.dataList.add(adapterPosition, any)
+        notifyItemInserted(adapterPosition)
     }
 
-    open fun removeData(position: Int) {
-        support.dataList.removeAt(position)
-        notifyItemRemoved(position)
+    open fun resetData(any: Any, adapterPosition: Int) {
+        support.dataList[adapterPosition] = any
+        notifyItemChanged(adapterPosition)
+    }
+
+    open fun removeData(adapterPosition: Int) {
+        support.dataList.removeAt(adapterPosition)
+        notifyItemRemoved(adapterPosition)
     }
 
     open fun removeLastData() {
@@ -150,17 +155,24 @@ open class HeaderFooterAdapter : MultipleAdapter() {
         )
     }
 
-    override fun insertData(any: Any, position: Int) {
-        support.dataList.add(position, any)
+    override fun insertData(any: Any, adapterPosition: Int) {
+        support.dataList.add(adapterPosition, any)
         notifyItemInserted(
-            position + headerCount()
+            adapterPosition + headerCount()
         )
     }
 
-    override fun removeData(position: Int) {
-        support.dataList.removeAt(position)
+    override fun resetData(any: Any, adapterPosition: Int) {
+        support.dataList[adapterPosition - headerCount()] = any
+        notifyItemChanged(
+            adapterPosition
+        )
+    }
+
+    override fun removeData(adapterPosition: Int) {
+        support.dataList.removeAt(adapterPosition)
         notifyItemRemoved(
-            position + headerCount()
+            adapterPosition + headerCount()
         )
     }
 

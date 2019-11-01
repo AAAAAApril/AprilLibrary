@@ -22,8 +22,8 @@ class MainActivity : AppCompatActivity() {
         val adapter = MultipleAdapter()
         am_rv.layoutManager = LinearLayoutManager(this)
         am_rv.addItemDecoration(GridSpanDecoration(this).apply {
-            setHorizontalSpacingDP(10)
-            setVerticalSpacingDP(16)
+            setHorizontalOffsetDP(10)
+            setVerticalOffsetDP(16)
             setIncludeEdge(true)
         })
         am_rv.adapter = adapter

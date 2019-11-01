@@ -30,9 +30,9 @@ open class GridSpanDecoration(
     @RecyclerView.Orientation
     private var mOrientation: Int = RecyclerView.VERTICAL
     //横向间隔（PX）
-    private var mHorizontalSpacing = 0
+    private var mHorizontalOffset = 0
     //纵向间隔（PX）
-    private var mVerticalSpacing = 0
+    private var mVerticalOffset = 0
     //是否包含边缘（如果为 false，则 item 与 RecyclerView 布局接触的地方不会出现边距，否则会出现）
     private var mIncludeEdge: Boolean = true
 
@@ -53,15 +53,15 @@ open class GridSpanDecoration(
     /**
      * 设置横向偏移量
      */
-    fun setHorizontalSpacingDP(horizontalSpacingDP: Int) {
-        mHorizontalSpacing = dp2px(horizontalSpacingDP)
+    fun setHorizontalOffsetDP(horizontalOffsetDP: Int) {
+        mHorizontalOffset = dp2px(horizontalOffsetDP)
     }
 
     /**
      * 设置纵向偏移量
      */
-    fun setVerticalSpacingDP(verticalSpacingDP: Int) {
-        mVerticalSpacing = dp2px(verticalSpacingDP)
+    fun setVerticalOffsetDP(verticalOffsetDP: Int) {
+        mVerticalOffset = dp2px(verticalOffsetDP)
     }
 
     /**
@@ -83,8 +83,8 @@ open class GridSpanDecoration(
             view,
             parent.getChildAdapterPosition(view),
             mSpanCount,
-            mHorizontalSpacing,
-            mVerticalSpacing,
+            mHorizontalOffset,
+            mVerticalOffset,
             mIncludeEdge
         )
     }
@@ -100,9 +100,9 @@ open class GridSpanDecoration(
         //每行或者每列的个数
         mSpanCount: Int,
         //横向边距
-        mHorizontalSpacing: Int,
+        mHorizontalOffset: Int,
         //纵向边距
-        mVerticalSpacing: Int,
+        mVerticalOffset: Int,
         //是否在 RecyclerView 边界位置应用偏移量
         mIncludeEdge: Boolean
     ) {
@@ -111,8 +111,8 @@ open class GridSpanDecoration(
             mOutRect,
             mPosition,
             mSpanCount,
-            mHorizontalSpacing,
-            mVerticalSpacing,
+            mHorizontalOffset,
+            mVerticalOffset,
             mIncludeEdge
         )
     }
@@ -126,8 +126,8 @@ open class GridSpanDecoration(
         outRect: Rect,
         position: Int,
         spanCount: Int,
-        horizontalSpacing: Int,
-        verticalSpacing: Int,
+        horizontalOffset: Int,
+        verticalOffset: Int,
         includeEdge: Boolean
     ) {
         val column = position % spanCount
@@ -136,38 +136,38 @@ open class GridSpanDecoration(
             RecyclerView.VERTICAL -> {
                 if (includeEdge) {
                     // spacing - column * ((1f / spanCount) * spacing)
-                    outRect.left = horizontalSpacing - column * horizontalSpacing / spanCount
+                    outRect.left = horizontalOffset - column * horizontalOffset / spanCount
                     // (column + 1) * ((1f / spanCount) * spacing)
-                    outRect.right = (column + 1) * horizontalSpacing / spanCount
+                    outRect.right = (column + 1) * horizontalOffset / spanCount
                     // top edge
                     if (position < spanCount) {
-                        outRect.top = verticalSpacing
+                        outRect.top = verticalOffset
                     }
-                    outRect.bottom = verticalSpacing // item bottom
+                    outRect.bottom = verticalOffset // item bottom
                 } else {
                     // column * ((1f / spanCount) * spacing)
-                    outRect.left = column * horizontalSpacing / spanCount
+                    outRect.left = column * horizontalOffset / spanCount
                     // spacing - (column + 1) * ((1f / spanCount) * spacing)
-                    outRect.right = horizontalSpacing - (column + 1) * horizontalSpacing / spanCount
+                    outRect.right = horizontalOffset - (column + 1) * horizontalOffset / spanCount
                     if (position >= spanCount) {
-                        outRect.top = verticalSpacing // item top
+                        outRect.top = verticalOffset // item top
                     }
                 }
             }
             //横向
             RecyclerView.HORIZONTAL -> {
                 if (includeEdge) {
-                    outRect.top = verticalSpacing - column * verticalSpacing / spanCount
-                    outRect.bottom = (column + 1) * verticalSpacing / spanCount
+                    outRect.top = verticalOffset - column * verticalOffset / spanCount
+                    outRect.bottom = (column + 1) * verticalOffset / spanCount
                     if (position < spanCount) {
-                        outRect.left = horizontalSpacing
+                        outRect.left = horizontalOffset
                     }
-                    outRect.right = horizontalSpacing
+                    outRect.right = horizontalOffset
                 } else {
-                    outRect.top = column * verticalSpacing / spanCount
-                    outRect.bottom = verticalSpacing - (column + 1) * verticalSpacing / spanCount
+                    outRect.top = column * verticalOffset / spanCount
+                    outRect.bottom = verticalOffset - (column + 1) * verticalOffset / spanCount
                     if (position >= spanCount) {
-                        outRect.left = horizontalSpacing
+                        outRect.left = horizontalOffset
                     }
                 }
             }

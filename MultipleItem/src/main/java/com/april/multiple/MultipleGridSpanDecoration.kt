@@ -14,17 +14,17 @@ class MultipleGridSpanDecoration(
     private val support: HeaderFooterSupport
 ) : GridSpanDecoration(context) {
 
-    private var mSpecialItemHorizontalSpacing: Int? = null
-    private var mSpecialItemVerticalSpacing: Int? = null
-    private var mSpecialItemNeedOffsets = false
+    private var mSpecialItemHorizontalOffset: Int? = null
+    private var mSpecialItemVerticalOffset: Int? = null
+    private var mSpecialItemNeedOffset = false
 
     /**
      * 设置特殊 item 横向上的偏移量 （单位：DP）
      *
      * 如果没有设置偏移量，但是又需要做偏移，则使用默认的值
      */
-    fun setSpecialItemHorizontalSpacingDP(specialItemHorizontalSpacingDP: Int) {
-        mSpecialItemHorizontalSpacing = dp2px(specialItemHorizontalSpacingDP)
+    fun setSpecialItemHorizontalOffsetDP(specialItemHorizontalOffsetDP: Int) {
+        mSpecialItemHorizontalOffset = dp2px(specialItemHorizontalOffsetDP)
     }
 
     /**
@@ -32,15 +32,15 @@ class MultipleGridSpanDecoration(
      *
      * 如果没有设置偏移量，但是又需要做偏移，则使用默认的值
      */
-    fun setSpecialItemVerticalSpacingDP(specialItemVerticalSpacingDP: Int) {
-        mSpecialItemVerticalSpacing = dp2px(specialItemVerticalSpacingDP)
+    fun setSpecialItemVerticalOffsetDP(specialItemVerticalOffsetDP: Int) {
+        mSpecialItemVerticalOffset = dp2px(specialItemVerticalOffsetDP)
     }
 
     /**
      * 设置特殊 item 布局是否应用偏移量
      */
-    fun setSpecialItemNeedOffsets(specialItemNeedOffsets: Boolean) {
-        mSpecialItemNeedOffsets = specialItemNeedOffsets
+    fun setSpecialItemNeedOffset(specialItemNeedOffset: Boolean) {
+        mSpecialItemNeedOffset = specialItemNeedOffset
     }
 
     override fun onItemOffsets(
@@ -49,14 +49,14 @@ class MultipleGridSpanDecoration(
         mItemView: View,
         mPosition: Int,
         mSpanCount: Int,
-        mHorizontalSpacing: Int,
-        mVerticalSpacing: Int,
+        mHorizontalOffset: Int,
+        mVerticalOffset: Int,
         mIncludeEdge: Boolean
     ) {
 
         var spanCount = mSpanCount
-        var horizontalSpacing = mHorizontalSpacing
-        var verticalSpacing = mVerticalSpacing
+        var horizontalOffset = mHorizontalOffset
+        var verticalOffset = mVerticalOffset
 
         //头尾、占位布局单独设置
         if (support.isHeaderPosition(mPosition)
@@ -66,17 +66,17 @@ class MultipleGridSpanDecoration(
             // 头部、尾部，以及占位布局，都返回 1，这样在给它们做偏移时，就正常了
             spanCount = 1
             //这些不需要做偏移
-            if (!mSpecialItemNeedOffsets) {
-                horizontalSpacing = 0
-                verticalSpacing = 0
+            if (!mSpecialItemNeedOffset) {
+                horizontalOffset = 0
+                verticalOffset = 0
             }
             //需要做偏移
             else {
                 /*
                     如果没有设置偏移量，但是又需要做偏移，则使用默认的值
                  */
-                horizontalSpacing = mSpecialItemHorizontalSpacing ?: mHorizontalSpacing
-                verticalSpacing = mSpecialItemVerticalSpacing ?: mVerticalSpacing
+                horizontalOffset = mSpecialItemHorizontalOffset ?: mHorizontalOffset
+                verticalOffset = mSpecialItemVerticalOffset ?: mVerticalOffset
             }
         }
 
@@ -86,8 +86,8 @@ class MultipleGridSpanDecoration(
             mItemView,
             mPosition,
             spanCount,
-            horizontalSpacing,
-            verticalSpacing,
+            horizontalOffset,
+            verticalOffset,
             mIncludeEdge
         )
     }

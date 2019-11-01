@@ -29,8 +29,8 @@ open class MultipleAdapter : AbsAdapter() {
         return placeholderView
     }
 
-    open fun getData(position: Int): Any {
-        return support.dataList[position]
+    open fun getData(adapterPosition: Int): Any {
+        return support.dataList[adapterPosition]
     }
 
     fun getDataList(): MutableList<Any> {
@@ -53,14 +53,19 @@ open class MultipleAdapter : AbsAdapter() {
         notifyItemInserted(support.dataList.lastIndex)
     }
 
-    open fun insertData(any: Any, position: Int) {
-        support.dataList.add(position, any)
-        notifyItemInserted(position)
+    open fun insertData(any: Any, adapterPosition: Int) {
+        support.dataList.add(adapterPosition, any)
+        notifyItemInserted(adapterPosition)
     }
 
-    open fun removeData(position: Int) {
-        support.dataList.removeAt(position)
-        notifyItemRemoved(position)
+    open fun resetData(any: Any, adapterPosition: Int) {
+        support.dataList[adapterPosition] = any
+        notifyItemChanged(adapterPosition)
+    }
+
+    open fun removeData(adapterPosition: Int) {
+        support.dataList.removeAt(adapterPosition)
+        notifyItemRemoved(adapterPosition)
     }
 
     open fun removeLastData() {
@@ -139,25 +144,35 @@ open class HeaderFooterAdapter : MultipleAdapter() {
         notifyItemRemoved(index)
     }
 
+    fun headerCount(): Int = support.headerCount()
+
+    fun footerCount(): Int = support.footerCount()
 
     override fun addData(any: Any) {
         support.dataList.add(any)
         notifyItemInserted(
-            support.dataList.lastIndex + support.headerCount()
+            support.dataList.lastIndex + headerCount()
         )
     }
 
-    override fun insertData(any: Any, position: Int) {
-        support.dataList.add(position, any)
+    override fun insertData(any: Any, adapterPosition: Int) {
+        support.dataList.add(adapterPosition, any)
         notifyItemInserted(
-            position + support.headerCount()
+            adapterPosition + headerCount()
         )
     }
 
-    override fun removeData(position: Int) {
-        support.dataList.removeAt(position)
+    override fun resetData(any: Any, adapterPosition: Int) {
+        support.dataList[adapterPosition - headerCount()] = any
+        notifyItemChanged(
+            adapterPosition
+        )
+    }
+
+    override fun removeData(adapterPosition: Int) {
+        support.dataList.removeAt(adapterPosition)
         notifyItemRemoved(
-            position + support.headerCount()
+            adapterPosition + headerCount()
         )
     }
 
@@ -165,7 +180,7 @@ open class HeaderFooterAdapter : MultipleAdapter() {
         val index = support.dataList.lastIndex
         support.dataList.removeAt(index)
         notifyItemRemoved(
-            index + support.headerCount()
+            index + headerCount()
         )
     }
 
@@ -176,7 +191,7 @@ open class HeaderFooterAdapter : MultipleAdapter() {
         val index = dataList.size
         support.dataList.addAll(dataList)
         notifyItemRangeInserted(
-            index + support.headerCount(),
+            index + headerCount(),
             dataList.size
         )
     }

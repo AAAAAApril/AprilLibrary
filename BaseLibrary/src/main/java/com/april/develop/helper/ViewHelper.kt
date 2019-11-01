@@ -7,7 +7,9 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
+import android.text.method.ScrollingMovementMethod
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -23,11 +25,16 @@ import androidx.core.content.ContextCompat
  * [invisible] View invisible
  * [backgroundColorRes] View 背景色 资源色
  * [backgroundTintListValueOfColorRes] View backgroundTintList
+ * [canScrollUp]
+ * [canScrollStart]
+ * [canScrollDown]
+ * [canScrollEnd]
  *
  * [trimString] TextView 去掉末尾空格的字符串
  * [halfBold] TextView 文字半粗，介于 normal 和 bold 之间
  * [textColorRes] TextView 文字颜色 资源文件
  * [drawables] TextView drawable start top end bottom
+ * [allowScroll] 允许滚动
  * [copyText] TextView 复制文字
  *
  * [search] EditText 软键盘搜索功能
@@ -86,6 +93,42 @@ fun View.canScrollEnd(): Boolean {
     return canScrollHorizontally(1)
 }
 
+
+/**
+ * 设置 margin
+ */
+fun View.setMargin(
+    startDP: Int? = null,
+    topDP: Int? = null,
+    endDP: Int? = null,
+    bottomDP: Int? = null
+) {
+    (layoutParams as? ViewGroup.MarginLayoutParams)?.let { params ->
+        params.setMargins(
+            if (startDP == null) {
+                params.leftMargin
+            } else {
+                context.dp2px(startDP.toFloat())
+            },
+            if (topDP == null) {
+                params.topMargin
+            } else {
+                context.dp2px(topDP.toFloat())
+            },
+            if (endDP == null) {
+                params.rightMargin
+            } else {
+                context.dp2px(endDP.toFloat())
+            },
+            if (bottomDP == null) {
+                params.bottomMargin
+            } else {
+                context.dp2px(bottomDP.toFloat())
+            }
+        )
+    }
+}
+
 fun TextView.trimString(): String {
     return text.toString().trim()
 }
@@ -128,6 +171,13 @@ fun TextView.drawables(
     setCompoundDrawablesRelativeWithIntrinsicBounds(
         start, top, end, bottom
     )
+}
+
+/**
+ * 允许滚动
+ */
+fun TextView.allowScroll() {
+    movementMethod = ScrollingMovementMethod.getInstance()
 }
 
 /**

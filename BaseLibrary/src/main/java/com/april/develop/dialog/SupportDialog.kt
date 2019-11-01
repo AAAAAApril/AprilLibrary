@@ -5,10 +5,7 @@ import android.graphics.Point
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.Window
+import android.view.*
 import androidx.annotation.CallSuper
 import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
@@ -21,25 +18,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 abstract class SupportDialogFragment : DialogFragment() {
 
     @LayoutRes
-    abstract fun setDialogLayoutRes(): Int
-
-    abstract override fun onViewCreated(view: View, savedInstanceState: Bundle?)
-
-    /**
-     * 设置样式和主题
-     */
-    protected open fun setStyleAndTheme(): Array<Int?> {
-        //弹窗时，调整宽度为默认。否则可能宽度过窄。
-        return arrayOf(
-            STYLE_NO_TITLE,
-            android.R.style.Theme_Material_Dialog_MinWidth
-        )
-    }
+    protected abstract fun supportDialogLayoutRes(): Int
 
     /**
      * 默认背景是否透明（透明之后才能看清自己给布局设置的背景）
      */
-    protected open fun backgroundTransparent(): Boolean {
+    protected open fun supportDialogTransparent(): Boolean {
         return false
     }
 
@@ -47,27 +31,29 @@ abstract class SupportDialogFragment : DialogFragment() {
      *  窗口透明度（黑色遮罩的阴暗程度，系统默认的在 0.7 左右）
      */
     @FloatRange(from = 0.0, to = 1.0)
-    protected open fun windowDarkFrameAlpha(): Float {
+    protected open fun supportDialogWindowDarkFrameAlpha(): Float {
         return 0.6f
     }
 
     /**
-     * 宽度、高度占窗口宽度、高度的百分比例
-     *
-     * 返回 null 表示自适应
+     * 窗口位置
      */
-    protected open fun widthAndHeightPercent(): Array<Float?> {
-        return arrayOf(0.8f, null)
+    protected open fun supportDialogGravity(): Int {
+        return Gravity.CENTER
     }
 
-    @CallSuper
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val style = setStyleAndTheme()[0]
-        val theme = setStyleAndTheme()[1]
-        if (style != null && theme != null) {
-            setStyle(style, theme)
-        }
+    /**
+     * Dialog 显示宽度
+     */
+    protected open fun supportDialogWidth(windowWidthPixels: Int): Int {
+        return (windowWidthPixels * 0.8f).toInt()
+    }
+
+    /**
+     * Dialog 显示高度
+     */
+    protected open fun supportDialogHeight(windowHeightPixels: Int): Int {
+        return ViewGroup.LayoutParams.WRAP_CONTENT
     }
 
     @CallSuper
@@ -78,37 +64,28 @@ abstract class SupportDialogFragment : DialogFragment() {
     ): View? {
         //弹窗时，不要标题
         dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        return inflater.inflate(setDialogLayoutRes(), container, false)
+        return inflater.inflate(supportDialogLayoutRes(), container, false)
     }
 
     @CallSuper
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         dialog?.window?.apply {
+            setGravity(supportDialogGravity())
             //背景透明
-            if (backgroundTransparent()) {
+            if (supportDialogTransparent()) {
                 setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             }
-            setDimAmount(windowDarkFrameAlpha())
-            //宽度占比
-            val dm = DisplayMetrics()
-            windowManager?.defaultDisplay?.getMetrics(dm)
-            //宽高比数据
-            val widthAndHeight = widthAndHeightPercent()
-            setLayout(
-                //宽度
-                if (widthAndHeight[0] != null) {
-                    (dm.widthPixels * widthAndHeight[0]!!).toInt()
-                } else {
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                },
-                //高度
-                if (widthAndHeight[1] != null) {
-                    (dm.heightPixels * widthAndHeight[1]!!).toInt()
-                } else {
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                }
-            )
+            setDimAmount(supportDialogWindowDarkFrameAlpha())
+            //宽高
+            DisplayMetrics().also {
+                windowManager.defaultDisplay.getMetrics(it)
+            }.let {
+                setLayout(
+                    supportDialogWidth(it.widthPixels),
+                    supportDialogHeight(it.heightPixels)
+                )
+            }
         }
     }
 
@@ -117,31 +94,29 @@ abstract class SupportDialogFragment : DialogFragment() {
 abstract class SupportBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     @LayoutRes
-    abstract fun setDialogLayoutRes(): Int
+    protected abstract fun supportDialogLayoutRes(): Int
 
-    abstract override fun onViewCreated(view: View, savedInstanceState: Bundle?)
+    /**
+     * 默认背景是否透明（透明之后才能看清自己给布局设置的背景）
+     */
+    protected open fun supportDialogTransparent(): Boolean {
+        return false
+    }
 
     /**
      *  窗口透明度（黑色遮罩的阴暗程度，系统默认的在 0.7 左右）
      */
     @FloatRange(from = 0.0, to = 1.0)
-    protected open fun windowDarkFrameAlpha(): Float {
+    protected open fun supportDialogWindowDarkFrameAlpha(): Float {
         return 0.6f
     }
 
     /**
-     * 默认背景是否透明（透明之后才能看清自己给布局设置的背景）
-     */
-    protected open fun backgroundTransparent(): Boolean {
-        return false
-    }
-
-    /**
-     * 展开时，固定死的高度占整个窗口高度的百分比，此时不允许滑动
+     * 展开时，固定死的高度，此时不允许滑动
      *
      * 返回 null 表示不固定高度
      */
-    protected open fun fixedHeightPercent(): Float? {
+    protected open fun supportDialogFixedHeight(windowHeightPixels: Int): Int? {
         return null
     }
 
@@ -153,7 +128,7 @@ abstract class SupportBottomSheetDialogFragment : BottomSheetDialogFragment() {
     ): View? {
         //弹窗时，不要标题
         dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        return inflater.inflate(setDialogLayoutRes(), container, false)
+        return inflater.inflate(supportDialogLayoutRes(), container, false)
     }
 
     private val mBottomSheetBehavior: BottomSheetBehavior<View>? by lazy {
@@ -176,24 +151,26 @@ abstract class SupportBottomSheetDialogFragment : BottomSheetDialogFragment() {
     @CallSuper
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        dialog?.window?.let { window ->
+        dialog?.window?.also { window ->
             //窗口阴影
-            window.setDimAmount(windowDarkFrameAlpha())
+            window.setDimAmount(supportDialogWindowDarkFrameAlpha())
             (view?.parent as? ViewGroup)?.let { parent ->
                 //背景透明
-                if (backgroundTransparent()) {
+                if (supportDialogTransparent()) {
                     parent.setBackgroundResource(android.R.color.transparent)
                 }
+                //设置高度
+                val fixedHeight = Point().let { point ->
+                    window.windowManager.defaultDisplay.getSize(point)
+                    supportDialogFixedHeight(point.y)
+                }
                 //固定死高度
-                if (fixedHeightPercent() != null) {
+                if (fixedHeight != null) {
                     parent.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
                     parent.post {
                         mBottomSheetBehavior?.let { behavior ->
                             behavior.setBottomSheetCallback(mBottomSheetBehaviorCallback)
-                            //设置高度
-                            val point = Point()
-                            window.windowManager.defaultDisplay.getSize(point)
-                            behavior.peekHeight = ((point.y) * fixedHeightPercent()!!).toInt()
+                            behavior.peekHeight = fixedHeight
                         }
                     }
                 }

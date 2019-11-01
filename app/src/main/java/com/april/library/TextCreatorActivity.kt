@@ -27,7 +27,7 @@ class TextCreatorActivity : AppCompatActivity() {
                 LineCreator(),
                 TextCreator("hello world !",
                     textType = TextCreatorType.Serif,
-                    onClick = {
+                    onClick = { _, _ ->
                         toast("hello world !")
                     }
                 ),

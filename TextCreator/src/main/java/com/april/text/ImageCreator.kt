@@ -16,4 +16,6 @@ class ImageCreator(
     //点击事件
     onClick: ((View) -> Unit)? = null
 //图片样式为占位类型，所以需要给个字符用来占位替换，这里用了空白字符 " "
-) : TextCreator(text = " ", onClick = onClick)
+) : TextCreator(text = " ", onClick = { view, _ ->
+    onClick?.invoke(view)
+})

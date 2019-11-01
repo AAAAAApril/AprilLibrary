@@ -18,7 +18,7 @@ import androidx.fragment.app.Fragment
 abstract class LazyFragment : Fragment() {
 
     @LayoutRes
-    protected abstract fun setLazyFragmentLayoutRes(): Int
+    protected abstract fun setLayoutRes(): Int
 
     protected abstract fun onShouldLoadView(contentView: View)
 
@@ -36,7 +36,7 @@ abstract class LazyFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         if (lazyFragmentContentView == null) {
-            lazyFragmentContentView = inflater.inflate(setLazyFragmentLayoutRes(), container, false)
+            lazyFragmentContentView = inflater.inflate(setLayoutRes(), container, false)
         }
         return lazyFragmentContentView
     }

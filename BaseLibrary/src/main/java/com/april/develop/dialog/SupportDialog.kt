@@ -5,10 +5,7 @@ import android.graphics.Point
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.Window
+import android.view.*
 import androidx.annotation.CallSuper
 import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
@@ -36,6 +33,13 @@ abstract class SupportDialogFragment : DialogFragment() {
     @FloatRange(from = 0.0, to = 1.0)
     protected open fun supportDialogWindowDarkFrameAlpha(): Float {
         return 0.6f
+    }
+
+    /**
+     * 窗口位置
+     */
+    protected open fun supportDialogGravity(): Int {
+        return Gravity.CENTER
     }
 
     /**
@@ -67,6 +71,7 @@ abstract class SupportDialogFragment : DialogFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         dialog?.window?.apply {
+            setGravity(supportDialogGravity())
             //背景透明
             if (supportDialogTransparent()) {
                 setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

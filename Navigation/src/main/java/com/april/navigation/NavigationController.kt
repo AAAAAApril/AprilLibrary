@@ -18,7 +18,7 @@ class NavigationController(
     /**
      * 压栈 操作
      */
-    fun pushFragment(option: PushOption) {
+    internal fun pushFragment(option: PushOption) {
         //需要移除当前这个
         if (option.removeNow
             //必须要存在至少一个 Fragment
@@ -83,6 +83,16 @@ class NavigationController(
             } else {
                 popFragmentInternalByName(option, backStackName)
             }
+        }
+    }
+
+    /**
+     * 出栈所有的 Fragment
+     */
+    fun popFragmentAll() {
+        pushStackOptionList.clear()
+        for (i in 0 until manager.backStackEntryCount) {
+            manager.popBackStackImmediate()
         }
     }
 

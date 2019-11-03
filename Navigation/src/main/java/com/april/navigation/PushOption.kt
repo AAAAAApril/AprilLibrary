@@ -1,5 +1,6 @@
 package com.april.navigation
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.annotation.AnimRes
 import androidx.annotation.AnimatorRes
@@ -13,6 +14,8 @@ class PushOption(
     internal val targetFragment: Fragment,
     //回退栈名
     internal val backStackName: String,
+    //回传数据回调接口
+    internal val callBack: NavigationResultCallBack? = null,
     //是否移除当前最顶层栈正在显示的这个 Fragment
     internal val removeNow: Boolean = false
 ) {
@@ -22,13 +25,8 @@ class PushOption(
         }
     }
 
-    //压栈发起人
-//    val sponsorFragment: Fragment? = null
-    //回传数据回调接口
-    internal val callBack: NavigationResultCallBack? = null
-
     //回传结果数据
-    internal var resultCode: Int? = null
+    internal var resultCode: Int = Activity.RESULT_CANCELED
     internal var resultData: Bundle? = null
 
 //    val sharedElementView: View? = null

@@ -7,9 +7,9 @@ import androidx.fragment.app.FragmentManager
 
 
 class NavigationController(
-    private val manager: FragmentManager,
+    internal val manager: FragmentManager,
     @IdRes
-    private val containerViewID: Int
+    internal val containerViewID: Int
 ) {
 
     //记录最顶层的压栈
@@ -66,7 +66,10 @@ class NavigationController(
      *
      * [backStackName] 需要被弹出栈的 回退栈名
      */
-    internal fun popFragment(backStackName: String? = null) {
+    internal fun popFragment(
+        backStackName: String? = null,
+        flag: Int = FragmentManager.POP_BACK_STACK_INCLUSIVE
+    ) {
         if (!canPopFragment()) {
             return
         }
@@ -81,7 +84,7 @@ class NavigationController(
             if (option == pushStackOptionList.last()) {
                 popFragmentInternal(option)
             } else {
-                popFragmentInternalByName(option, backStackName)
+                popFragmentInternalByName(option, backStackName, flag)
             }
         }
     }
@@ -89,7 +92,7 @@ class NavigationController(
     /**
      * 出栈所有的 Fragment
      */
-    fun popFragmentAll() {
+    internal fun popFragmentAll() {
         pushStackOptionList.clear()
         for (i in 0 until manager.backStackEntryCount) {
             manager.popBackStackImmediate()
@@ -101,11 +104,7 @@ class NavigationController(
      */
     private fun popFragmentInternal(option: PushOption) {
         manager.popBackStackImmediate()
-        option.callBack?.let { callBack ->
-            option.resultCode?.let {
-                callBack.onNavigationResult(it, option.resultData)
-            }
-        }
+        option.callBack?.onNavigationResult(option.resultCode, option.resultData)
         pushStackOptionList.remove(option)
     }
 
@@ -113,8 +112,14 @@ class NavigationController(
      * 回退
      *
      * 包含 [backStackName] 所对应的 操作
+     * [flag] 0 或者 POP_BACK_STACK_INCLUSIVE，即：不包含 或者 包含。
+     * 如果包含，则这个 回退名所对应的 Fragment 会被移除
      */
-    private fun popFragmentInternalByName(option: PushOption, backStackName: String) {
+    private fun popFragmentInternalByName(
+        option: PushOption,
+        backStackName: String,
+        flag: Int = FragmentManager.POP_BACK_STACK_INCLUSIVE
+    ) {
         //backStackName 对应的操作以后的所有
         val subList = pushStackOptionList.subList(
             pushStackOptionList.indexOf(option),
@@ -125,16 +130,14 @@ class NavigationController(
         //出栈
         manager.popBackStackImmediate(
             backStackName,
-            FragmentManager.POP_BACK_STACK_INCLUSIVE
+            flag
         )
     }
 
     /**
-     * 由 [Activity.onBackPressed] 调度此函数
-     *
      * [Boolean] 是否还有 Fragment 可以回退
      */
-    fun onBackPressed(): Boolean {
+    internal fun onBackPressed(): Boolean {
         val can = canPopFragment()
         if (can) {
             pushStackOptionList.last().let {
@@ -147,14 +150,14 @@ class NavigationController(
     /**
      * [Boolean] 是否可以弹出 Fragment
      */
-    fun canPopFragment(): Boolean {
+    internal fun canPopFragment(): Boolean {
         return pushStackOptionList.size > 1
     }
 
     /**
      * 设置导航回传数据
      */
-    fun setNavigationResult(
+    internal fun setNavigationResult(
         //回传数据的 Fragment
         fragment: Fragment,
         //结果码

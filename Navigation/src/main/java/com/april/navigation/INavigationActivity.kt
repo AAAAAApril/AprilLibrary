@@ -1,5 +1,5 @@
 package com.april.navigation
 
 interface INavigationActivity {
-    val navigator: NavigationController
+    val navigator: Navigator
 }

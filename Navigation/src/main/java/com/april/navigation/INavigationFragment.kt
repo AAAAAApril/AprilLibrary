@@ -1,8 +1,12 @@
 package com.april.navigation
 
+import android.app.Activity
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 
 interface INavigationFragment {
+
+    fun getNavigator(): Navigator?
 
     /**
      * 返回操作，可以通过这个函数出栈
@@ -28,4 +32,20 @@ interface INavigationFragment {
         resultData: Bundle?
     )
 
+}
+
+//==================================================================================================
+
+fun <T> T.setNavigationResult(
+    //结果数据
+    resultData: Bundle,
+    //结果码
+    resultCode: Int = Activity.RESULT_OK
+) where T : Fragment,
+        T : INavigationFragment {
+    getNavigator()?.setNavigationResult(
+        this,
+        resultCode,
+        resultData
+    )
 }

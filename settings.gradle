@@ -1,1 +1,1 @@
-include ':app', ':MultipleItem', ':Navigation', ':TextCreator', ':APermission', ':BaseLibrary'
+include ':app', ':MultipleItem', ':Navigation', ':TextCreator', ':APermission', ':BaseLibrary', ':BannerView'

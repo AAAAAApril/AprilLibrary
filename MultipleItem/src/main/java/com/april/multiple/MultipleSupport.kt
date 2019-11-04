@@ -84,31 +84,31 @@ open class MultipleSupport {
     /**
      * 适配 GridLayoutManager
      *
+     * FIXME  实现还有问题，需要重新设计
+     *
      * 注意：请在 adapter 注册完所有 ItemDelegate 之后，并且在
      * ItemDelegate 调用过 setSpanSizeInGridLayoutManager(Int) 函数之后，再调用此函数
      *
      * @param manager （已经，或者将要）设置给 RecyclerView 的 网格布局管理器
      */
-    fun adapteGridLayoutManager(
-        support: MultipleSupport,
-        manager: GridLayoutManager
-    ) {
-        assert(support.itemDelegateArray.isNotEmpty()) {
-            "请在注册完所有的 ItemDelegate 之后再调用此函数"
-        }
-        val spanSizeArray = IntArray(support.itemDelegateArray.size()) {
-            support.itemDelegateArray[it].getSpanSizeInGridLayoutManager()
-        }
-        //求出最小公倍数
-        val leastCommonMultiple = getLeastCommonMultiple(spanSizeArray)
-        //变化的倍数
-        val times = (leastCommonMultiple / spanSizeArray.max()!!)
-        support.itemDelegateArray.forEach { _, delegate ->
-            //  给每个 item 设置这个倍数
-            delegate.setAdaptedTimesInGridLayoutManager(times)
-        }
-        //重新给 GridLayoutManager 的 spanSizeLookup 赋值
-        manager.spanSizeLookup = CrossSpanSizeLookUp(support, leastCommonMultiple)
+    fun adaptGridLayoutManager(manager: GridLayoutManager) {
+//        assert(itemDelegateArray.isNotEmpty()) {
+//            "请在注册完所有的 ItemDelegate 之后再调用此函数"
+//        }
+//        val spanSizeArray = IntArray(itemDelegateArray.size()) {
+//            itemDelegateArray.valueAt(it).getSpanSizeInGridLayoutManager()
+//        }
+//        //求出最小公倍数
+//        val leastCommonMultiple = getLeastCommonMultiple(spanSizeArray)
+//        //变化的倍数
+//        val times = (leastCommonMultiple / spanSizeArray.max()!!)
+//        itemDelegateArray.forEach { _, delegate ->
+//            //  给每个 item 设置这个倍数
+//            delegate.setAdaptedTimesInGridLayoutManager(times)
+//        }
+//        //重新给 GridLayoutManager 的 spanSizeLookup 赋值
+//        manager.spanSizeLookup = CrossSpanSizeLookUp(this, leastCommonMultiple)
+        manager.spanSizeLookup = CrossSpanSizeLookUp(this, manager.spanCount)
     }
 
     /**

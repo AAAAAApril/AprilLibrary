@@ -57,12 +57,14 @@ class MultipleGridSpanDecoration(
         var spanCount = mSpanCount
         var horizontalOffset = mHorizontalOffset
         var verticalOffset = mVerticalOffset
+        var position = mPosition
 
         //头尾、占位布局单独设置
         if (support.isHeaderPosition(mPosition)
             || support.isFooterPosition(mPosition)
             || mItemView == support.placeholderView
         ) {
+            position = 0
             // 头部、尾部，以及占位布局，都返回 1，这样在给它们做偏移时，就正常了
             spanCount = 1
             //这些不需要做偏移
@@ -78,13 +80,15 @@ class MultipleGridSpanDecoration(
                 horizontalOffset = mSpecialItemHorizontalOffset ?: mHorizontalOffset
                 verticalOffset = mSpecialItemVerticalOffset ?: mVerticalOffset
             }
+        } else {
+            position = (position - support.headerCount())
         }
 
         super.onItemOffsets(
             mOrientation,
             mOutRect,
             mItemView,
-            mPosition,
+            position,
             spanCount,
             horizontalOffset,
             verticalOffset,

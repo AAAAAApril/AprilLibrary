@@ -58,7 +58,7 @@ class NavigationController(
             pushStackOptionList.add(option)
         }
             //提交
-            .commitNowAllowingStateLoss()
+            .commitAllowingStateLoss()
     }
 
     /**

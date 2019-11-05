@@ -129,6 +129,44 @@ fun View.setMargin(
     }
 }
 
+
+private val VIEW_STATUS_BAR_HEIGHT_SET = "ViewStatusBarHeightSet".hashCode()
+
+/**
+ *  给 View 增加一个状态栏高度的 paddingTop
+ *
+ *  [clearHeight] 是否是清除这个高度的操作
+ */
+fun View.fitSystemStatusBarHeight(clearHeight: Boolean = false) {
+    val set: Boolean = (getTag(VIEW_STATUS_BAR_HEIGHT_SET) as? Boolean) ?: false
+    //设置过了
+    if (set) {
+        //现在需要清除
+        if (clearHeight) {
+            setPadding(
+                paddingLeft,
+                paddingTop - context.statusBarHeight(),
+                paddingRight,
+                paddingBottom
+            )
+            setTag(VIEW_STATUS_BAR_HEIGHT_SET, false)
+        }
+    }
+    //没设置过
+    else {
+        if (!clearHeight) {
+            setPadding(
+                paddingLeft,
+                paddingTop + context.statusBarHeight(),
+                paddingRight,
+                paddingBottom
+            )
+            setTag(VIEW_STATUS_BAR_HEIGHT_SET, true)
+        }
+    }
+}
+
+
 fun TextView.trimString(): String {
     return text.toString().trim()
 }

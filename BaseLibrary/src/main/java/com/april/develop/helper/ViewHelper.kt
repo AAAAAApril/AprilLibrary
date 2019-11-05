@@ -93,75 +93,88 @@ fun View.canScrollEnd(): Boolean {
     return canScrollHorizontally(1)
 }
 
-
 /**
  * 设置 margin
  */
-fun View.setMargin(
-    startDP: Int? = null,
-    topDP: Int? = null,
-    endDP: Int? = null,
-    bottomDP: Int? = null
-) {
-    (layoutParams as? ViewGroup.MarginLayoutParams)?.let { params ->
-        params.setMargins(
-            if (startDP == null) {
-                params.leftMargin
-            } else {
-                context.dp2px(startDP.toFloat())
-            },
-            if (topDP == null) {
-                params.topMargin
-            } else {
-                context.dp2px(topDP.toFloat())
-            },
-            if (endDP == null) {
-                params.rightMargin
-            } else {
-                context.dp2px(endDP.toFloat())
-            },
-            if (bottomDP == null) {
-                params.bottomMargin
-            } else {
-                context.dp2px(bottomDP.toFloat())
-            }
-        )
+fun View.margin(block: (ViewGroup.MarginLayoutParams) -> ViewGroup.MarginLayoutParams) {
+    (layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+        layoutParams = block.invoke(it)
     }
 }
 
-
-private val VIEW_STATUS_BAR_HEIGHT_SET = "ViewStatusBarHeightSet".hashCode()
+private val VIEW_STATUS_BAR_HEIGHT_SET_PADDING = "ViewStatusBarHeightSetPadding".hashCode()
+private val VIEW_STATUS_BAR_HEIGHT_SET_MARGIN = "ViewStatusBarHeightSetMargin".hashCode()
 
 /**
  *  给 View 增加一个状态栏高度的 paddingTop
  *
+ *  [marginModel] 是否是增加 marginTop
  *  [clearHeight] 是否是清除这个高度的操作
  */
-fun View.fitSystemStatusBarHeight(clearHeight: Boolean = false) {
-    val set: Boolean = (getTag(VIEW_STATUS_BAR_HEIGHT_SET) as? Boolean) ?: false
-    //设置过了
-    if (set) {
-        //现在需要清除
-        if (clearHeight) {
-            setPadding(
-                paddingLeft,
-                paddingTop - context.statusBarHeight(),
-                paddingRight,
-                paddingBottom
-            )
-            setTag(VIEW_STATUS_BAR_HEIGHT_SET, false)
+fun View.fitSystemStatusBarHeight(
+    marginModel: Boolean = false,
+    clearHeight: Boolean = false
+) {
+    //现在需要清除
+    if (clearHeight) {
+        if (marginModel) {
+            val marginSet: Boolean =
+                (getTag(VIEW_STATUS_BAR_HEIGHT_SET_MARGIN) as? Boolean) ?: false
+            if (marginSet) {
+                (layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+                    it.setMargins(
+                        it.leftMargin,
+                        it.topMargin - context.statusBarHeight(),
+                        it.rightMargin,
+                        it.bottomMargin
+                    )
+                    layoutParams = it
+                }
+                setTag(VIEW_STATUS_BAR_HEIGHT_SET_MARGIN, false)
+            }
+        } else {
+            val paddingSet: Boolean =
+                (getTag(VIEW_STATUS_BAR_HEIGHT_SET_PADDING) as? Boolean) ?: false
+            if (paddingSet) {
+                setPadding(
+                    paddingLeft,
+                    paddingTop - context.statusBarHeight(),
+                    paddingRight,
+                    paddingBottom
+                )
+                setTag(VIEW_STATUS_BAR_HEIGHT_SET_PADDING, false)
+            }
         }
     }
-    //没设置过
+    //需要添加
     else {
-        if (!clearHeight) {
-            setPadding(
-                paddingLeft,
-                paddingTop + context.statusBarHeight(),
-                paddingRight,
-                paddingBottom
-            )
-            setTag(VIEW_STATUS_BAR_HEIGHT_SET, true)
+        if (marginModel) {
+            val marginSet: Boolean =
+                (getTag(VIEW_STATUS_BAR_HEIGHT_SET_MARGIN) as? Boolean) ?: false
+            if (!marginSet) {
+                (layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+                    it.setMargins(
+                        it.leftMargin,
+                        it.topMargin + context.statusBarHeight(),
+                        it.rightMargin,
+                        it.bottomMargin
+                    )
+                    layoutParams = it
+                }
+                setTag(VIEW_STATUS_BAR_HEIGHT_SET_MARGIN, true)
+            }
+        } else {
+            val paddingSet: Boolean =
+                (getTag(VIEW_STATUS_BAR_HEIGHT_SET_PADDING) as? Boolean) ?: false
+            if (!paddingSet) {
+                setPadding(
+                    paddingLeft,
+                    paddingTop + context.statusBarHeight(),
+                    paddingRight,
+                    paddingBottom
+                )
+                setTag(VIEW_STATUS_BAR_HEIGHT_SET_PADDING, true)
+            }
         }
     }
 }

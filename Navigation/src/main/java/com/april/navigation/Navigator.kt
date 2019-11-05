@@ -21,8 +21,56 @@ class Navigator(
     /**
      * 压栈操作
      */
+    fun pushFragment(
+        targetFragment: Fragment,
+        removeNow: Boolean = false
+    ) {
+        pushFragment(
+            PushOption(
+                targetFragment,
+                targetFragment.javaClass.name,
+                removeNow = removeNow
+            )
+        )
+    }
+
+    /**
+     * 压栈操作
+     */
+    fun pushFragment(
+        targetFragmentClass: Class<out Fragment>,
+        removeNow: Boolean = false
+    ) {
+        pushFragment(
+            PushOption(
+                createFragment(targetFragmentClass),
+                targetFragmentClass.name,
+                removeNow = removeNow
+            )
+        )
+    }
+
+    /**
+     * 压栈操作
+     */
     fun pushFragment(option: PushOption) {
         controller.pushFragment(option)
+    }
+
+    /**
+     * 压栈操作，并需要回传数据
+     */
+    fun pushFragmentForResult(
+        targetFragment: Fragment,
+        resultCallBack: NavigationResultCallBack
+    ) {
+        pushFragment(
+            PushOption(
+                targetFragment,
+                targetFragment.javaClass.name,
+                callBack = resultCallBack
+            )
+        )
     }
 
     /**
@@ -96,19 +144,6 @@ class Navigator(
 
 //==================================================================================================
 
-fun Navigator.pushFragment(
-    targetFragment: Fragment,
-    removeNow: Boolean = false
-) {
-    pushFragment(
-        PushOption(
-            targetFragment,
-            targetFragment.javaClass.name,
-            removeNow = removeNow
-        )
-    )
-}
-
 inline fun <reified T> Navigator.pushFragment(
     arguments: Bundle? = null,
     removeNow: Boolean = false
@@ -135,19 +170,6 @@ inline fun <reified T> Navigator.pushFragment(
 }
 
 //==================================================================================================
-
-fun Navigator.pushFragmentForResult(
-    targetFragment: Fragment,
-    resultCallBack: NavigationResultCallBack
-) {
-    pushFragment(
-        PushOption(
-            targetFragment,
-            targetFragment.javaClass.name,
-            callBack = resultCallBack
-        )
-    )
-}
 
 inline fun <reified T> Navigator.pushFragmentForResult(
     arguments: Bundle? = null,

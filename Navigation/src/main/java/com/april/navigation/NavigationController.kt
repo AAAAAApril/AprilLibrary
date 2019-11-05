@@ -24,10 +24,10 @@ class NavigationController(
             //必须要存在至少一个 Fragment
             && pushStackOptionList.size > 0
         ) {
-            pushStackOptionList.removeAt(
-                pushStackOptionList.lastIndex
-            )
+            val lastOption = pushStackOptionList.last()
+            pushStackOptionList.remove(lastOption)
             manager.popBackStackImmediate()
+            manager.fragments.remove(lastOption.targetFragment)
         }
         //执行压栈任务
         manager.beginTransaction().also { transition ->
@@ -93,10 +93,13 @@ class NavigationController(
      * 出栈所有的 Fragment
      */
     internal fun popFragmentAll() {
-        pushStackOptionList.clear()
         for (i in 0 until manager.backStackEntryCount) {
             manager.popBackStackImmediate()
         }
+        for (option in pushStackOptionList) {
+            manager.fragments.remove(option.targetFragment)
+        }
+        pushStackOptionList.clear()
     }
 
     /**
@@ -105,6 +108,7 @@ class NavigationController(
     private fun popFragmentInternal(option: PushOption) {
         manager.popBackStackImmediate()
         option.callBack?.onNavigationResult(option.resultCode, option.resultData)
+        manager.fragments.remove(option.targetFragment)
         pushStackOptionList.remove(option)
     }
 
@@ -125,13 +129,16 @@ class NavigationController(
             pushStackOptionList.indexOf(option),
             pushStackOptionList.size
         )
-        //移除以后的所有
-        pushStackOptionList.removeAll(subList)
         //出栈
         manager.popBackStackImmediate(
             backStackName,
             flag
         )
+        for (removeOption in subList) {
+            manager.fragments.remove(removeOption.targetFragment)
+        }
+        //移除以后的所有
+        pushStackOptionList.removeAll(subList)
     }
 
     /**

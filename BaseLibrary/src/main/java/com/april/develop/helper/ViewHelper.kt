@@ -235,10 +235,10 @@ fun TextView.allowScroll() {
  * 复制 TextView 上面的文字
  * [Boolean] 是否成功
  */
-fun TextView.copyText(): Boolean {
+fun TextView.copyText(targetText: CharSequence? = null): Boolean {
     val manager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
     return if (manager != null) {
-        manager.primaryClip = ClipData.newPlainText("Label", text)
+        manager.primaryClip = ClipData.newPlainText("Label", targetText ?: text)
         true
     } else {
         false

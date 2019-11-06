@@ -26,7 +26,7 @@ class NavigationController(
         ) {
             val lastOption = pushStackOptionList.last()
             pushStackOptionList.remove(lastOption)
-            manager.popBackStackImmediate()
+            manager.popBackStack()
             manager.fragments.remove(lastOption.targetFragment)
         }
         //执行压栈任务

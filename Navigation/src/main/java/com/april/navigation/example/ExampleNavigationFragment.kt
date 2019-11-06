@@ -23,7 +23,7 @@ open class ExampleNavigationFragment : Fragment(), INavigationFragment {
     }
 
     final override fun setNavigationResult(resultCode: Int, resultData: Bundle?) {
-        (activity as? INavigationActivity)?.navigator?.setNavigationResult(
+        getNavigator()?.setNavigationResult(
             this,
             resultCode,
             resultData

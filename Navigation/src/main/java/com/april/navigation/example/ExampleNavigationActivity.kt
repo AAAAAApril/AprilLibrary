@@ -7,12 +7,11 @@ import com.april.navigation.Navigator
 
 open class ExampleNavigationActivity : AppCompatActivity(), INavigationActivity {
 
-    override val navigator: Navigator by lazy {
+    override var navigator: Navigator? =
         Navigator(supportFragmentManager, Window.ID_ANDROID_CONTENT)
-    }
 
     override fun onBackPressed() {
-        if (!navigator.onBackPressed()) {
+        if (navigator?.onBackPressed() != true) {
             super.onBackPressed()
         }
     }

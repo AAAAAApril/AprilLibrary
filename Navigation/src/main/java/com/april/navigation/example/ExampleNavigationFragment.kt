@@ -12,10 +12,10 @@ open class ExampleNavigationFragment : Fragment(), INavigationFragment {
 
     final override fun onDispatchBackPressed() {
         activity?.let {
-            if (it is INavigationActivity) {
-                if (it.navigator.canPopFragment()) {
-                    it.navigator.popFragment()
-                }
+            if (it is INavigationActivity
+                && getNavigator()?.canPopFragment() == true
+            ) {
+                getNavigator()?.popFragment()
             } else {
                 it.onBackPressed()
             }

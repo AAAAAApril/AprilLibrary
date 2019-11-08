@@ -108,16 +108,16 @@ private val VIEW_STATUS_BAR_HEIGHT_SET_MARGIN = "ViewStatusBarHeightSetMargin".h
 /**
  *  给 View 增加一个状态栏高度的 paddingTop
  *
- *  [marginModel] 是否是增加 marginTop
+ *  [marginMode] 是否是增加 marginTop
  *  [clearHeight] 是否是清除这个高度的操作
  */
 fun View.fitSystemStatusBarHeight(
-    marginModel: Boolean = false,
+    marginMode: Boolean = false,
     clearHeight: Boolean = false
 ) {
     //现在需要清除
     if (clearHeight) {
-        if (marginModel) {
+        if (marginMode) {
             val marginSet: Boolean =
                 (getTag(VIEW_STATUS_BAR_HEIGHT_SET_MARGIN) as? Boolean) ?: false
             if (marginSet) {
@@ -148,7 +148,7 @@ fun View.fitSystemStatusBarHeight(
     }
     //需要添加
     else {
-        if (marginModel) {
+        if (marginMode) {
             val marginSet: Boolean =
                 (getTag(VIEW_STATUS_BAR_HEIGHT_SET_MARGIN) as? Boolean) ?: false
             if (!marginSet) {

@@ -4,6 +4,8 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
@@ -179,6 +181,17 @@ fun View.fitSystemStatusBarHeight(
     }
 }
 
+/**
+ * 给 View 做快照（截屏）
+ */
+fun View.snapShot(): Bitmap {
+    val bitmap = Bitmap.createBitmap(
+        width, height, Bitmap.Config.ARGB_8888
+    )
+    val canvas = Canvas(bitmap)
+    draw(canvas)
+    return bitmap
+}
 
 fun TextView.trimString(): String {
     return text.toString().trim()

@@ -251,7 +251,7 @@ fun TextView.allowScroll() {
 fun TextView.copyText(targetText: CharSequence? = null): Boolean {
     val manager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
     return if (manager != null) {
-        manager.primaryClip = ClipData.newPlainText("Label", targetText ?: text)
+        manager.setPrimaryClip(ClipData.newPlainText("Label", targetText ?: text))
         true
     } else {
         false

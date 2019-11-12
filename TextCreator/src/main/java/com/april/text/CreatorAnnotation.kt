@@ -1,6 +1,7 @@
 package com.april.text
 
 import android.graphics.Typeface
+import android.text.style.DynamicDrawableSpan
 import androidx.annotation.IntDef
 import androidx.annotation.StringDef
 

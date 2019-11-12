@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
+import java.lang.IllegalArgumentException
 
 
 /*
@@ -78,7 +79,7 @@ fun <T : TextCreator> Context.richCharSequence(vararg creators: T): CharSequence
                 is LineCreator -> {
 
                 }
-                //添加图片
+                //添加图片资源
                 is ImageCreator -> {
                     //添加点击事件
                     it.onClick?.let { click ->
@@ -94,12 +95,21 @@ fun <T : TextCreator> Context.richCharSequence(vararg creators: T): CharSequence
                         )
                     }
 
-                    builder.setSpan(
-                        ImageStyleSpan(this@richCharSequence, it.image, it.vertical),
-                        start,
-                        builder.length,
-                        it.getSpanFlag()
-                    )
+                    when {
+                        it.imageRes != null -> builder.setSpan(
+                            ImageStyleSpan(this@richCharSequence, it.imageRes, it.centerVertical),
+                            start,
+                            builder.length,
+                            it.getSpanFlag()
+                        )
+                        it.imageDrawable != null -> builder.setSpan(
+                            ImageStyleSpan(it.imageDrawable, it.centerVertical),
+                            start,
+                            builder.length,
+                            it.getSpanFlag()
+                        )
+                        else -> throw IllegalArgumentException("")
+                    }
                 }
                 //其他
                 else -> {

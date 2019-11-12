@@ -3,12 +3,11 @@ package com.april.text
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.drawable.Drawable
 import android.text.TextPaint
-import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ImageSpan
 import android.view.View
-import android.widget.TextView
 import androidx.annotation.DrawableRes
 
 
@@ -35,11 +34,28 @@ internal class OnClickSpan(
  *
  * 主要处理图片显示的位置
  */
-internal class ImageStyleSpan(
-    context: Context,
-    @DrawableRes image: Int,
-    private val vertical: Boolean
-) : ImageSpan(context, image) {
+internal class ImageStyleSpan : ImageSpan {
+
+    private val centerVertical: Boolean
+
+    constructor(drawable: Drawable, centerVertical: Boolean) : super(drawable.also {
+        if (it.bounds.isEmpty) {
+            it.setBounds(
+                0, 0, it.intrinsicWidth,
+                it.intrinsicHeight
+            )
+        }
+    }) {
+        this.centerVertical = centerVertical
+    }
+
+    constructor(context: Context, @DrawableRes drawableRes: Int, centerVertical: Boolean) : super(
+        context,
+        drawableRes
+    ) {
+        this.centerVertical = centerVertical
+    }
+
     override fun getSize(
         paint: Paint,
         text: CharSequence?,
@@ -47,7 +63,7 @@ internal class ImageStyleSpan(
         end: Int,
         fm: Paint.FontMetricsInt?
     ): Int {
-        if (vertical) {
+        if (centerVertical) {
             val rect = drawable.bounds
             fm?.run {
                 val fmPaint = paint.fontMetricsInt
@@ -79,7 +95,7 @@ internal class ImageStyleSpan(
         bottom: Int,
         paint: Paint
     ) {
-        if (vertical) {
+        if (centerVertical) {
             val drawable = drawable
             canvas.save()
             canvas.translate(x, ((bottom - top - drawable.bounds.bottom) / 2 + top).toFloat())

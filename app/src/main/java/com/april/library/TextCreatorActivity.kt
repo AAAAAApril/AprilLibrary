@@ -1,9 +1,17 @@
 package com.april.library
 
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.style.DynamicDrawableSpan
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.april.develop.helper.toast
 import com.april.text.*
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.BitmapImageViewTarget
+import com.bumptech.glide.request.target.ImageViewTarget
 import kotlinx.android.synthetic.main.activity_text_creator.*
 
 class TextCreatorActivity : AppCompatActivity() {
@@ -19,7 +27,7 @@ class TextCreatorActivity : AppCompatActivity() {
                 TextCreator("hello ", textSizeDP = 18),
                 ImageCreator(
                     R.drawable.ic_launcher_foreground,
-                    vertical = true,
+                    centerVertical = true,
                     onClick = {
                         toast("picture clicked !")
                     }),
@@ -38,5 +46,19 @@ class TextCreatorActivity : AppCompatActivity() {
 //                toast("TextView！")
 //            }
         }
+
+        atc_tv1.richText(
+            TextCreator("你"),
+            ImageCreator(
+                imageRes = R.drawable.icon_money_round_green,
+                centerVertical = false
+            ),
+            TextCreator("好"),
+            ImageCreator(
+                imageDrawable = ContextCompat.getDrawable(this, R.drawable.icon_money_round_yellow),
+                centerVertical = true
+            ),
+            TextCreator("呀")
+        )
     }
 }

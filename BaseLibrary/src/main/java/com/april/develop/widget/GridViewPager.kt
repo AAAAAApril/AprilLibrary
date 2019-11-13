@@ -62,8 +62,6 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
 
     //礼物数据列
     private val mDataList = mutableListOf<T>()
-    //拆分之后的数据列
-    private val mSplitDataList = mutableListOf<MutableList<T>>()
     //adapter 列
     private val mAdapterList = mutableListOf<RecyclerViewAdapter<T>>()
     //选中数据列
@@ -180,7 +178,6 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
         adapter = null
         mCheckArray.clear()
         mDataList.clear()
-        mSplitDataList.clear()
         mAdapterList.clear()
 
         if (newDataList.isEmpty()) {
@@ -195,7 +192,6 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
         }
         //拆分成组
         splitDataList(mRowCount * mColumnCount, newDataList) {
-            mSplitDataList.add(it)
             mAdapterList.add(
                 RecyclerViewAdapter(
                     this,

@@ -9,7 +9,7 @@ import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 
 /**
- * 线性排列的 指示器
+ * RadioGroup 实现的 指示器
  */
 class RadioIndicator @JvmOverloads constructor(
     context: Context,
@@ -35,6 +35,10 @@ class RadioIndicator @JvmOverloads constructor(
     //指示器未选中时的样式
     @DrawableRes
     private var mIndicatorUncheckedDrawableRes: Int = 0
+
+    init {
+        gravity = Gravity.CENTER
+    }
 
     /**
      * 选中某个位置
@@ -103,16 +107,14 @@ class RadioIndicator @JvmOverloads constructor(
     fun setTotalCount(totalCount: Int, defaultCheckedIndex: Int = 0) {
         removeAllViews()
         for (index in 0 until totalCount) {
-            ImageView(context).also { image ->
+            //添加 View
+            addView(ImageView(context).also { image ->
                 //设置背景资源
                 image.setBackgroundResource(mIndicatorUncheckedDrawableRes)
-                val params = LayoutParams(
-                    mIndicatorUncheckedSizePX.width,
-                    mIndicatorUncheckedSizePX.height,
-                    1f
-                ).apply {
-                    gravity = Gravity.CENTER
-                }
+            }, LayoutParams(
+                mIndicatorUncheckedSizePX.width,
+                mIndicatorUncheckedSizePX.height
+            ).also { params ->
                 //不是最后一个
                 if (index != totalCount - 1) {
                     if (orientation == HORIZONTAL) {
@@ -121,9 +123,7 @@ class RadioIndicator @JvmOverloads constructor(
                         params.bottomMargin = mIndicatorBetweenMarginPX
                     }
                 }
-                //添加 View
-                addView(image, params)
-            }
+            })
         }
         checkIndex(defaultCheckedIndex)
     }

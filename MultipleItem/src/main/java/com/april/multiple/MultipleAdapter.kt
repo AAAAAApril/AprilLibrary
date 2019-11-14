@@ -58,6 +58,14 @@ open class MultipleAdapter : AbsAdapter() {
         notifyItemInserted(adapterPosition)
     }
 
+    open fun insertDataList(adapterPosition: Int, dataList: MutableList<Any>) {
+        if (dataList.isEmpty()) {
+            return
+        }
+        support.dataList.addAll(adapterPosition, dataList)
+        notifyItemRangeInserted(adapterPosition, dataList.size)
+    }
+
     open fun resetData(any: Any, adapterPosition: Int) {
         support.dataList[adapterPosition] = any
         notifyItemChanged(adapterPosition)
@@ -78,7 +86,7 @@ open class MultipleAdapter : AbsAdapter() {
         if (dataList.isEmpty()) {
             return
         }
-        val index = dataList.size
+        val index = support.dataList.size
         support.dataList.addAll(dataList)
         notifyItemRangeInserted(
             index,
@@ -162,6 +170,17 @@ open class HeaderFooterAdapter : MultipleAdapter() {
         )
     }
 
+    override fun insertDataList(adapterPosition: Int, dataList: MutableList<Any>) {
+        if (dataList.isEmpty()) {
+            return
+        }
+        support.dataList.addAll(adapterPosition, dataList)
+        notifyItemRangeInserted(
+            adapterPosition + support.headerCount(),
+            dataList.size
+        )
+    }
+
     override fun resetData(any: Any, adapterPosition: Int) {
         support.dataList[adapterPosition - headerCount()] = any
         notifyItemChanged(
@@ -188,7 +207,7 @@ open class HeaderFooterAdapter : MultipleAdapter() {
         if (dataList.isEmpty()) {
             return
         }
-        val index = dataList.size
+        val index = support.dataList.size
         support.dataList.addAll(dataList)
         notifyItemRangeInserted(
             index + headerCount(),

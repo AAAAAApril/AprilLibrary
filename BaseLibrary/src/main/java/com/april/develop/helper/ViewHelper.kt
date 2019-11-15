@@ -44,7 +44,7 @@ import androidx.core.content.ContextCompat
  * [showPassword] TextView 显示与隐藏密码
  *
  * [showSoftInput] View 显示与隐藏软键盘
- * [softInputShowing] View 软键盘是否显示
+ * [isSoftInputShowing] View 软键盘是否显示
  */
 
 fun View.gone() {
@@ -337,7 +337,7 @@ fun View.showSoftInput(show: Boolean = true) {
  *
  * [Boolean] 是否正在显示
  */
-fun View.softInputShowing(): Boolean {
+fun View.isSoftInputShowing(): Boolean {
     val manager: InputMethodManager? =
         context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     return manager != null && manager.isActive

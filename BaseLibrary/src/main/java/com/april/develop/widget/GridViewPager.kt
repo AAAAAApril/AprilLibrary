@@ -65,7 +65,7 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
     //adapter 列
     private val mAdapterList = mutableListOf<RecyclerViewAdapter<T>>()
     //选中数据列
-    private val mCheckArray = SparseBooleanArray()
+    internal val mCheckArray = SparseBooleanArray()
     //行（横向为行）
     private var mRowCount: Int = 2
     //列（纵向为列）
@@ -73,9 +73,17 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
     //item 创建监听
     internal var itemCreateListener: OnGridItemCreateListener<T>? = null
     //item 选中监听
-    private var itemSelectChangeListener: OnGridItemSelectChangeListener<T>? = null
+    internal var itemSelectChangeListener: OnGridItemSelectChangeListener<T>? = null
     //item 装饰器
     internal var itemCreateDecorationListener: OnGridItemCreateDecorationListener? = null
+    //上一个选择的页面
+    internal var mLastSelectedPageIndex = 0
+    //页面切换之后取消选择
+    internal var mUnSelectWhenPageChanged = false
+
+    init {
+        OnGridViewPagerPageChangeListener(this)
+    }
 
     /**
      * 解决高度不能随内部数据高度自适应的问题
@@ -108,6 +116,13 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
     fun setColumnAndRowCount(columnCount: Int, rowCount: Int) {
         mColumnCount = columnCount
         mRowCount = rowCount
+    }
+
+    /**
+     * 在页面切换之后，取消之前一个选中
+     */
+    fun setUnSelectWhenPageChanged(doUnSelect: Boolean = true) {
+        mUnSelectWhenPageChanged = doUnSelect
     }
 
     /**
@@ -246,8 +261,8 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
             else {
                 //更新之前的
                 notifyLastCheckedAdapterPosition(lastCheckedIndexInDataList)
-                mCheckArray.put(mCheckArray.keyAt(nowCheckedIndexInDataList), true)
                 //更新现在的
+                mCheckArray.put(mCheckArray.keyAt(nowCheckedIndexInDataList), true)
                 adapter.notifyItemChanged(nowCheckedIndexInAdapter)
                 itemSelectChangeListener?.onGridItemSelectChanged(this, bean)
             }
@@ -268,7 +283,7 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
     /**
      * 更新之前选中的位置
      */
-    private fun notifyLastCheckedAdapterPosition(lastCheckedIndexInDataList: Int) {
+    internal fun notifyLastCheckedAdapterPosition(lastCheckedIndexInDataList: Int) {
         val splitItemNum = mRowCount * mColumnCount
         val lastSize = lastCheckedIndexInDataList + 1
         //余数
@@ -289,6 +304,41 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
         }
     }
 
+}
+
+/**
+ * 页面切换监听
+ */
+internal class OnGridViewPagerPageChangeListener(
+    private val viewPager: GridViewPager<*>
+) : ViewPager.OnPageChangeListener {
+    init {
+        viewPager.addOnPageChangeListener(this)
+    }
+
+    override fun onPageScrollStateChanged(state: Int) {
+    }
+
+    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+    }
+
+    override fun onPageSelected(position: Int) {
+        if (!viewPager.mUnSelectWhenPageChanged) {
+            return
+        }
+        if (viewPager.mLastSelectedPageIndex == position) {
+            return
+        }
+        viewPager.mLastSelectedPageIndex = position
+        //上一个选中的数据在所有数据列里面的下标
+        val lastCheckedIndexInDataList = viewPager.mCheckArray.indexOfValue(true)
+        if (lastCheckedIndexInDataList == -1) {
+            return
+        }
+        viewPager.mCheckArray.put(viewPager.mCheckArray.keyAt(lastCheckedIndexInDataList), false)
+        viewPager.notifyLastCheckedAdapterPosition(lastCheckedIndexInDataList)
+        viewPager.itemSelectChangeListener?.onGridItemSelectChanged(viewPager, null)
+    }
 }
 
 internal class RecyclerViewAdapter<T : Any>(

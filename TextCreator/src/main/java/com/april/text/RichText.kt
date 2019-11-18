@@ -8,7 +8,6 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
-import java.lang.IllegalArgumentException
 
 
 /*
@@ -51,192 +50,212 @@ fun <T : TextCreator> TextView.richText(
     vararg creators: T,
     //是否是设置给 hint
     forHint: Boolean = false,
+    //是否是增加模式
+    appendMode: Boolean = false,
+    //点击时的高亮背景
     @ColorRes highLightColor: Int = android.R.color.transparent
 ): TextView {
-    val builder = context.richCharSequence(*creators)
+    var set = false
+    val builder = context.richCharSequence(*creators) {
+        if (this !is EditText) {
+            if (!set) {
+                set = true
+                movementMethod = LinkMovementMethod.getInstance()
+                highlightColor = ContextCompat.getColor(context, highLightColor)
+            }
+        }
+    }
     if (forHint) {
         hint = builder
     } else {
-        text = builder
+        if (appendMode) {
+            append(builder)
+        } else {
+            text = builder
+        }
     }
-    if (this !is EditText) {
-        movementMethod = LinkMovementMethod.getInstance()
-    }
-    highlightColor = ContextCompat.getColor(context, highLightColor)
     return this
 }
 
 /**
  * 构建富文本字符格式
  */
-fun <T : TextCreator> Context.richCharSequence(vararg creators: T): CharSequence =
-    SpannableStringBuilder().also { builder ->
-        creators.forEach {
-            val start = builder.length
-            builder.append(it.text)
-            when (it) {
-                //换行
-                is LineCreator -> {
+fun <T : TextCreator> Context.richCharSequence(
+    vararg creators: T,
+    hasClick: (() -> Unit)? = null
+): CharSequence = SpannableStringBuilder().also { builder ->
+    creators.forEach {
+        val start = builder.length
+        builder.append(it.text)
+        when (it) {
+            //换行
+            is LineCreator -> {
 
+            }
+            //添加图片资源
+            is ImageCreator -> {
+                if (it.onClick != null) {
+                    hasClick?.invoke()
                 }
-                //添加图片资源
-                is ImageCreator -> {
-                    //添加点击事件
-                    it.onClick?.let { click ->
-                        builder.setSpan(
-                            OnClickSpan(
-                                it.underLine ?: false,
-                                "",
-                                click
-                            ),
-                            start,
-                            builder.length,
-                            it.getSpanFlag()
-                        )
-                    }
-
-                    when {
-                        it.imageRes != null -> builder.setSpan(
-                            ImageStyleSpan(this@richCharSequence, it.imageRes, it.centerVertical),
-                            start,
-                            builder.length,
-                            it.getSpanFlag()
-                        )
-                        it.imageDrawable != null -> builder.setSpan(
-                            ImageStyleSpan(it.imageDrawable, it.centerVertical),
-                            start,
-                            builder.length,
-                            it.getSpanFlag()
-                        )
-                        else -> throw IllegalArgumentException("")
-                    }
+                //添加点击事件
+                it.onClick?.let { click ->
+                    builder.setSpan(
+                        OnClickSpan(
+                            it.underLine ?: false,
+                            "",
+                            click
+                        ),
+                        start,
+                        builder.length,
+                        it.getSpanFlag()
+                    )
                 }
-                //其他
-                else -> {
-                    //文字颜色
-                    it.textColor?.run {
-                        builder.setSpan(
-                            ForegroundColorSpan(
-                                ContextCompat.getColor(
-                                    this@richCharSequence,
-                                    this
-                                )
-                            ),
-                            start,
-                            builder.length,
-                            it.getSpanFlag()
-                        )
-                    }
 
-                    //文字背景色
-                    it.backgroundColor?.run {
-                        builder.setSpan(
-                            BackgroundColorSpan(
-                                ContextCompat.getColor(
-                                    this@richCharSequence,
-                                    this
-                                )
-                            ),
-                            start,
-                            builder.length,
-                            it.getSpanFlag()
-                        )
-                    }
+                when {
+                    it.imageRes != null -> builder.setSpan(
+                        ImageStyleSpan(this@richCharSequence, it.imageRes, it.centerVertical),
+                        start,
+                        builder.length,
+                        it.getSpanFlag()
+                    )
+                    it.imageDrawable != null -> builder.setSpan(
+                        ImageStyleSpan(it.imageDrawable, it.centerVertical),
+                        start,
+                        builder.length,
+                        it.getSpanFlag()
+                    )
+                    else -> throw IllegalArgumentException("")
+                }
+            }
+            //其他
+            else -> {
+                //文字颜色
+                it.textColor?.run {
+                    builder.setSpan(
+                        ForegroundColorSpan(
+                            ContextCompat.getColor(
+                                this@richCharSequence,
+                                this
+                            )
+                        ),
+                        start,
+                        builder.length,
+                        it.getSpanFlag()
+                    )
+                }
 
-                    //文字大小
-                    it.textSizeDP?.run {
-                        builder.setSpan(
-                            AbsoluteSizeSpan(this, true),
-                            start,
-                            builder.length,
-                            it.getSpanFlag()
-                        )
-                    }
+                //文字背景色
+                it.backgroundColor?.run {
+                    builder.setSpan(
+                        BackgroundColorSpan(
+                            ContextCompat.getColor(
+                                this@richCharSequence,
+                                this
+                            )
+                        ),
+                        start,
+                        builder.length,
+                        it.getSpanFlag()
+                    )
+                }
 
-                    //文字大小缩放
-                    it.textSizeScale?.run {
-                        builder.setSpan(
-                            RelativeSizeSpan(this),
-                            start,
-                            builder.length,
-                            it.getSpanFlag()
-                        )
-                    }
+                //文字大小
+                it.textSizeDP?.run {
+                    builder.setSpan(
+                        AbsoluteSizeSpan(this, true),
+                        start,
+                        builder.length,
+                        it.getSpanFlag()
+                    )
+                }
 
-                    //文字样式
-                    it.textStyle?.run {
-                        builder.setSpan(
-                            StyleSpan(this),
-                            start,
-                            builder.length,
-                            it.getSpanFlag()
-                        )
-                    }
+                //文字大小缩放
+                it.textSizeScale?.run {
+                    builder.setSpan(
+                        RelativeSizeSpan(this),
+                        start,
+                        builder.length,
+                        it.getSpanFlag()
+                    )
+                }
 
-                    //文字字体
-                    it.textType?.run {
-                        builder.setSpan(
-                            TypefaceSpan(this),
-                            start,
-                            builder.length,
-                            it.getSpanFlag()
-                        )
-                    }
+                //文字样式
+                it.textStyle?.run {
+                    builder.setSpan(
+                        StyleSpan(this),
+                        start,
+                        builder.length,
+                        it.getSpanFlag()
+                    )
+                }
 
-                    //文字下划线
-                    it.underLine?.run {
-                        builder.setSpan(
-                            UnderlineSpan(),
-                            start,
-                            builder.length,
-                            it.getSpanFlag()
-                        )
-                    }
+                //文字字体
+                it.textType?.run {
+                    builder.setSpan(
+                        TypefaceSpan(this),
+                        start,
+                        builder.length,
+                        it.getSpanFlag()
+                    )
+                }
 
-                    //文字删除线
-                    it.deleteLine?.run {
-                        builder.setSpan(
-                            StrikethroughSpan(),
-                            start,
-                            builder.length,
-                            it.getSpanFlag()
-                        )
-                    }
+                //文字下划线
+                it.underLine?.run {
+                    builder.setSpan(
+                        UnderlineSpan(),
+                        start,
+                        builder.length,
+                        it.getSpanFlag()
+                    )
+                }
 
-                    //文字作为上标
-                    it.asSuperscript?.run {
-                        builder.setSpan(
-                            SuperscriptSpan(),
-                            start,
-                            builder.length,
-                            it.getSpanFlag()
-                        )
-                    }
+                //文字删除线
+                it.deleteLine?.run {
+                    builder.setSpan(
+                        StrikethroughSpan(),
+                        start,
+                        builder.length,
+                        it.getSpanFlag()
+                    )
+                }
 
-                    //文字作为下标
-                    it.asSubscript?.run {
-                        builder.setSpan(
-                            SubscriptSpan(),
-                            start,
-                            builder.length,
-                            it.getSpanFlag()
-                        )
-                    }
+                //文字作为上标
+                it.asSuperscript?.run {
+                    builder.setSpan(
+                        SuperscriptSpan(),
+                        start,
+                        builder.length,
+                        it.getSpanFlag()
+                    )
+                }
 
-                    //添加点击事件
-                    it.onClick?.let { click ->
-                        builder.setSpan(
-                            OnClickSpan(
-                                it.underLine ?: false,
-                                it.text,
-                                click
-                            ),
-                            start,
-                            builder.length,
-                            it.getSpanFlag()
-                        )
-                    }
+                //文字作为下标
+                it.asSubscript?.run {
+                    builder.setSpan(
+                        SubscriptSpan(),
+                        start,
+                        builder.length,
+                        it.getSpanFlag()
+                    )
+                }
+
+                if (it.onClick != null) {
+                    hasClick?.invoke()
+                }
+                //添加点击事件
+                it.onClick?.let { click ->
+                    builder.setSpan(
+                        OnClickSpan(
+                            it.underLine ?: false,
+                            it.text,
+                            click
+                        ),
+                        start,
+                        builder.length,
+                        it.getSpanFlag()
+                    )
                 }
             }
         }
     }
+}

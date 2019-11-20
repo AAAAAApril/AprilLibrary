@@ -223,3 +223,10 @@ private fun getAreaCode(): Hashtable<String, String> {
  * 最后 35 + 35 = 70 可以被 10 整除，认定校验通过。
  */
 //fun String.isBankCard(needCheckFormat: Boolean = false,): Boolean {}
+
+/**
+ * 清除字符串中的空白
+ */
+fun CharSequence.clearBlank(): String {
+    return this.toString().replace(" ", "")
+}

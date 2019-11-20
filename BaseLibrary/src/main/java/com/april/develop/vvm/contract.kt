@@ -13,9 +13,9 @@ import androidx.lifecycle.ViewModelProviders
  */
 interface IViewContract : Observer<ContractBean> {
 
-    fun onShowToast(message: CharSequence?) {}
+    fun onShowToast(message: CharSequence?)
 
-    fun onShowLoading(show: Boolean?) {}
+    fun onShowLoading(show: Boolean?)
 
     override fun onChanged(t: ContractBean?) {
         when (t?.contractType) {
@@ -33,22 +33,24 @@ interface IViewContract : Observer<ContractBean> {
 /**
  * Activity 内获取 ContractViewModel
  */
-inline fun <reified VM : ContractViewModel<*>, A> A.obtainVM(): VM
-        where A : FragmentActivity,
-              A : IViewContract {
+inline fun <reified VM : ContractViewModel<*>> FragmentActivity.obtainVM(): VM {
+    assert((this as? IViewContract) != null) {
+        "${this.javaClass.name} 不能为 null，且必须实现 IViewContract 接口"
+    }
     return ViewModelProviders.of(this).get(VM::class.java).apply {
-        contractLiveData.observe(this@obtainVM, this@obtainVM)
+        contractLiveData.observe(this@obtainVM, this@obtainVM as IViewContract)
     }
 }
 
 /**
  * Fragment 内获取 ContractViewModel
  */
-inline fun <reified VM : ContractViewModel<*>, F> F.obtainVM(): VM
-        where F : Fragment,
-              F : IViewContract {
+inline fun <reified VM : ContractViewModel<*>> Fragment.obtainVM(): VM {
+    assert((this as? IViewContract) != null) {
+        "${this.javaClass.name} 不能为 null，且必须实现 IViewContract 接口"
+    }
     return ViewModelProviders.of(this).get(VM::class.java).apply {
-        contractLiveData.observe(this@obtainVM, this@obtainVM)
+        contractLiveData.observe(this@obtainVM, this@obtainVM as IViewContract)
     }
 }
 
@@ -57,7 +59,7 @@ inline fun <reified VM : ContractViewModel<*>, F> F.obtainVM(): VM
  */
 inline fun <reified VM : ContractViewModel<*>> Fragment.obtainVMFromParent(): VM {
     assert((this.parentFragment as? IViewContract) != null) {
-        "ParentFragment 不能为 null，且必须实现 IViewContract 接口"
+        "${this.javaClass.name} 的 ParentFragment 不能为 null，且必须实现 IViewContract 接口"
     }
     return ViewModelProviders.of(this.requireParentFragment()).get(VM::class.java)
 }
@@ -67,7 +69,7 @@ inline fun <reified VM : ContractViewModel<*>> Fragment.obtainVMFromParent(): VM
  */
 inline fun <reified VM : ContractViewModel<*>> Fragment.obtainVMFromHostActivity(): VM {
     assert((this.activity as? IViewContract) != null) {
-        "宿主 Activity 不能为 null，且必须实现 IViewContract 接口"
+        "${this.javaClass.name} 的宿主 Activity 不能为 null，且必须实现 IViewContract 接口"
     }
     return ViewModelProviders.of(this.requireActivity()).get(VM::class.java)
 }

@@ -7,7 +7,7 @@ class IFragmentSupportImpl : IFragmentSupport {
 
     override fun getSupport(): Fragment = this as Fragment
 
-    override var recorder: FragmentPoolRecorder =
+    override var fragmentPoolRecorder: FragmentPoolRecorder =
         ViewModelProviders.of(getSupport()).get(FragmentPoolRecorder::class.java)
 
     override fun <F> startFragment(
@@ -51,9 +51,11 @@ class IFragmentSupportImpl : IFragmentSupport {
         fragment: F,
         requestCode: Int
     ) where F : Fragment, F : IFragmentSupport {
+        //TODO
     }
 
     override fun onBackPressedInternal() {
+        //TODO
     }
 
 }

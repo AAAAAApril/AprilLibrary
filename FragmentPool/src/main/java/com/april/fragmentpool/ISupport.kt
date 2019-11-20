@@ -4,7 +4,7 @@ interface ISupport {
 
     fun getSupport(): Any
 
-    var recorder: FragmentPoolRecorder
+    var fragmentPoolRecorder: FragmentPoolRecorder
 
     fun onBackPressed() {
         onBackPressedInternal()

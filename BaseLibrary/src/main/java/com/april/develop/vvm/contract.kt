@@ -61,7 +61,11 @@ inline fun <reified VM : ContractViewModel<*>> Fragment.obtainVMFromParent(): VM
     assert((this.parentFragment as? IViewContract) != null) {
         "${this.javaClass.name} 的 ParentFragment 不能为 null，且必须实现 IViewContract 接口"
     }
-    return ViewModelProviders.of(this.requireParentFragment()).get(VM::class.java)
+    return ViewModelProviders.of(this.requireParentFragment()).get(VM::class.java).apply {
+        val parentFragment = this@obtainVMFromParent.parentFragment ?: return@apply
+        contractLiveData.removeObserver(parentFragment as IViewContract)
+        contractLiveData.observe(parentFragment, parentFragment as IViewContract)
+    }
 }
 
 /**
@@ -71,7 +75,11 @@ inline fun <reified VM : ContractViewModel<*>> Fragment.obtainVMFromHostActivity
     assert((this.activity as? IViewContract) != null) {
         "${this.javaClass.name} 的宿主 Activity 不能为 null，且必须实现 IViewContract 接口"
     }
-    return ViewModelProviders.of(this.requireActivity()).get(VM::class.java)
+    return ViewModelProviders.of(this.requireActivity()).get(VM::class.java).apply {
+        val activity = this@obtainVMFromHostActivity.activity ?: return@apply
+        contractLiveData.removeObserver(activity as IViewContract)
+        contractLiveData.observe(activity, activity as IViewContract)
+    }
 }
 
 /**

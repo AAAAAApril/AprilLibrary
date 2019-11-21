@@ -43,9 +43,10 @@ open class MultipleAdapter : AbsAdapter() {
         notifyDataSetChanged()
     }
 
-    fun clearDataList() {
+    open fun clearDataList() {
+        val count = support.dataList.size
         support.dataList.clear()
-        notifyDataSetChanged()
+        notifyItemRangeRemoved(0, count)
     }
 
     open fun addData(any: Any) {
@@ -163,6 +164,12 @@ open class HeaderFooterAdapter : MultipleAdapter() {
         )
     }
 
+    override fun clearDataList() {
+        val count = support.dataList.size
+        support.dataList.clear()
+        notifyItemRangeRemoved(headerCount(), count)
+    }
+
     override fun insertData(any: Any, adapterPosition: Int) {
         support.dataList.add(adapterPosition, any)
         notifyItemInserted(
@@ -176,7 +183,7 @@ open class HeaderFooterAdapter : MultipleAdapter() {
         }
         support.dataList.addAll(adapterPosition, dataList)
         notifyItemRangeInserted(
-            adapterPosition + support.headerCount(),
+            adapterPosition + headerCount(),
             dataList.size
         )
     }

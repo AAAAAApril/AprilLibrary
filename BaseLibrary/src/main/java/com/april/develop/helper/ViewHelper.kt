@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Checkable
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.ColorRes
@@ -22,6 +23,7 @@ import androidx.core.content.ContextCompat
 /**
  * 本文件扩展函数汇总
  *
+ * [setOnSingleClickListener] View 防止重复点击
  * [gone] View gone
  * [visible] View visible
  * [invisible] View invisible
@@ -46,6 +48,31 @@ import androidx.core.content.ContextCompat
  * [showSoftInput] View 显示与隐藏软键盘
  * [isSoftInputShowing] View 软键盘是否显示
  */
+
+private var View.lastClickTime: Long
+    set(value) = setTag(this.hashCode(), value)
+    get() = getTag(this.hashCode()) as? Long ?: 0
+
+fun View.setOnSingleClickListener(
+    fastClickInterval: Long = 800,
+    onClickListener: View.OnClickListener?
+) {
+    if (onClickListener == null) {
+        setOnClickListener(null)
+    } else {
+        setOnClickListener {
+            System.currentTimeMillis().let { currentTimeMillis ->
+                if (currentTimeMillis - lastClickTime > fastClickInterval
+                    //可选中的控件不处理
+                    || this is Checkable
+                ) {
+                    lastClickTime = currentTimeMillis
+                    onClickListener.onClick(it)
+                }
+            }
+        }
+    }
+}
 
 fun View.gone() {
     this.visibility = View.GONE

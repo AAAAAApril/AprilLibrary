@@ -49,9 +49,11 @@ import androidx.core.content.ContextCompat
  * [isSoftInputShowing] View 软键盘是否显示
  */
 
+private const val FAST_CLICK_TAG_KEY = 1234343789
+
 private var View.lastClickTime: Long
-    set(value) = setTag(this.hashCode(), value)
-    get() = getTag(this.hashCode()) as? Long ?: 0
+    set(value) = setTag(FAST_CLICK_TAG_KEY, value)
+    get() = getTag(FAST_CLICK_TAG_KEY) as? Long ?: 0
 
 fun View.setOnSingleClickListener(
     fastClickInterval: Long = 800,

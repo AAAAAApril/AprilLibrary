@@ -7,10 +7,10 @@ import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 
 /**
- * 内置的一个默认的 ItemDelegate
+ * 内置的一个默认的 MultipleItemDelegate
  */
 abstract class DefaultItemDelegate<T>(@LayoutRes private val itemLayoutRes: Int) :
-    ItemDelegate<T, RecyclerView.ViewHolder>() {
+    MultipleItemDelegate<T, RecyclerView.ViewHolder>() {
 
     override fun onCreateItemView(parent: ViewGroup): View {
         return LayoutInflater.from(parent.context).inflate(itemLayoutRes, parent, false)
@@ -24,8 +24,6 @@ abstract class DefaultItemDelegate<T>(@LayoutRes private val itemLayoutRes: Int)
         onBindItemView(holder.itemView, bean, holder.adapterPosition)
     }
 
-    protected open fun onBindItemView(itemView: View, bean: T, itemAdapterPosition: Int) {
-
-    }
+    protected abstract fun onBindItemView(itemView: View, bean: T, adapterPosition: Int)
 
 }

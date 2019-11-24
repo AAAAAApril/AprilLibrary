@@ -2,7 +2,7 @@ package com.april.multiple
 
 import android.util.SparseArray
 
-fun <T> createManager(
+fun <T : Any> createManager(
     itemBeanClassHashCode: Int,
     support: MultipleSupport
 ): Manager<T> {
@@ -16,13 +16,14 @@ fun <T> createManager(
  *
  * [itemBeanClassHashCode] [T]对应 Class 的 hash code
  */
-class Manager<T> internal constructor(
+class Manager<T : Any> internal constructor(
     private val itemBeanClassHashCode: Int,
     private val support: MultipleSupport
 ) {
 
-    private val delegateClassArray: SparseArray<Class<out ItemDelegate<out T, *>>> = SparseArray()
-    private lateinit var delegateClasses: Array<Class<out ItemDelegate<out T, *>>>
+    private val delegateClassArray: SparseArray<Class<out MultipleItemDelegate<out T, *>>> =
+        SparseArray()
+    private lateinit var delegateClasses: Array<Class<out MultipleItemDelegate<out T, *>>>
     // item 样式识别器
     private lateinit var recognizer: Recognizer<T>
 
@@ -56,7 +57,7 @@ class Manager<T> internal constructor(
      * [recognizer] 识别器
      */
     fun setItemDelegates(
-        vararg itemDelegate: ItemDelegate<out T, *>,
+        vararg itemDelegate: MultipleItemDelegate<out T, *>,
         recognizer: Recognizer<T>
     ) {
         this.recognizer = recognizer
@@ -76,15 +77,17 @@ class Manager<T> internal constructor(
 /**
  * item 样式识别器
  */
-interface Recognizer<T> {
+interface Recognizer<T : Any> {
     fun recognize(
         //添加的同数据类型的所有 item 样式代理
-        classes: Array<Class<out ItemDelegate<out T, *>>>,
+        classes: Array<Class<out MultipleItemDelegate<out T, *>>>,
         //数据实例
         bean: T,
         //所在位置
         position: Int
     ):
     //根据数据或者 item 位置识别出的 item 代理类的 class
-            Class<out ItemDelegate<out T, *>>
+            Class<out MultipleItemDelegate<out T, *>> {
+        return classes[0]
+    }
 }

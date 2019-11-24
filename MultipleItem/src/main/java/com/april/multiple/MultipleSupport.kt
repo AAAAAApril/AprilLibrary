@@ -3,8 +3,6 @@ package com.april.multiple
 import android.util.SparseArray
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.util.forEach
-import androidx.core.util.isNotEmpty
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -21,7 +19,7 @@ open class MultipleSupport {
     internal val managerArray = SparseArray<Manager<*>>()
     // item 样式代理列表，
     // 以 itemViewType 为 key，以 item 样式代理为 value
-    internal val itemDelegateArray = SparseArray<ItemDelegate<*, *>>()
+    internal val itemDelegateArray = SparseArray<MultipleItemDelegate<*, *>>()
 
     //空视图占位布局
     internal var placeholderView: View? = null
@@ -86,14 +84,14 @@ open class MultipleSupport {
      *
      * FIXME  实现还有问题，需要重新设计
      *
-     * 注意：请在 adapter 注册完所有 ItemDelegate 之后，并且在
-     * ItemDelegate 调用过 setSpanSizeInGridLayoutManager(Int) 函数之后，再调用此函数
+     * 注意：请在 adapter 注册完所有 MultipleItemDelegate 之后，并且在
+     * MultipleItemDelegate 调用过 setSpanSizeInGridLayoutManager(Int) 函数之后，再调用此函数
      *
      * @param manager （已经，或者将要）设置给 RecyclerView 的 网格布局管理器
      */
     fun adaptGridLayoutManager(manager: GridLayoutManager) {
 //        assert(itemDelegateArray.isNotEmpty()) {
-//            "请在注册完所有的 ItemDelegate 之后再调用此函数"
+//            "请在注册完所有的 MultipleItemDelegate 之后再调用此函数"
 //        }
 //        val spanSizeArray = IntArray(itemDelegateArray.size()) {
 //            itemDelegateArray.valueAt(it).getSpanSizeInGridLayoutManager()

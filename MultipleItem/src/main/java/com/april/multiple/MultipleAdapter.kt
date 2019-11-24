@@ -2,15 +2,16 @@ package com.april.multiple
 
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 
 /**
  * 多样式 Adapter
  */
-open class MultipleAdapter : AbsAdapter() {
+open class MultipleAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    override val support = MultipleSupport()
+    open val support = MultipleSupport()
 
     /**
      * 从布局资源文件添加
@@ -29,15 +30,53 @@ open class MultipleAdapter : AbsAdapter() {
         return placeholderView
     }
 
-    open fun getData(adapterPosition: Int): Any {
-        return support.dataList[adapterPosition]
+    override fun getItemCount(): Int {
+        return support.getItemCount()
     }
 
-    fun getDataList(): MutableList<Any> {
+    override fun getItemViewType(position: Int): Int {
+        return support.getItemViewType(position)
+    }
+
+    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        support.onViewAttachedToWindow(holder)
+    }
+
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        super.onViewDetachedFromWindow(holder)
+        support.onViewDetachedFromWindow(holder)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return support.onCreateViewHolder(parent, viewType)
+    }
+
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        support.onBindViewHolder(holder, position, payloads)
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    }
+
+    open fun <T : Any> getData(dataPosition: Int): T {
+        return support.dataList[dataPosition] as T
+    }
+
+    open fun getDataList(): MutableList<Any> {
         return support.dataList
     }
 
-    fun resetDataList(dataList: MutableList<Any>) {
+    open fun <T : Any> resetData(any: T, dataPosition: Int) {
+        support.dataList[dataPosition] = any
+        notifyItemChanged(dataPosition)
+    }
+
+    open fun <T : Any> resetDataList(dataList: MutableList<T>) {
         support.dataList.clear()
         support.dataList.addAll(dataList)
         notifyDataSetChanged()
@@ -49,41 +88,12 @@ open class MultipleAdapter : AbsAdapter() {
         notifyItemRangeRemoved(0, count)
     }
 
-    open fun addData(any: Any) {
+    open fun <T : Any> addData(any: T) {
         support.dataList.add(any)
         notifyItemInserted(support.dataList.lastIndex)
     }
 
-    open fun insertData(any: Any, adapterPosition: Int) {
-        support.dataList.add(adapterPosition, any)
-        notifyItemInserted(adapterPosition)
-    }
-
-    open fun insertDataList(adapterPosition: Int, dataList: MutableList<Any>) {
-        if (dataList.isEmpty()) {
-            return
-        }
-        support.dataList.addAll(adapterPosition, dataList)
-        notifyItemRangeInserted(adapterPosition, dataList.size)
-    }
-
-    open fun resetData(any: Any, adapterPosition: Int) {
-        support.dataList[adapterPosition] = any
-        notifyItemChanged(adapterPosition)
-    }
-
-    open fun removeData(adapterPosition: Int) {
-        support.dataList.removeAt(adapterPosition)
-        notifyItemRemoved(adapterPosition)
-    }
-
-    open fun removeLastData() {
-        val index = support.dataList.lastIndex
-        support.dataList.removeAt(index)
-        notifyItemRemoved(index)
-    }
-
-    open fun addDataList(dataList: MutableList<Any>) {
+    open fun <T : Any> addDataList(dataList: MutableList<T>) {
         if (dataList.isEmpty()) {
             return
         }
@@ -95,131 +105,27 @@ open class MultipleAdapter : AbsAdapter() {
         )
     }
 
-}
-
-open class HeaderFooterAdapter : MultipleAdapter() {
-
-    override val support: HeaderFooterSupport = HeaderFooterSupport()
-
-    /**
-     * 添加 header
-     *
-     * @param recyclerView 目标 RecyclerView
-     * @return headerView
-     */
-    fun addHeader(
-        recyclerView: RecyclerView,
-        @LayoutRes headerLayoutRes: Int
-    ): View {
-        val headerView = LayoutInflater.from(recyclerView.context)
-            .inflate(headerLayoutRes, recyclerView, false)
-        support.addHeader(headerView)
-        notifyItemInserted(support.headerArray.indexOfValue(headerView))
-        return headerView
+    open fun <T : Any> insertData(any: T, dataPosition: Int) {
+        support.dataList.add(dataPosition, any)
+        notifyItemInserted(dataPosition)
     }
 
-    /**
-     * 移除 HeaderView
-     */
-    fun removeHeader(headerView: View) {
-        val index = support.headerArray.indexOfValue(headerView)
-        support.headerArray.removeAt(index)
-        notifyItemRemoved(index)
-    }
-
-    /**
-     * 添加 footer
-     *
-     * @param recyclerView 目标 RecyclerView
-     * @return footerView
-     */
-    fun addFooter(
-        recyclerView: RecyclerView,
-        @LayoutRes footerLayoutRes: Int
-    ): View {
-        val footerView = LayoutInflater.from(recyclerView.context)
-            .inflate(footerLayoutRes, recyclerView, false)
-        support.addFooter(footerView)
-        notifyItemInserted(support.adapterPositionOfFooter(footerView))
-        return footerView
-    }
-
-    /**
-     * 移除 FooterView
-     */
-    fun removeFooter(footerView: View) {
-        val index = support.adapterPositionOfFooter(footerView)
-        support.footerArray.removeAt(support.footerArray.indexOfValue(footerView))
-        notifyItemRemoved(index)
-    }
-
-    fun headerCount(): Int = support.headerCount()
-
-    fun footerCount(): Int = support.footerCount()
-
-    override fun addData(any: Any) {
-        support.dataList.add(any)
-        notifyItemInserted(
-            support.dataList.lastIndex + headerCount()
-        )
-    }
-
-    override fun clearDataList() {
-        val count = support.dataList.size
-        support.dataList.clear()
-        notifyItemRangeRemoved(headerCount(), count)
-    }
-
-    override fun insertData(any: Any, adapterPosition: Int) {
-        support.dataList.add(adapterPosition, any)
-        notifyItemInserted(
-            adapterPosition + headerCount()
-        )
-    }
-
-    override fun insertDataList(adapterPosition: Int, dataList: MutableList<Any>) {
+    open fun <T : Any> insertDataList(dataPosition: Int, dataList: MutableList<T>) {
         if (dataList.isEmpty()) {
             return
         }
-        support.dataList.addAll(adapterPosition, dataList)
-        notifyItemRangeInserted(
-            adapterPosition + headerCount(),
-            dataList.size
-        )
+        support.dataList.addAll(dataPosition, dataList)
+        notifyItemRangeInserted(dataPosition, dataList.size)
     }
 
-    override fun resetData(any: Any, adapterPosition: Int) {
-        support.dataList[adapterPosition - headerCount()] = any
-        notifyItemChanged(
-            adapterPosition
-        )
+    open fun removeData(dataPosition: Int) {
+        support.dataList.removeAt(dataPosition)
+        notifyItemRemoved(dataPosition)
     }
 
-    override fun removeData(adapterPosition: Int) {
-        support.dataList.removeAt(adapterPosition)
-        notifyItemRemoved(
-            adapterPosition + headerCount()
-        )
-    }
-
-    override fun removeLastData() {
-        val index = support.dataList.lastIndex
-        support.dataList.removeAt(index)
-        notifyItemRemoved(
-            index + headerCount()
-        )
-    }
-
-    override fun addDataList(dataList: MutableList<Any>) {
-        if (dataList.isEmpty()) {
-            return
-        }
-        val index = support.dataList.size
-        support.dataList.addAll(dataList)
-        notifyItemRangeInserted(
-            index + headerCount(),
-            dataList.size
-        )
+    open fun <T : Any> removeDataList(dataList: MutableList<T>) {
+        support.dataList.removeAll(dataList)
+        notifyDataSetChanged()
     }
 
 }

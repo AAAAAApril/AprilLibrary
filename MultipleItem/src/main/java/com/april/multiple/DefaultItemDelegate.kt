@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 /**
  * 内置的一个默认的 MultipleItemDelegate
  */
-abstract class DefaultItemDelegate<T>(@LayoutRes private val itemLayoutRes: Int) :
+abstract class DefaultItemDelegate<T : Any>(@LayoutRes private val itemLayoutRes: Int) :
     MultipleItemDelegate<T, RecyclerView.ViewHolder>() {
 
     override fun onCreateItemView(parent: ViewGroup): View {

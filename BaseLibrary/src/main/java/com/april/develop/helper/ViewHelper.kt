@@ -1,7 +1,5 @@
 package com.april.develop.helper
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
@@ -39,7 +37,6 @@ import androidx.core.content.ContextCompat
  * [textColorRes] TextView 文字颜色 资源文件
  * [drawables] TextView drawable start top end bottom
  * [allowScroll] 允许滚动
- * [copyText] TextView 复制文字
  *
  * [search] EditText 软键盘搜索功能
  * [send] EditText 软键盘发送功能
@@ -271,20 +268,6 @@ fun TextView.drawables(
  */
 fun TextView.allowScroll() {
     movementMethod = ScrollingMovementMethod.getInstance()
-}
-
-/**
- * 复制 TextView 上面的文字
- * [Boolean] 是否成功
- */
-fun TextView.copyText(targetText: CharSequence? = null): Boolean {
-    val manager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
-    return if (manager != null) {
-        manager.setPrimaryClip(ClipData.newPlainText("Label", targetText ?: text))
-        true
-    } else {
-        false
-    }
 }
 
 /**

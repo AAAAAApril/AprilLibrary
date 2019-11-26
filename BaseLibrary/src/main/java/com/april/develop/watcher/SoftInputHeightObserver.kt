@@ -62,6 +62,13 @@ class SoftInputHeightObserver(
         return mSoftInputShowingHeight
     }
 
+    /**
+     * 软件盘是否正在展示
+     */
+    fun isSoftInputShowing(): Boolean {
+        return mSoftInputShowingHeight >= softInputShowingHeightThreshold
+    }
+
     override fun onGlobalLayout() {
         listener.getSoftInputObservableWindow()?.let { window ->
             Rect().let { rect ->
@@ -92,8 +99,8 @@ class SoftInputHeightObserver(
         //需要回调才继续处理
         listener.onSoftInputHeightChanged(
             this,
-            mSoftInputShowingHeight,
-            softInputShowingHeight >= softInputShowingHeightThreshold
+            getSoftInputShowingHeight(),
+            isSoftInputShowing()
         )
     }
 

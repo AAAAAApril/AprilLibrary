@@ -1,9 +1,12 @@
 package com.april.develop.helper
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.widget.TextView
 
 /**
  * [dp] [Float] dp 转 px
@@ -23,6 +26,20 @@ fun Context.px2dp(px: Int): Float {
         return 0.0f
     }
     return px / (resources.displayMetrics.density) + 0.5f
+}
+
+/**
+ * 复制 文字
+ * [Boolean] 是否成功
+ */
+fun Context.copyText(targetText: CharSequence? = null, label: CharSequence = ""): Boolean {
+    val manager = getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+    return if (manager != null) {
+        manager.setPrimaryClip(ClipData.newPlainText(label, targetText ?: ""))
+        true
+    } else {
+        false
+    }
 }
 
 /**

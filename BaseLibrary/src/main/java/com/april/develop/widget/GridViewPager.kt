@@ -32,6 +32,8 @@ interface OnGridItemSelectChangeListener<in T : Any> {
     /**
      * 选中监听
      *
+     * 注：这个函数的调用会在 Adapter 更新之前
+     *
      * [selectedBean] 被选中的数据，null 表示没有一个选中
      */
     fun onGridItemSelectChanged(
@@ -43,6 +45,7 @@ interface OnGridItemSelectChangeListener<in T : Any> {
 interface OnGridItemCreateDecorationListener {
     /**
      * 给 item 创建装饰器
+     *
      * [vertical] 是否是纵向
      */
     fun onGridItemCreateDecoration(
@@ -65,7 +68,7 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
     //adapter 列
     private val mAdapterList = mutableListOf<RecyclerViewAdapter<T>>()
     //选中数据列
-    internal val mCheckArray = SparseBooleanArray()
+    private val mCheckArray = SparseBooleanArray()
     //行（横向为行）
     private var mRowCount: Int = 2
     //列（纵向为列）
@@ -73,13 +76,15 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
     //item 创建监听
     internal var itemCreateListener: OnGridItemCreateListener<T>? = null
     //item 选中监听
-    internal var itemSelectChangeListener: OnGridItemSelectChangeListener<T>? = null
+    private var itemSelectChangeListener: OnGridItemSelectChangeListener<T>? = null
     //item 装饰器
     internal var itemCreateDecorationListener: OnGridItemCreateDecorationListener? = null
     //上一个选择的页面
     internal var mLastSelectedPageIndex = 0
     //页面切换之后取消选择
-    internal var mUnSelectWhenPageChanged = false
+    internal var mUnSelectWhenPageChanged = true
+    //当重复点击时，是否取消选中
+    private var mClearSelectWhenReClick = true
 
     init {
         OnGridViewPagerPageChangeListener(this)
@@ -113,7 +118,7 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
     /**
      * 列数和行数（默认4列2行）
      */
-    fun setColumnAndRowCount(columnCount: Int, rowCount: Int) {
+    fun setColumnAndRowCount(columnCount: Int = mColumnCount, rowCount: Int = mRowCount) {
         mColumnCount = columnCount
         mRowCount = rowCount
     }
@@ -121,8 +126,15 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
     /**
      * 在页面切换之后，取消之前一个选中
      */
-    fun setUnSelectWhenPageChanged(doUnSelect: Boolean = true) {
+    fun setUnSelectWhenPageChanged(doUnSelect: Boolean = mUnSelectWhenPageChanged) {
         mUnSelectWhenPageChanged = doUnSelect
+    }
+
+    /**
+     * 设置重复点击时，是否取消选中
+     */
+    fun setClearSelectWhenReClick(doClear: Boolean = mClearSelectWhenReClick) {
+        mClearSelectWhenReClick = doClear
     }
 
     /**
@@ -135,14 +147,18 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
     /**
      * 设置 item 选中监听
      */
-    fun setOnGridItemSelectChangeListener(itemSelectChangeListener: OnGridItemSelectChangeListener<T>) {
+    fun setOnGridItemSelectChangeListener(
+        itemSelectChangeListener: OnGridItemSelectChangeListener<T>
+    ) {
         this.itemSelectChangeListener = itemSelectChangeListener
     }
 
     /**
      * 设置 item 装饰器
      */
-    fun setOnGridItemCreateDecorationListener(itemCreateDecorationListener: OnGridItemCreateDecorationListener) {
+    fun setOnGridItemCreateDecorationListener(
+        itemCreateDecorationListener: OnGridItemCreateDecorationListener
+    ) {
         this.itemCreateDecorationListener = itemCreateDecorationListener
     }
 
@@ -155,6 +171,19 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
             return null
         }
         return mDataList[index]
+    }
+
+    /**
+     * 取消选中的数据
+     */
+    fun clearSelectedBean() {
+        val lastCheckedIndexInDataList = mCheckArray.indexOfValue(true)
+        if (lastCheckedIndexInDataList == -1) {
+            return
+        }
+        itemSelectChangeListener?.onGridItemSelectChanged(this, null)
+        mCheckArray.put(mCheckArray.keyAt(lastCheckedIndexInDataList), false)
+        notifyLastCheckedAdapterPosition(lastCheckedIndexInDataList)
     }
 
     /**
@@ -239,32 +268,41 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
             之前没有选中
          */
         if (lastCheckedIndexInDataList == -1) {
+            itemSelectChangeListener?.onGridItemSelectChanged(this, bean)
             mCheckArray.put(mCheckArray.keyAt(nowCheckedIndexInDataList), true)
             adapter.notifyItemChanged(nowCheckedIndexInAdapter)
-            itemSelectChangeListener?.onGridItemSelectChanged(this, bean)
         }
         /*
             之前有选中的
          */
         else {
-            mCheckArray.put(mCheckArray.keyAt(lastCheckedIndexInDataList), false)
             /*
-                上一个选中的就是现在点击的这个（表示取消选择）
+                上一个选中的就是现在点击的这个
              */
             if (lastCheckedIndexInDataList == nowCheckedIndexInDataList) {
-                adapter.notifyItemChanged(nowCheckedIndexInAdapter)
-                itemSelectChangeListener?.onGridItemSelectChanged(this, null)
+                //重复点击时，如果取消选中
+                if (mClearSelectWhenReClick) {
+                    itemSelectChangeListener?.onGridItemSelectChanged(this, null)
+                    mCheckArray.put(mCheckArray.keyAt(lastCheckedIndexInDataList), false)
+                    adapter.notifyItemChanged(nowCheckedIndexInAdapter)
+                }
+                //不取消选中
+                else {
+                    itemSelectChangeListener?.onGridItemSelectChanged(this, bean)
+                    adapter.notifyItemChanged(nowCheckedIndexInAdapter)
+                }
             }
             /*
                 更换了选择
              */
             else {
+                itemSelectChangeListener?.onGridItemSelectChanged(this, bean)
                 //更新之前的
+                mCheckArray.put(mCheckArray.keyAt(lastCheckedIndexInDataList), false)
                 notifyLastCheckedAdapterPosition(lastCheckedIndexInDataList)
                 //更新现在的
                 mCheckArray.put(mCheckArray.keyAt(nowCheckedIndexInDataList), true)
                 adapter.notifyItemChanged(nowCheckedIndexInAdapter)
-                itemSelectChangeListener?.onGridItemSelectChanged(this, bean)
             }
         }
 
@@ -283,7 +321,7 @@ class GridViewPager<T : Any> @JvmOverloads constructor(
     /**
      * 更新之前选中的位置
      */
-    internal fun notifyLastCheckedAdapterPosition(lastCheckedIndexInDataList: Int) {
+    private fun notifyLastCheckedAdapterPosition(lastCheckedIndexInDataList: Int) {
         val splitItemNum = mRowCount * mColumnCount
         val lastSize = lastCheckedIndexInDataList + 1
         //余数
@@ -330,14 +368,7 @@ internal class OnGridViewPagerPageChangeListener(
             return
         }
         viewPager.mLastSelectedPageIndex = position
-        //上一个选中的数据在所有数据列里面的下标
-        val lastCheckedIndexInDataList = viewPager.mCheckArray.indexOfValue(true)
-        if (lastCheckedIndexInDataList == -1) {
-            return
-        }
-        viewPager.mCheckArray.put(viewPager.mCheckArray.keyAt(lastCheckedIndexInDataList), false)
-        viewPager.notifyLastCheckedAdapterPosition(lastCheckedIndexInDataList)
-        viewPager.itemSelectChangeListener?.onGridItemSelectChanged(viewPager, null)
+        viewPager.clearSelectedBean()
     }
 }
 

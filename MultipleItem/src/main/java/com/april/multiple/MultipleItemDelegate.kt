@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
  * [T] 绑定的数据实体
  * [VH] 绑定的 ViewHolder
  */
-abstract class ItemDelegate<T, VH : RecyclerView.ViewHolder> {
+abstract class MultipleItemDelegate<T : Any, VH : RecyclerView.ViewHolder> {
 
     //想要占据的个数
     private var spanSizeInGridLayoutManager: Int = 1

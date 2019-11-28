@@ -28,8 +28,7 @@ class MainActivity : AppCompatActivity() {
         })
         am_rv.adapter = adapter
         adapter.only(object : DefaultItemDelegate<ItemBean>(R.layout.item_0) {
-            override fun onBindItemView(itemView: View, bean: ItemBean, itemAdapterPosition: Int) {
-                super.onBindItemView(itemView, bean, itemAdapterPosition)
+            override fun onBindItemView(itemView: View, bean: ItemBean, adapterPosition: Int) {
                 itemView.i0_tv.text = bean.text
                 itemView.setOnClickListener {
                     bean.onClick.invoke(bean)

@@ -4,12 +4,12 @@ import android.view.View
 import androidx.annotation.LayoutRes
 import androidx.core.util.containsValue
 import androidx.recyclerview.widget.RecyclerView
-import com.april.multiple.*
+import com.april.multiple.HeaderFooterAdapter
 
 /**
  * 加载更多 Adapter
  */
-class LoadMoreAdapter : HeaderFooterAdapter() {
+open class LoadMoreAdapter : HeaderFooterAdapter() {
 
     //是否可以加载更多
     private var canLoadMore = false
@@ -76,6 +76,9 @@ class LoadMoreAdapter : HeaderFooterAdapter() {
 
     /**
      * 显示或者隐藏 加载更多 View
+     *
+     * 注：在调用 [showLoadMoreView(true)] 之前，必须确保 Footer 已经添加完成，
+     * 否则可能导致 Footer 的位置与 [loadMoreView] 的位置错乱
      */
     fun showLoadMoreView(show: Boolean) {
         wrapper?.let {

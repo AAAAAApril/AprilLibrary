@@ -5,18 +5,11 @@ package com.april.multiple
  *
  * 一个数据实体类型对应 一个 item 样式代理
  */
-inline fun <reified T> AbsAdapter.only(itemDelegate: ItemDelegate<T, *>) {
+inline fun <reified T : Any> MultipleAdapter.only(itemDelegate: MultipleItemDelegate<T, *>) {
     createManager<T>(T::class.java.hashCode(), support).setItemDelegates(
         itemDelegate,
-        recognizer = object : Recognizer<T> {
-            override fun recognize(
-                classes: Array<Class<out ItemDelegate<out T, *>>>,
-                bean: T,
-                position: Int
-            ): Class<out ItemDelegate<out T, *>> {
-                return classes.first()
-            }
-        })
+        recognizer = object : Recognizer<T> {}
+    )
 }
 
 /**
@@ -24,25 +17,25 @@ inline fun <reified T> AbsAdapter.only(itemDelegate: ItemDelegate<T, *>) {
  *
  * 一个数据实体类型对应 多个 item 样式代理
  */
-inline fun <reified T> AbsAdapter.many(
-    vararg delegate: ItemDelegate<T, *>,
+inline fun <reified T : Any> MultipleAdapter.many(
+    vararg delegate: MultipleItemDelegate<T, *>,
     crossinline recognizer: (
         //添加的同数据类型的所有 item 样式代理
-        classes: Array<Class<out ItemDelegate<out T, *>>>,
+        classes: Array<Class<out MultipleItemDelegate<out T, *>>>,
         //数据实例
         bean: T,
         //所在位置
         position: Int
-    ) -> Class<out ItemDelegate<out T, *>>
+    ) -> Class<out MultipleItemDelegate<out T, *>>
 ) {
     createManager<T>(T::class.java.hashCode(), support).setItemDelegates(
         *delegate,
         recognizer = object : Recognizer<T> {
             override fun recognize(
-                classes: Array<Class<out ItemDelegate<out T, *>>>,
+                classes: Array<Class<out MultipleItemDelegate<out T, *>>>,
                 bean: T,
                 position: Int
-            ): Class<out ItemDelegate<out T, *>> {
+            ): Class<out MultipleItemDelegate<out T, *>> {
                 return recognizer.invoke(classes, bean, position)
             }
         })
@@ -53,7 +46,7 @@ inline fun <reified T> AbsAdapter.many(
  *
  * 注意：拿到 Manager 之后，只有调用了 setItemDelegates 函数，才可以在 MultipleAdapter 里面使用到
  */
-inline fun <reified T> AbsAdapter.obtainManager(): Manager<T> {
+inline fun <reified T : Any> MultipleAdapter.obtainManager(): Manager<T> {
     return createManager(T::class.java.hashCode(), support)
 }
 

@@ -2,18 +2,20 @@ package com.april.network
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
  * 一个 处理 try catch 的扩展函数
  */
 fun ViewModel.tryLaunch(
-    onBeforeTry: suspend () -> Unit = {},
-    onException: suspend (Exception) -> Unit = {},
-    onFinally: suspend () -> Unit = {},
+    onBeforeTry: () -> Unit = {},
+    onException: (Exception) -> Unit = {},
+    onFinally: () -> Unit = {},
     onTry: suspend () -> Unit
-) {
-    viewModelScope.launch {
+): Job {
+    return viewModelScope.launch {
         onBeforeTry.invoke()
         try {
             onTry.invoke()
@@ -22,6 +24,18 @@ fun ViewModel.tryLaunch(
             onException.invoke(e)
         } finally {
             onFinally.invoke()
+        }
+    }
+}
+
+fun ViewModel.countDown(
+    maxCount: Int = 60,
+    running: suspend (Int) -> Unit
+): Job {
+    return viewModelScope.launch {
+        repeat(60) {
+            running.invoke(maxCount - (it + 1))
+            delay(1000)
         }
     }
 }

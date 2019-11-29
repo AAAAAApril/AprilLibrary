@@ -33,7 +33,7 @@ fun ViewModel.countDown(
     running: suspend (Int) -> Unit
 ): Job {
     return viewModelScope.launch {
-        repeat(60) {
+        repeat(maxCount) {
             running.invoke(maxCount - (it + 1))
             delay(1000)
         }

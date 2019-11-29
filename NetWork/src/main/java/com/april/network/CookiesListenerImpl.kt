@@ -10,12 +10,12 @@ class CookiesListenerImpl(
     context: Context
 ) : OnCookiesListener {
 
-    private val preferencesFileName = "April_${context.packageName}_Cookies"
+    private val cookiesSharedPreferencesFileName = "April_${context.packageName}_Cookies"
     private val cookiesKey = "${context.packageName}_Cookies_Key"
 
     private val sharedPreferences by lazy {
         context.getSharedPreferences(
-            preferencesFileName,
+            cookiesSharedPreferencesFileName,
             Context.MODE_PRIVATE
         )
     }

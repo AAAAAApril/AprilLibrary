@@ -50,8 +50,12 @@ object CookiesController : OnCookiesListener {
         cookiesListener?.onAddCookiesFromUser(*cookies)
     }
 
-    override fun onClearCookies() {
-        cookiesListener?.onClearCookies()
+    override fun isCookiesExist(): Boolean {
+        return cookiesListener?.isCookiesExist() ?: false
+    }
+
+    override fun doClearCookies() {
+        cookiesListener?.doClearCookies()
     }
 }
 
@@ -69,5 +73,7 @@ interface OnCookiesListener {
         vararg cookies: String
     )
 
-    fun onClearCookies()
+    fun isCookiesExist(): Boolean
+
+    fun doClearCookies()
 }

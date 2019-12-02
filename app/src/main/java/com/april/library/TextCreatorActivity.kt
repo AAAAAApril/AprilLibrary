@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.april.develop.helper.toast
 import com.april.text.*
+import com.april.text.dsl.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.BitmapImageViewTarget
 import com.bumptech.glide.request.target.ImageViewTarget
@@ -60,5 +61,33 @@ class TextCreatorActivity : AppCompatActivity() {
             ),
             TextCreator("呀")
         )
+
+        act_tv2.spannableText {
+            text {
+                value = "你"
+                textColor = getColorInt(R.color.colorAccent)
+            }
+            line(1)
+            image {
+                drawableValue = getDrawable(R.drawable.icon_money_round_yellow)
+                centerVertical = true
+            }
+            line(1)
+            text {
+                value = "好"
+                textColor = getColorInt(R.color.colorPrimary)
+            }
+            line(2)
+            image {
+                resourceValue = R.drawable.icon_money_round_green
+                centerVertical = false
+            }
+            line()
+            text {
+                value = "呀"
+                textColor = getColorInt(R.color.colorPrimaryDark)
+            }
+        }
+
     }
 }

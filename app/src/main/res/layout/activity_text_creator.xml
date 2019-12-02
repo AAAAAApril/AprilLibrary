@@ -19,4 +19,11 @@
         android:includeFontPadding="false"
         android:textSize="16sp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        android:id="@+id/act_tv2"
+        android:textSize="14sp" />
+
 </LinearLayout>

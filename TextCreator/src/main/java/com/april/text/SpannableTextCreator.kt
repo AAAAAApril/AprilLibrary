@@ -1,4 +1,4 @@
-package com.april.text.dsl
+package com.april.text
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -11,11 +11,8 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.IntRange
 import androidx.core.content.ContextCompat
-import com.april.text.ImageStyleSpan
 
-class RichTextCreator internal constructor(
-    internal val context: Context
-) {
+class SpannableTextCreator internal constructor(internal val context: Context) {
     internal val builder: SpannableStringBuilder by lazy {
         SpannableStringBuilder()
     }
@@ -48,7 +45,7 @@ class RichTextCreator internal constructor(
 /**
  * 文字
  */
-fun RichTextCreator.text(block: TextBuilder.() -> Unit) {
+fun SpannableTextCreator.text(block: TextBuilder.() -> Unit) {
     TextBuilder().apply(block).let {
         val start = builder.length
         builder.append(it.value)
@@ -155,7 +152,7 @@ fun RichTextCreator.text(block: TextBuilder.() -> Unit) {
                     }
 
                     override fun onClick(widget: View) {
-                        click.onTextClick(widget as TextView, it.value)
+                        click.invoke(widget as TextView, it.value)
                     }
                 },
                 start,
@@ -169,7 +166,7 @@ fun RichTextCreator.text(block: TextBuilder.() -> Unit) {
 /**
  * 图片
  */
-fun RichTextCreator.image(block: ImageBuilder.() -> Unit) {
+fun SpannableTextCreator.image(block: ImageBuilder.() -> Unit) {
     ImageBuilder().apply(block).let {
         if ((it.resourceValue == null) && (it.drawableValue == null)) {
             return@let
@@ -202,7 +199,7 @@ fun RichTextCreator.image(block: ImageBuilder.() -> Unit) {
                     }
 
                     override fun onClick(widget: View) {
-                        onClick.onImageClick(widget as TextView)
+                        onClick.invoke(widget as TextView)
                     }
                 },
                 start,
@@ -216,7 +213,7 @@ fun RichTextCreator.image(block: ImageBuilder.() -> Unit) {
 /**
  * 行（hang）
  */
-fun RichTextCreator.line(
+fun SpannableTextCreator.line(
     //表示空白行的数量（默认只是换行，不增加空白行）
     @IntRange(from = 0) blankLineCount: Int = 0
 ) {

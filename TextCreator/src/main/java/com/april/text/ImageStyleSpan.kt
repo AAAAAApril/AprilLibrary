@@ -4,30 +4,8 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
-import android.text.TextPaint
-import android.text.style.ClickableSpan
 import android.text.style.ImageSpan
-import android.view.View
 import androidx.annotation.DrawableRes
-
-
-/**
- * 自定义点击
- */
-internal class OnClickSpan(
-    private val showUnderLine: Boolean,
-    private val text: String = "",
-    private val onClick: ((View, String) -> Unit)?
-) : ClickableSpan() {
-
-    override fun updateDrawState(ds: TextPaint) {
-        ds.isUnderlineText = showUnderLine
-    }
-
-    override fun onClick(widget: View) {
-        onClick?.invoke(widget, text)
-    }
-}
 
 /**
  * 图片样式处理

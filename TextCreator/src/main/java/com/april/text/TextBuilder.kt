@@ -1,9 +1,8 @@
-package com.april.text.dsl
+package com.april.text
 
 import android.text.Spanned
 import android.widget.TextView
 import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 
@@ -62,7 +61,7 @@ class TextBuilder internal constructor() {
     /**
      * 该段文字的点击事件
      */
-    var onClick: OnTextClickListener? = null
+    var onClick: ((view: TextView, text: String) -> Unit)? = null
     /**
      * 编辑框时，在该位置前面插入文字是否应用该样式（如有需要，可以选择公开此属性）
      */

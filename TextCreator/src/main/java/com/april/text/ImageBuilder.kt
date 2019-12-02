@@ -1,7 +1,8 @@
-package com.april.text.dsl
+package com.april.text
 
 import android.graphics.drawable.Drawable
 import android.text.Spanned
+import android.widget.TextView
 import androidx.annotation.DrawableRes
 
 /**
@@ -24,7 +25,7 @@ class ImageBuilder internal constructor() {
     /**
      * 该图片的点击事件
      */
-    var onClick: OnImageClickListener? = null
+    var onClick: ((view: TextView) -> Unit)? = null
 
     /**
      * 用于占位的空白文字

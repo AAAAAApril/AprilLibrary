@@ -1,4 +1,4 @@
-package com.april.text.dsl
+package com.april.text
 
 import android.graphics.Typeface
 

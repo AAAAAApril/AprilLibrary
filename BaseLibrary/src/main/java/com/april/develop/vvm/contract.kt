@@ -113,22 +113,22 @@ abstract class ContractViewModel(application: Application) : AndroidViewModel(ap
     }
 
     protected open suspend fun tryLaunch(
-        onBeforeTry: () -> Boolean = { true },
+        onBeforeTry: (() -> Boolean)? = { true },
         onTryLaunch: suspend () -> Unit = {},
-        onException: () -> Unit = {},
-        onFinally: () -> Boolean = { true }
+        onException: (() -> Unit)? = null,
+        onFinally: (() -> Boolean)? = { true }
     ): Job {
         return viewModelScope.launch {
-            if (onBeforeTry.invoke()) {
+            if (onBeforeTry?.invoke() == true) {
                 onShowLoading(true)
             }
             try {
                 onTryLaunch.invoke()
             } catch (e: Exception) {
                 e.printStackTrace()
-                onException.invoke()
+                onException?.invoke()
             } finally {
-                if (onFinally.invoke()) {
+                if (onFinally?.invoke() == true) {
                     onShowLoading(false)
                 }
             }
@@ -138,16 +138,16 @@ abstract class ContractViewModel(application: Application) : AndroidViewModel(ap
     protected open suspend fun tryLaunchDSL(block: ViewModelTryLaunch.() -> Unit): Job {
         return ViewModelTryLaunch().apply(block).let {
             viewModelScope.launch {
-                if (it.onBeforeTry.invoke()) {
+                if (it.onBeforeTry?.invoke() == true) {
                     onShowLoading(true)
                 }
                 try {
                     it.onTryLaunch.invoke()
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    it.onException.invoke()
+                    it.onException?.invoke()
                 } finally {
-                    if (it.onFinally.invoke()) {
+                    if (it.onFinally?.invoke() == true) {
                         onShowLoading(false)
                     }
                 }
@@ -159,10 +159,9 @@ abstract class ContractViewModel(application: Application) : AndroidViewModel(ap
 
 class ViewModelTryLaunch {
     //是否执行默认的行为
-    var onBeforeTry: () -> Boolean = { true }
+    var onBeforeTry: (() -> Boolean)? = { true }
     var onTryLaunch: suspend () -> Unit = {}
+    var onException: (() -> Unit)? = null
     //是否执行默认的行为
-    var onException: () -> Unit = {}
-    //是否执行默认的行为
-    var onFinally: () -> Boolean = { true }
+    var onFinally: (() -> Boolean)? = { true }
 }

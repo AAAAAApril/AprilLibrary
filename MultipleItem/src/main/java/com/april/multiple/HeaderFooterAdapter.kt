@@ -5,6 +5,14 @@ import android.view.View
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 
+/**
+ * 支持头尾布局的 Adapter
+ *
+ * 注意：数据操作相关方法中，
+ * dataPosition 是指数据列下标，并不包含头尾布局，
+ * adapterPosition 是包含头尾布局的下标，
+ * [headerCount] 和 [footerCount] 函数可以分别获取到头尾布局的个数
+ */
 open class HeaderFooterAdapter : MultipleAdapter() {
 
     override val support: HeaderFooterSupport = HeaderFooterSupport()

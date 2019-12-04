@@ -3,10 +3,9 @@ package com.april.develop.vvm
 import android.app.Application
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 /**
  * 视图层 约束接口
@@ -59,16 +58,17 @@ inline fun <reified VM : ContractViewModel> Fragment.obtainVMFromParent(): VM {
     assert((this.parentFragment as? IViewContract) != null) {
         "${this.javaClass.name} 的 ParentFragment 不能为 null，且必须实现 IViewContract 接口"
     }
-    return ViewModelProviders.of(this.requireParentFragment()).get(VM::class.java).apply {
-        val parentFragment = this@obtainVMFromParent.parentFragment ?: return@apply
-        val contract = parentFragment as IViewContract
-
-        contractToastLiveData.removeObserver(contract.toastObserver)
-        contractToastLiveData.observe(parentFragment, contract.toastObserver)
-
-        contractLoadingLiveData.removeObserver(contract.loadingObserver)
-        contractLoadingLiveData.observe(parentFragment, contract.loadingObserver)
-    }
+    return ViewModelProviders.of(this.requireParentFragment()).get(VM::class.java)
+//        .apply {
+//            val parentFragment = this@obtainVMFromParent.parentFragment ?: return@apply
+//            val contract = parentFragment as IViewContract
+//
+//            contractToastLiveData.removeObserver(contract.toastObserver)
+//            contractToastLiveData.observe(parentFragment, contract.toastObserver)
+//
+//            contractLoadingLiveData.removeObserver(contract.loadingObserver)
+//            contractLoadingLiveData.observe(parentFragment, contract.loadingObserver)
+//        }
 }
 
 /**
@@ -78,16 +78,17 @@ inline fun <reified VM : ContractViewModel> Fragment.obtainVMFromHostActivity():
     assert((this.activity as? IViewContract) != null) {
         "${this.javaClass.name} 的宿主 Activity 不能为 null，且必须实现 IViewContract 接口"
     }
-    return ViewModelProviders.of(this.requireActivity()).get(VM::class.java).apply {
-        val activity = this@obtainVMFromHostActivity.activity ?: return@apply
-        val contract = activity as IViewContract
-
-        contractToastLiveData.removeObserver(contract.toastObserver)
-        contractToastLiveData.observe(activity, contract.toastObserver)
-
-        contractLoadingLiveData.removeObserver(contract.loadingObserver)
-        contractLoadingLiveData.observe(activity, contract.loadingObserver)
-    }
+    return ViewModelProviders.of(this.requireActivity()).get(VM::class.java)
+//        .apply {
+//            val activity = this@obtainVMFromHostActivity.activity ?: return@apply
+//            val contract = activity as IViewContract
+//
+//            contractToastLiveData.removeObserver(contract.toastObserver)
+//            contractToastLiveData.observe(activity, contract.toastObserver)
+//
+//            contractLoadingLiveData.removeObserver(contract.loadingObserver)
+//            contractLoadingLiveData.observe(activity, contract.loadingObserver)
+//        }
 }
 
 /**
@@ -111,4 +112,57 @@ abstract class ContractViewModel(application: Application) : AndroidViewModel(ap
         contractLoadingLiveData.postValue(show)
     }
 
+    protected open suspend fun tryLaunch(
+        onBeforeTry: () -> Boolean = { true },
+        onTryLaunch: suspend () -> Unit = {},
+        onException: () -> Unit = {},
+        onFinally: () -> Boolean = { true }
+    ): Job {
+        return viewModelScope.launch {
+            if (onBeforeTry.invoke()) {
+                onShowLoading(true)
+            }
+            try {
+                onTryLaunch.invoke()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                onException.invoke()
+            } finally {
+                if (onFinally.invoke()) {
+                    onShowLoading(false)
+                }
+            }
+        }
+    }
+
+    protected open suspend fun tryLaunchDSL(block: ViewModelTryLaunch.() -> Unit): Job {
+        return ViewModelTryLaunch().apply(block).let {
+            viewModelScope.launch {
+                if (it.onBeforeTry.invoke()) {
+                    onShowLoading(true)
+                }
+                try {
+                    it.onTryLaunch.invoke()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    it.onException.invoke()
+                } finally {
+                    if (it.onFinally.invoke()) {
+                        onShowLoading(false)
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+class ViewModelTryLaunch {
+    //是否执行默认的行为
+    var onBeforeTry: () -> Boolean = { true }
+    var onTryLaunch: suspend () -> Unit = {}
+    //是否执行默认的行为
+    var onException: () -> Unit = {}
+    //是否执行默认的行为
+    var onFinally: () -> Boolean = { true }
 }

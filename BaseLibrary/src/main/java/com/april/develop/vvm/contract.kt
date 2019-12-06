@@ -115,7 +115,7 @@ abstract class ContractViewModel(application: Application) : AndroidViewModel(ap
     protected open suspend fun tryLaunch(
         onBeforeTry: (() -> Boolean)? = { true },
         onTryLaunch: suspend () -> Unit = {},
-        onException: (() -> Unit)? = null,
+        onException: ((Exception) -> Unit)? = null,
         onFinally: (() -> Boolean)? = { true }
     ): Job {
         return viewModelScope.launch {
@@ -126,7 +126,7 @@ abstract class ContractViewModel(application: Application) : AndroidViewModel(ap
                 onTryLaunch.invoke()
             } catch (e: Exception) {
                 e.printStackTrace()
-                onException?.invoke()
+                onException?.invoke(e)
             } finally {
                 if (onFinally?.invoke() == true) {
                     onShowLoading(false)
@@ -145,7 +145,7 @@ abstract class ContractViewModel(application: Application) : AndroidViewModel(ap
                     it.onTryLaunch.invoke()
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    it.onException?.invoke()
+                    it.onException?.invoke(e)
                 } finally {
                     if (it.onFinally?.invoke() == true) {
                         onShowLoading(false)
@@ -161,7 +161,7 @@ class ViewModelTryLaunch {
     //是否执行默认的行为
     var onBeforeTry: (() -> Boolean)? = { true }
     var onTryLaunch: suspend () -> Unit = {}
-    var onException: (() -> Unit)? = null
+    var onException: ((Exception) -> Unit)? = null
     //是否执行默认的行为
     var onFinally: (() -> Boolean)? = { true }
 }

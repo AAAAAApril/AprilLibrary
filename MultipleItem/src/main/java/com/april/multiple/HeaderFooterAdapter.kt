@@ -119,6 +119,10 @@ open class HeaderFooterAdapter : MultipleAdapter() {
     }
 
     override fun <T : Any> addDataList(dataList: MutableList<T>) {
+        if (support.dataList.isEmpty()) {
+            resetDataList(dataList)
+            return
+        }
         if (dataList.isEmpty()) {
             return
         }

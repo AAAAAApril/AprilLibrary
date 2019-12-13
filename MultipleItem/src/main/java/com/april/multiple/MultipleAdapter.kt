@@ -94,6 +94,10 @@ open class MultipleAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     open fun <T : Any> addDataList(dataList: MutableList<T>) {
+        if (support.dataList.isEmpty()) {
+            resetDataList(dataList)
+            return
+        }
         if (dataList.isEmpty()) {
             return
         }

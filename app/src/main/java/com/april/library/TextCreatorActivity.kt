@@ -2,10 +2,7 @@ package com.april.library
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.april.text.image
-import com.april.text.line
-import com.april.text.spannableText
-import com.april.text.text
+import com.april.text.*
 import kotlinx.android.synthetic.main.activity_text_creator.*
 
 class TextCreatorActivity : AppCompatActivity() {
@@ -13,16 +10,15 @@ class TextCreatorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_text_creator)
         act_tv2.spannableText {
-            text {
-                value = "你"
+            text("你") {
                 textColor = getColorInt(R.color.colorAccent)
-                onClick = { view, text ->
+                onClick = { _, _ ->
                     //do something
                 }
             }
             line(1)
-            image {
-                drawableValue = getDrawable(R.drawable.icon_money_round_yellow)
+            drawable {
+                value = getDrawable(R.drawable.icon_money_round_yellow)
                 centerVertical = true
             }
             line(1)
@@ -31,10 +27,10 @@ class TextCreatorActivity : AppCompatActivity() {
                 textColor = getColorInt(R.color.colorPrimary)
             }
             line(2)
-            image {
-                resourceValue = R.drawable.icon_money_round_green
+            image(R.drawable.icon_money_round_green) {
+                value = R.drawable.icon_money_round_green
                 centerVertical = false
-                onClick = {
+                onClick = { _, _ ->
                     //do something
                 }
             }

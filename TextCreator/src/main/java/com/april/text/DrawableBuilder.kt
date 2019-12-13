@@ -1,19 +1,18 @@
 package com.april.text
 
+import android.graphics.drawable.Drawable
 import android.text.Spanned
 import android.widget.TextView
-import androidx.annotation.DrawableRes
 
 /**
- * 构建资源图片
+ * 构建 Drawable
  */
-class ImageBuilder internal constructor() {
+class DrawableBuilder internal constructor() {
 
     /**
-     * 图片资源
+     * 图片 Drawable
      */
-    @DrawableRes
-    var value: Int = 0
+    var value: Drawable? = null
 
     /**
      * 图片相对于文字垂直居中（否则 底部对齐）
@@ -22,7 +21,7 @@ class ImageBuilder internal constructor() {
     /**
      * 该图片的点击事件
      */
-    var onClick: ((view: TextView, imageResource: Int) -> Unit)? = null
+    var onClick: ((view: TextView) -> Unit)? = null
 
     /**
      * 用于占位的空白文字

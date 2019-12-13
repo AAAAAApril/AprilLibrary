@@ -45,8 +45,14 @@ class SpannableTextCreator internal constructor(internal val context: Context) {
 /**
  * 文字
  */
-fun SpannableTextCreator.text(block: TextBuilder.() -> Unit) {
+fun SpannableTextCreator.text(value: String? = null, block: TextBuilder.() -> Unit) {
     TextBuilder().apply(block).let {
+        //将传入的字符设置给构建器
+        if (it.value.isEmpty()
+            && value != null
+        ) {
+            it.value = value
+        }
         val start = builder.length
         builder.append(it.value)
         val end = builder.length
@@ -164,32 +170,64 @@ fun SpannableTextCreator.text(block: TextBuilder.() -> Unit) {
 }
 
 /**
- * 图片
+ * 资源图片
  */
-fun SpannableTextCreator.image(block: ImageBuilder.() -> Unit) {
+fun SpannableTextCreator.image(@DrawableRes value: Int = 0, block: ImageBuilder.() -> Unit) {
     ImageBuilder().apply(block).let {
-        if ((it.resourceValue == null) && (it.drawableValue == null)) {
+        //将设置的值赋值到构建器
+        if (it.value == 0
+            && value != 0
+        ) {
+            it.value = value
+        }
+        val start = builder.length
+        builder.append(it.placementTextValue)
+        val end = builder.length
+        //资源
+        builder.setSpan(
+            ImageStyleSpan(context, it.value, it.centerVertical),
+            start,
+            end,
+            it.spanFlag
+        )
+        // 给图片添加点击事件
+        it.onClick?.let { onClick ->
+            hasClick = true
+            builder.setSpan(
+                object : ClickableSpan() {
+                    override fun updateDrawState(ds: TextPaint) {
+                    }
+
+                    override fun onClick(widget: View) {
+                        onClick.invoke(widget as TextView, it.value)
+                    }
+                },
+                start,
+                end,
+                it.spanFlag
+            )
+        }
+    }
+}
+
+/**
+ * Drawable 图片
+ */
+fun SpannableTextCreator.drawable(block: DrawableBuilder.() -> Unit) {
+    DrawableBuilder().apply(block).let {
+        if (it.value == null) {
             return@let
         }
         val start = builder.length
         builder.append(it.placementTextValue)
         val end = builder.length
-        when {
-            //资源
-            it.resourceValue != null -> builder.setSpan(
-                ImageStyleSpan(context, it.resourceValue!!, it.centerVertical),
-                start,
-                end,
-                it.spanFlag
-            )
-            //Drawable
-            it.drawableValue != null -> builder.setSpan(
-                ImageStyleSpan(it.drawableValue!!, it.centerVertical),
-                start,
-                end,
-                it.spanFlag
-            )
-        }
+        //drawable
+        builder.setSpan(
+            ImageStyleSpan(it.value!!, it.centerVertical),
+            start,
+            end,
+            it.spanFlag
+        )
         // 给图片添加点击事件
         it.onClick?.let { onClick ->
             hasClick = true
@@ -217,10 +255,23 @@ fun SpannableTextCreator.line(
     //表示空白行的数量（默认只是换行，不增加空白行）
     @IntRange(from = 0) blankLineCount: Int = 0
 ) {
-    val text: String = StringBuilder().apply {
+    builder.append(StringBuilder().apply {
         for (i in 0 until (blankLineCount + 1)) {
             append("\n")
         }
-    }.toString()
-    builder.append(text)
+    }.toString())
+}
+
+/**
+ * 空白字符
+ */
+fun SpannableTextCreator.space(
+    //空白字符的数量
+    @IntRange(from = 1) spaceCount: Int = 1
+) {
+    builder.append(StringBuilder().apply {
+        for (i in 0 until spaceCount) {
+            append(" ")
+        }
+    }.toString())
 }

@@ -41,9 +41,19 @@ open class MultipleSupport {
             return placeholderViewType
         }
         val itemBean = dataList[position]
-        return managerArray.valueAt(
-            managerArray.indexOfKey(itemBean.javaClass.hashCode())
-        ).getItemViewType(itemBean, position)
+        var clazz: Class<in Any>? = itemBean.javaClass
+        var index: Int = managerArray.indexOfKey(clazz.hashCode())
+        /*
+            这里的循环，是实现数据实体父类型约束的关键。
+            A 作为父类被添加到约束队列之后，其子类 A1、A2 如果未单独添加约束，那么在传入 A1、A2 数据类型时，
+            会查找并使用 A 对应的 item 样式代理。
+            如果在此处出现报错，表示该位置上的数据类型未作为多样式 item 的约束数据类型
+         */
+        while (index < 0) {
+            clazz = clazz?.superclass
+            index = managerArray.indexOfKey(clazz.hashCode())
+        }
+        return managerArray.valueAt(index).getItemViewType(itemBean, position)
     }
 
     internal open fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {

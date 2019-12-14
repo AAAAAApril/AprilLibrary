@@ -1,7 +1,6 @@
 package com.april.multiple
 
 import android.util.SparseArray
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,13 +21,18 @@ open class MultipleSupport {
     internal val itemDelegateArray = SparseArray<MultipleItemDelegate<*, *>>()
 
     //空视图占位布局
-    internal var placeholderView: View? = null
-    internal var placeholderViewType = -1
+    internal var placeholderBean: Any? = null
+    internal var placeholderItemDelegate: SpecialItemDelegate<*>? = null
+        internal set(value) {
+            field = value
+            placeholderItemType = value?.hashCode() ?: -1
+        }
+    private var placeholderItemType = -1
 
     //==============================================================================================
 
     internal open fun getItemCount(): Int {
-        return if (dataList.isEmpty() && placeholderView != null) {
+        return if (dataList.isEmpty() && placeholderItemDelegate != null) {
             1
         } else {
             dataList.size
@@ -37,8 +41,8 @@ open class MultipleSupport {
 
     internal open fun getItemViewType(position: Int): Int {
         //占位视图
-        if (dataList.isEmpty() && placeholderView != null) {
-            return placeholderViewType
+        if (dataList.isEmpty() && placeholderItemDelegate != null) {
+            return placeholderItemType
         }
         val itemBean = dataList[position]
         var clazz: Class<in Any>? = itemBean.javaClass
@@ -68,10 +72,11 @@ open class MultipleSupport {
         parent: ViewGroup,
         viewType: Int
     ): RecyclerView.ViewHolder {
-        return if (placeholderView != null
-            && viewType == placeholderViewType
+        return if (
+            viewType == placeholderItemType
+            && placeholderItemDelegate != null
         ) {
-            object : RecyclerView.ViewHolder(placeholderView!!) {}
+            placeholderItemDelegate!!.createViewHolder(parent)
         } else {
             itemDelegateArray.get(viewType).createViewHolder(parent)
         }
@@ -82,9 +87,16 @@ open class MultipleSupport {
         position: Int,
         payloads: MutableList<Any>
     ) {
-        itemDelegateArray.get(holder.itemViewType)?.bindViewHolder(
-            holder, dataList[position], payloads
-        )
+        val type = holder.itemViewType
+        if (type == placeholderItemType) {
+            placeholderItemDelegate?.bindSpecialViewHolder(
+                holder, placeholderBean
+            )
+        } else {
+            itemDelegateArray.get(type)?.bindViewHolder(
+                holder, dataList[position], payloads
+            )
+        }
     }
 
     //==============================================================================================
@@ -124,7 +136,7 @@ open class MultipleSupport {
      * [Int] 在 GridLayoutManager 里面的时候，这个位置上的 item 占据的宽度
      */
     internal open fun getItemSpanSizeInGridLayoutManager(position: Int, spanCount: Int): Int {
-        return if (dataList.isEmpty() && placeholderView != null) {
+        return if (dataList.isEmpty() && placeholderItemDelegate != null) {
             //限定占位布局为拉通展示
             spanCount
         } else {

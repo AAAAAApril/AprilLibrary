@@ -13,6 +13,8 @@ abstract class SpecialItemDelegate<T : Any?>(
     @LayoutRes private val specialItemLayoutRes: Int
 ) : MultipleItemDelegate<Any, RecyclerView.ViewHolder>() {
 
+    internal var itemView: View? = null
+
     final override fun isCrossRowWhenGridLayout(): Boolean {
         return true
     }
@@ -30,6 +32,7 @@ abstract class SpecialItemDelegate<T : Any?>(
         parent: ViewGroup,
         itemView: View
     ): RecyclerView.ViewHolder {
+        this.itemView = itemView
         return object : RecyclerView.ViewHolder(itemView) {}
     }
 

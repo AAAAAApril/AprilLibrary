@@ -13,7 +13,7 @@ open class MultipleAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     /**
      * 设置占位布局 item 样式代理
      */
-    fun setPlaceholder(placeholderItemDelegate: SpecialItemDelegate<*>?) {
+    fun <T : SpecialItemDelegate<*>> setPlaceholder(placeholderItemDelegate: T?) {
         support.placeholderItemDelegate = placeholderItemDelegate
     }
 

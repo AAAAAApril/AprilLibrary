@@ -61,11 +61,21 @@ open class MultipleSupport {
     }
 
     internal open fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
-        itemDelegateArray.get(holder.itemViewType)?.viewAttachedToWindow(holder)
+        val viewType = holder.itemViewType
+        if (viewType == placeholderItemType) {
+            placeholderItemDelegate?.viewAttachedToWindow(holder)
+        } else {
+            itemDelegateArray.get(viewType)?.viewAttachedToWindow(holder)
+        }
     }
 
     internal open fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
-        itemDelegateArray.get(holder.itemViewType)?.viewDetachedFromWindow(holder)
+        val viewType = holder.itemViewType
+        if (viewType == placeholderItemType) {
+            placeholderItemDelegate?.viewDetachedFromWindow(holder)
+        } else {
+            itemDelegateArray.get(viewType)?.viewDetachedFromWindow(holder)
+        }
     }
 
     internal open fun onCreateViewHolder(

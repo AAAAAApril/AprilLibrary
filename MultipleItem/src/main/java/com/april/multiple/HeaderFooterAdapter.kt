@@ -1,10 +1,5 @@
 package com.april.multiple
 
-import android.view.LayoutInflater
-import android.view.View
-import androidx.annotation.LayoutRes
-import androidx.recyclerview.widget.RecyclerView
-
 /**
  * 支持头尾布局的 Adapter
  *
@@ -18,55 +13,70 @@ open class HeaderFooterAdapter : MultipleAdapter() {
     override val support: HeaderFooterSupport = HeaderFooterSupport()
 
     /**
-     * 添加 header
-     *
-     * @param recyclerView 目标 RecyclerView
-     * @return headerView
+     * @param headerItemDelegate 添加 header
      */
-    fun addHeader(
-        recyclerView: RecyclerView,
-        @LayoutRes headerLayoutRes: Int
-    ): View {
-        val headerView = LayoutInflater.from(recyclerView.context)
-            .inflate(headerLayoutRes, recyclerView, false)
-        support.addHeader(headerView)
-        notifyItemInserted(support.headerArray.indexOfValue(headerView))
-        return headerView
+    fun <T : SpecialItemDelegate<*>> addHeader(headerItemDelegate: T) {
+        support.addHeader(headerItemDelegate)
+        notifyItemInserted(support.adapterPositionOfHeader(headerItemDelegate))
     }
 
     /**
-     * 移除 HeaderView
+     * 移除 header
      */
-    fun removeHeader(headerView: View) {
-        val index = support.headerArray.indexOfValue(headerView)
-        support.headerArray.removeAt(index)
-        notifyItemRemoved(index)
+    fun <T : SpecialItemDelegate<*>> removeHeader(headerItemDelegate: T) {
+        val adapterPosition = support.adapterPositionOfHeader(headerItemDelegate)
+        if (adapterPosition < 0) {
+            return
+        }
+        if (support.removeHeader(headerItemDelegate)) {
+            notifyItemRemoved(adapterPosition)
+        }
     }
 
     /**
-     * 添加 footer
-     *
-     * @param recyclerView 目标 RecyclerView
-     * @return footerView
+     * @param footerItemDelegate 添加 footer
      */
-    open fun addFooter(
-        recyclerView: RecyclerView,
-        @LayoutRes footerLayoutRes: Int
-    ): View {
-        val footerView = LayoutInflater.from(recyclerView.context)
-            .inflate(footerLayoutRes, recyclerView, false)
-        support.addFooter(footerView)
-        notifyItemInserted(support.adapterPositionOfFooter(footerView))
-        return footerView
+    fun <T : SpecialItemDelegate<*>> addFooter(footerItemDelegate: T) {
+        support.addFooter(footerItemDelegate)
+        notifyItemInserted(support.adapterPositionOfFooter(footerItemDelegate))
     }
 
     /**
-     * 移除 FooterView
+     * 移除 footer
      */
-    open fun removeFooter(footerView: View) {
-        val index = support.adapterPositionOfFooter(footerView)
-        support.footerArray.removeAt(support.footerArray.indexOfValue(footerView))
-        notifyItemRemoved(index)
+    fun <T : SpecialItemDelegate<*>> removeFooter(footerItemDelegate: T) {
+        val index = support.footerArray.indexOfValue(footerItemDelegate)
+        if (index < 0) {
+            return
+        }
+        val adapterPosition = support.adapterPositionOfFooter(footerItemDelegate)
+        if (support.removeFooter(footerItemDelegate)) {
+            notifyItemRemoved(adapterPosition)
+        }
+    }
+
+    /**
+     * 设置 header 需要的数据
+     */
+    fun <T : SpecialItemDelegate<*>> resetHeaderData(
+        headerItemDelegate: T,
+        headerData: Any?
+    ) {
+        if (support.resetHeaderData(headerItemDelegate, headerData)) {
+            notifyItemChanged(support.adapterPositionOfHeader(headerItemDelegate))
+        }
+    }
+
+    /**
+     * 设置 footer 需要的数据
+     */
+    fun <T : SpecialItemDelegate<*>> resetFooterData(
+        footerItemDelegate: T,
+        footerData: Any?
+    ) {
+        if (support.resetFooterData(footerItemDelegate, footerData)) {
+            notifyItemChanged(support.adapterPositionOfFooter(footerItemDelegate))
+        }
     }
 
     fun headerCount(): Int = support.headerCount()

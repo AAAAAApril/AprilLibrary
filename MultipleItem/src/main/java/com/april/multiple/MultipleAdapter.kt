@@ -1,9 +1,6 @@
 package com.april.multiple
 
-import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 
 /**
@@ -14,20 +11,24 @@ open class MultipleAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     open val support = MultipleSupport()
 
     /**
-     * 从布局资源文件添加
-     *
-     * @return 创建出的占位布局
+     * 设置占位布局 item 样式代理
      */
-    fun setPlaceholder(
-        targetRecyclerView: RecyclerView,
-        @LayoutRes placeholderViewResId: Int
-    ): View {
-        val placeholderView = LayoutInflater.from(targetRecyclerView.context).inflate(
-            placeholderViewResId, targetRecyclerView, false
-        )
-        support.placeholderView = placeholderView
-        support.placeholderViewType = placeholderView.javaClass.hashCode()
-        return placeholderView
+    fun <T : SpecialItemDelegate<*>> setPlaceholder(placeholderItemDelegate: T?) {
+        support.placeholderItemDelegate = placeholderItemDelegate
+    }
+
+    /**
+     * 设置占位布局所需的数据
+     */
+    fun resetPlaceholderData(placeholderData: Any?) {
+        support.placeholderBean = placeholderData
+        //如果数据列是空的，并且设置了占位布局
+        if (support.dataList.isEmpty()
+            && support.placeholderItemDelegate != null
+        ) {
+            //就刷新一下
+            notifyDataSetChanged()
+        }
     }
 
     override fun getItemCount(): Int {
@@ -67,8 +68,8 @@ open class MultipleAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         return support.dataList[dataPosition] as T
     }
 
-    open fun getDataList(): MutableList<Any> {
-        return support.dataList
+    open fun <T : Any> getDataList(): MutableList<T> {
+        return support.dataList as MutableList<T>
     }
 
     open fun <T : Any> resetData(any: T, dataPosition: Int) {

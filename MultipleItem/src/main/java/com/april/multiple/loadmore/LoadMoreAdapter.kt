@@ -1,10 +1,9 @@
 package com.april.multiple.loadmore
 
-import android.view.View
-import androidx.annotation.LayoutRes
 import androidx.core.util.containsValue
 import androidx.recyclerview.widget.RecyclerView
 import com.april.multiple.HeaderFooterAdapter
+import com.april.multiple.SpecialItemDelegate
 
 /**
  * 加载更多 Adapter
@@ -16,7 +15,7 @@ open class LoadMoreAdapter : HeaderFooterAdapter() {
     //是否正在加载更多
     private var isLoadingMore = false
     //加载更多 布局包装
-    private var wrapper: LoadMoreWrapper? = null
+    private var wrapper: SpecialItemDelegate<*>? = null
     //加载更多监听
     private var loadMoreListener: LoadMoreListener? = null
 
@@ -51,20 +50,8 @@ open class LoadMoreAdapter : HeaderFooterAdapter() {
     /**
      * @return LoadMore View
      */
-    fun setLoadMoreLayoutRes(
-        targetRecyclerView: RecyclerView,
-        @LayoutRes loadMoreLayoutRes: Int
-    ): View {
-        return setLoadMoreView(LoadMoreWrapper(targetRecyclerView, loadMoreLayoutRes))
-    }
-
-    /**
-     * @return LoadMore View
-     */
-    fun setLoadMoreView(wrapper: LoadMoreWrapper): View {
-        wrapper.createLoadMoreView()
-        this.wrapper = wrapper
-        return wrapper.loadMoreView
+    fun <T : SpecialItemDelegate<*>> setLoadMoreItemDelegate(delegate: T) {
+        this.wrapper = delegate
     }
 
     /**
@@ -72,6 +59,7 @@ open class LoadMoreAdapter : HeaderFooterAdapter() {
      */
     fun setLoadMoreListener(loadMoreListener: LoadMoreListener?) {
         this.loadMoreListener = loadMoreListener
+        setCanLoadMore(true)
     }
 
     /**
@@ -83,17 +71,14 @@ open class LoadMoreAdapter : HeaderFooterAdapter() {
     fun showLoadMoreView(show: Boolean) {
         wrapper?.let {
             //是否有这个 FooterView
-            val contains = support.footerArray.containsValue(it.loadMoreView)
+            val contains = support.footerArray.containsValue(it)
             //显示 且 不包含
             if (show && !contains) {
-                support.addFooter(it.loadMoreView)
-                notifyItemInserted(support.adapterPositionOfFooter(it.loadMoreView))
-                it.onViewAttachedToWindow()
+                addFooter(it)
             }
             //不显示 且 包含
             if (!show && contains) {
-                it.onViewDetachedFromWindow()
-                removeFooter(it.loadMoreView)
+                removeFooter(it)
             }
         }
     }

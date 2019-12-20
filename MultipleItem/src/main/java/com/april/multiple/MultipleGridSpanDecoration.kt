@@ -62,7 +62,7 @@ class MultipleGridSpanDecoration(
         //头尾、占位布局单独设置
         if (support.isHeaderPosition(mPosition)
             || support.isFooterPosition(mPosition)
-            || mItemView == support.placeholderView
+            || mItemView == support.placeholderItemDelegate?.itemView
         ) {
             position = 0
             // 头部、尾部，以及占位布局，都返回 1，这样在给它们做偏移时，就正常了

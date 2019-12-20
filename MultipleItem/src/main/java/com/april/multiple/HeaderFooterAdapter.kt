@@ -111,6 +111,19 @@ open class HeaderFooterAdapter : MultipleAdapter() {
         )
     }
 
+    override fun <T : Any> resetDataList(dataList: MutableList<T>) {
+        support.dataList.clear()
+        val count = dataList.size
+        support.dataList.addAll(dataList)
+        if (headerCount() == 0
+            && footerCount() == 0
+        ) {
+            notifyDataSetChanged()
+        } else {
+            notifyItemRangeChanged(headerCount(), count)
+        }
+    }
+
     override fun removeData(dataPosition: Int) {
         support.dataList.removeAt(dataPosition)
         notifyItemRemoved(

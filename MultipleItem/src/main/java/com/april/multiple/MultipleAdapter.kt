@@ -77,7 +77,7 @@ open class MultipleAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         notifyItemChanged(dataPosition)
     }
 
-    open fun <T : Any> resetDataList(dataList: MutableList<T>) {
+    open fun <T : Any> resetDataList(dataList: List<T>) {
         support.dataList.clear()
         support.dataList.addAll(dataList)
         notifyDataSetChanged()
@@ -94,7 +94,7 @@ open class MultipleAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         notifyItemInserted(support.dataList.lastIndex)
     }
 
-    open fun <T : Any> addDataList(dataList: MutableList<T>) {
+    open fun <T : Any> addDataList(dataList: List<T>) {
         if (support.dataList.isEmpty()) {
             resetDataList(dataList)
             return
@@ -115,7 +115,7 @@ open class MultipleAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         notifyItemInserted(dataPosition)
     }
 
-    open fun <T : Any> insertDataList(dataPosition: Int, dataList: MutableList<T>) {
+    open fun <T : Any> insertDataList(dataPosition: Int, dataList: List<T>) {
         if (dataList.isEmpty()) {
             return
         }
@@ -128,7 +128,7 @@ open class MultipleAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         notifyItemRemoved(dataPosition)
     }
 
-    open fun <T : Any> removeDataList(dataList: MutableList<T>) {
+    open fun <T : Any> removeDataList(dataList: List<T>) {
         support.dataList.removeAll(dataList)
         notifyDataSetChanged()
     }

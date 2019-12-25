@@ -2,28 +2,46 @@ package com.april.network
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 /**
  * 一个 处理 try catch 的扩展函数
  */
 fun ViewModel.tryLaunch(
     onBeforeTry: () -> Unit = {},
-    onException: (Exception) -> Unit = {},
+    onException: (Throwable) -> Unit = {},
     onFinally: () -> Unit = {},
-    onTry: suspend () -> Unit
+    onTry: suspend CoroutineScope.() -> Unit
 ): Job {
-    return viewModelScope.launch {
+    return viewModelScope.launch(
+        CoroutineExceptionHandler { _, throwable ->
+            throwable.printStackTrace()
+            onException.invoke(throwable)
+        }
+    ) {
         onBeforeTry.invoke()
         try {
-            onTry.invoke()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            onException.invoke(e)
+            onTry.invoke(this)
         } finally {
             onFinally.invoke()
+        }
+    }
+}
+
+fun ViewModel.tryLaunchDSL(block: ViewModelTryLaunch.() -> Unit): Job {
+    return ViewModelTryLaunch().apply(block).let {
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, throwable ->
+                throwable.printStackTrace()
+                it.onException.invoke(throwable)
+            }
+        ) {
+            it.onBeforeTry.invoke()
+            try {
+                it.onTry.invoke(this)
+            } finally {
+                it.onFinally.invoke()
+            }
         }
     }
 }
@@ -38,4 +56,11 @@ fun ViewModel.countDown(
             delay(1000)
         }
     }
+}
+
+class ViewModelTryLaunch {
+    var onBeforeTry: () -> Unit = { }
+    var onTry: suspend CoroutineScope.() -> Unit = {}
+    var onException: ((Throwable) -> Unit) = {}
+    var onFinally: () -> Unit = { }
 }

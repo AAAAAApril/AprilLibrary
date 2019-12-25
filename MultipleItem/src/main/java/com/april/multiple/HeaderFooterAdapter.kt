@@ -121,7 +121,7 @@ open class HeaderFooterAdapter : MultipleAdapter() {
         )
     }
 
-    override fun <T : Any> resetDataList(dataList: MutableList<T>) {
+    override fun <T : Any> resetDataList(dataList: List<T>) {
         support.dataList.clear()
         val count = dataList.size
         support.dataList.addAll(dataList)

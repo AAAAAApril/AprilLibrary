@@ -54,7 +54,7 @@ fun TextView.spannableText(
     @ColorInt highLightColor: Int = Color.TRANSPARENT,
     block: SpannableTextCreator.() -> Unit
 ): TextView {
-    val creator = context.richTextCreator(block)
+    val creator = context.spannableTextCreator(block)
     if (creator.hasClick && (this !is EditText)) {
         movementMethod = LinkMovementMethod.getInstance()
         highlightColor = highLightColor
@@ -71,6 +71,10 @@ fun TextView.spannableText(
     return this
 }
 
-fun Context.richTextCreator(block: SpannableTextCreator.() -> Unit): SpannableTextCreator {
-    return SpannableTextCreator(this).apply(block)
+fun Context.spannableTextCreator(block: (SpannableTextCreator.() -> Unit)? = null): SpannableTextCreator {
+    return SpannableTextCreator(this).also { creator ->
+        if (block != null) {
+            creator.apply(block)
+        }
+    }
 }

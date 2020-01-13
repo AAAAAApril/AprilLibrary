@@ -40,5 +40,6 @@ class TextCreatorActivity : AppCompatActivity() {
                 textColor = getColorInt(R.color.colorPrimaryDark)
             }
         }
+
     }
 }

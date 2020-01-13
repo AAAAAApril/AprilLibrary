@@ -5,28 +5,26 @@ import java.security.NoSuchAlgorithmException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
-import kotlin.experimental.and
 
 /**
- * 对字符串做 MD5 加密
+ * 32 位 MD5 加密
  */
-fun String.md5(): String {
-    if (this.isNotEmpty()) {
-        try {
-            val md5 = MessageDigest.getInstance("MD5")
-            val bytes = md5.digest(toByteArray())
-            val result = StringBuilder()
-            for (b in bytes) {
-                var temp = Integer.toHexString((b and 0xff.toByte()).toInt())
-                if (temp.length == 1) {
-                    temp = "0$temp"
-                }
-                result.append(temp)
-            }
-            return result.toString()
-        } catch (e: NoSuchAlgorithmException) {
-            e.printStackTrace()
+fun String.md5_32(): String {
+    try {
+        val md = MessageDigest.getInstance("MD5")
+        md.update(toByteArray())
+        val b = md.digest()
+        var i: Int
+        val buf = StringBuffer("")
+        for (offset in b.indices) {
+            i = b[offset].toInt()
+            if (i < 0) i += 256
+            if (i < 16) buf.append("0")
+            buf.append(Integer.toHexString(i))
         }
+        return buf.toString()
+    } catch (e: NoSuchAlgorithmException) {
+        e.printStackTrace()
     }
     return ""
 }
@@ -74,18 +72,20 @@ fun String.md5(): String {
  * [onError] 错误信息回调
  *
  */
-fun String.isIDCardNum(needCheckFormat: Boolean = false,
-                       error: String? = null,//统一错误信息
-                       lengthError: String = "身份证号码长度应该为18位",
-                       contentError: String = "身份证号码除了最后一位，其余的都应该为数字",
-                       lastCharError: String = "身份证号码最后一位应该为数字或者大、小写的X",
-                       birthDayError: String = "身份证生日无效",
-                       birthDayInvalidError: String = "身份证生日不在有效范围内",
-                       birthDayMonthInvalidError: String = "身份证月份无效",
-                       birthDayDayInvalidError: String = "身份证日期无效",
-                       areaError: String = "身份证地区编码错误",
-                       idCardInvalidError: String = "身份证号不合法",
-                       onError: ((String) -> Unit)? = null): Boolean {
+fun String.isIDCardNum(
+    needCheckFormat: Boolean = false,
+    error: String? = null,//统一错误信息
+    lengthError: String = "身份证号码长度应该为18位",
+    contentError: String = "身份证号码除了最后一位，其余的都应该为数字",
+    lastCharError: String = "身份证号码最后一位应该为数字或者大、小写的X",
+    birthDayError: String = "身份证生日无效",
+    birthDayInvalidError: String = "身份证生日不在有效范围内",
+    birthDayMonthInvalidError: String = "身份证月份无效",
+    birthDayDayInvalidError: String = "身份证日期无效",
+    areaError: String = "身份证地区编码错误",
+    idCardInvalidError: String = "身份证号不合法",
+    onError: ((String) -> Unit)? = null
+): Boolean {
     if (needCheckFormat) {
         //长度不满足18位
         if (length != 18) {
@@ -121,13 +121,15 @@ fun String.isIDCardNum(needCheckFormat: Boolean = false,
     //检测生日
     if (!Pattern.compile(
             "^((\\d{2}(([02468][048])|([13579][26]))[\\-/\\s]?((((0?[13578])|(1[02]))[\\-/\\s]?((0?[1-9])|([1-2][0-9])|(3[01])))|(((0?[469])|(11))[\\-/\\s]?((0?[1-9])|([1-2][0-9])|(30)))|(0?2[\\-/\\s]?((0?[1-9])|([1-2][0-9])))))|(\\d{2}(([02468][1235679])|([13579][01345789]))[\\-/\\s]?((((0?[13578])|(1[02]))[\\-/\\s]?((0?[1-9])|([1-2][0-9])|(3[01])))|(((0?[469])|(11))[\\-/\\s]?((0?[1-9])|([1-2][0-9])|(30)))|(0?2[\\-/\\s]?((0?[1-9])|(1[0-9])|(2[0-8]))))))(\\s(((0?[0-9])|([1-2][0-3])):([0-5]?[0-9])((\\s)|(:([0-5]?[0-9])))))?\$"
-        ).matcher(birthDay).matches()) {
+        ).matcher(birthDay).matches()
+    ) {
         onError?.invoke(error ?: birthDayError)
         return false
     }
     val calendar = GregorianCalendar()
     if ((calendar.get(Calendar.YEAR) - year.toInt()) > 150 ||
-        (calendar.time.time - SimpleDateFormat("yyyy-MM-dd", Locale.CHINA).parse(birthDay).time) < 0) {
+        (calendar.time.time - SimpleDateFormat("yyyy-MM-dd", Locale.CHINA).parse(birthDay).time) < 0
+    ) {
         onError?.invoke(error ?: birthDayInvalidError)
         return false
     }
@@ -154,7 +156,20 @@ fun String.isIDCardNum(needCheckFormat: Boolean = false,
     for (index in 0 until 17) {
         totalNum += ai[index].toInt() * wi[index].toInt()
     }
-    if ("$ai${arrayOf("1", "0", "x", "9", "8", "7", "6", "5", "4", "3", "2")[totalNum % 11]}" != toLowerCase()) {
+    if ("$ai${arrayOf(
+            "1",
+            "0",
+            "x",
+            "9",
+            "8",
+            "7",
+            "6",
+            "5",
+            "4",
+            "3",
+            "2"
+        )[totalNum % 11]}" != toLowerCase()
+    ) {
         onError?.invoke(error ?: idCardInvalidError)
         return false
     }

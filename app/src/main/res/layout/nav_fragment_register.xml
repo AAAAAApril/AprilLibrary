@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/NavTitleStyle"
+        android:text="这里是注册页" />
+
+    <EditText
+        android:id="@+id/nfr_et_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="要注册的手机号" />
+
+    <EditText
+        android:id="@+id/nfr_et_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入密码" />
+
+    <Button
+        android:id="@+id/nfr_btn_go_login"
+        style="@style/NavButtonStyle"
+        android:text="注册" />
+
+</LinearLayout>

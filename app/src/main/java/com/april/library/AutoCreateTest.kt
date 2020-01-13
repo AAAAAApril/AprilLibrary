@@ -33,6 +33,11 @@ class AutoCreateTestFragment : AutoCreateFragment(),
         createdContentView.lacc_tv_bottom.text = "这里是Fragment的底部内容"
     }
 
+    /**
+     * 可以自行实现，
+     * 如果自行实现，则不会使用被委托的类里面的实现，
+     * 在此处，则表示不会使用 [CreateContentView] 类里面的实现
+     */
     override fun onCreateContentViewLayoutParams(parent: LinearLayout?): ViewGroup.LayoutParams {
         return ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,

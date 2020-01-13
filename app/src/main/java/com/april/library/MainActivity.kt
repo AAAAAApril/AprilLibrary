@@ -49,6 +49,9 @@ class MainActivity : AppCompatActivity() {
                 },
                 ItemBean("MultipleItem") {
                     startContractIntent(Intent(this, MultipleItemActivity::class.java))
+                },
+                ItemBean("AutoCreate") {
+                    startContractIntent(Intent(this, AutoCreateTestActivity::class.java))
                 }
             )
         )

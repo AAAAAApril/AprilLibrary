@@ -1,0 +1,2 @@
+com.april.fragmentpool
+string app_name

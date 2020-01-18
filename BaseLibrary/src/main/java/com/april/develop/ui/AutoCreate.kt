@@ -10,55 +10,30 @@ import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 
-interface ICreateTitleView {
-    var createdTitleView: View
-    fun onCreateTitleView(inflater: LayoutInflater): View
-}
-
-class CreateTitleView(
+interface IInflateView {
     @LayoutRes
-    private val titleBarLayoutId: Int
-) : ICreateTitleView {
-    override lateinit var createdTitleView: View
-    override fun onCreateTitleView(inflater: LayoutInflater): View {
-        return inflater.inflate(titleBarLayoutId, null, false).apply {
-            createdTitleView = this
-        }
-    }
-}
+    fun inflateTitleLayoutRes(): Int
 
-//==================================================================================================
-
-interface ICreateContentView {
-    var createdContentView: View
-    fun onCreateContentViewLayoutParams(parent: LinearLayout?): ViewGroup.LayoutParams
-    fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup?): View
-}
-
-class CreateContentView(
     @LayoutRes
-    private val contentLayoutId: Int
-) : ICreateContentView {
-    override lateinit var createdContentView: View
-    override fun onCreateContentViewLayoutParams(parent: LinearLayout?): ViewGroup.LayoutParams {
-        return if (parent == null) {
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        } else {
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                0,
-                1f
-            )
-        }
-    }
+    fun inflateContentLayoutRes(): Int
 
-    override fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup?): View {
-        return inflater.inflate(contentLayoutId, container, false).apply {
-            createdContentView = this
-        }
+    fun inflateContentLayoutParams(): LinearLayout.LayoutParams
+}
+
+class InflateView(
+    @LayoutRes
+    private val title: Int = 0,
+    @LayoutRes
+    private val content: Int = 0
+) : IInflateView {
+    override fun inflateTitleLayoutRes(): Int = title
+    override fun inflateContentLayoutRes(): Int = content
+    override fun inflateContentLayoutParams(): LinearLayout.LayoutParams {
+        return LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            0,
+            1f
+        )
     }
 }
 
@@ -70,10 +45,10 @@ open class AutoCreateFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return autoCreateView(
+        return inflateView(
             inflater,
-            (this as? ICreateTitleView),
-            (this as? ICreateContentView)
+            container,
+            (this as? IInflateView)
         )
     }
 }
@@ -82,10 +57,10 @@ open class AutoCreateActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(
-            autoCreateView(
+            inflateView(
                 LayoutInflater.from(this),
-                (this as? ICreateTitleView),
-                (this as? ICreateContentView)
+                null,
+                (this as? IInflateView)
             )
         )
     }
@@ -93,32 +68,35 @@ open class AutoCreateActivity : AppCompatActivity() {
 
 //==================================================================================================
 
-private fun autoCreateView(
+private fun inflateView(
     inflater: LayoutInflater,
-    createTitleView: ICreateTitleView?,
-    createContentView: ICreateContentView?
+    container: ViewGroup?,
+    autoInflate: IInflateView?
 ): View {
-    val titleBar: View? = createTitleView?.onCreateTitleView(inflater)
-    val content: View? = createContentView?.onCreateContentView(inflater, null)
-    // both not null
-    return if (titleBar != null && content != null) {
+    if (autoInflate == null) {
+        return Space(inflater.context)
+    }
+    val titleView: View? = autoInflate.inflateTitleLayoutRes().let { titleLayoutRes ->
+        return@let if (titleLayoutRes != 0) {
+            inflater.inflate(titleLayoutRes, container, false)
+        } else {
+            null
+        }
+    }
+    val contentView: View? = autoInflate.inflateContentLayoutRes().let { contentLayoutRes ->
+        return@let if (contentLayoutRes != 0) {
+            inflater.inflate(contentLayoutRes, container, false)
+        } else {
+            null
+        }
+    }
+    return if (titleView != null && contentView != null) {
         LinearLayout(inflater.context).apply {
             orientation = LinearLayout.VERTICAL
-            addView(titleBar)
-            addView(content, createContentView.onCreateContentViewLayoutParams(this))
+            addView(titleView)
+            addView(contentView, autoInflate.inflateContentLayoutParams())
         }
     } else {
-        //no content
-        if (titleBar != null && content == null) {
-            titleBar
-        }
-        //no title bar
-        else if (titleBar == null && content != null) {
-            content
-        }
-        //both null
-        else {
-            Space(inflater.context)
-        }
+        titleView ?: (contentView ?: Space(inflater.context))
     }
 }

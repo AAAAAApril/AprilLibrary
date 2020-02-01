@@ -1,8 +1,9 @@
-package com.april.multiple
+package com.april.multiple.decoration
 
 import android.content.Context
 import android.graphics.Rect
 import android.view.View
+import com.april.multiple.HeaderFooterSupport
 
 /**
  * 使用 MultipleAdapter 时，最好是使用这个  Decoration

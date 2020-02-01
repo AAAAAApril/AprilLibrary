@@ -28,3 +28,12 @@ abstract class DefaultItemDelegate<T : Any>(
     protected abstract fun onBindItemView(itemView: View, bean: T, adapterPosition: Int)
 
 }
+
+open class DefaultItemDelegateDsl<T : Any>(
+    @LayoutRes private val itemLayoutRes: Int,
+    private val onBindItemView: (item: View, bean: T) -> Unit
+) : DefaultItemDelegate<T>(itemLayoutRes) {
+    override fun onBindItemView(itemView: View, bean: T, adapterPosition: Int) {
+        onBindItemView.invoke(itemView, bean)
+    }
+}

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.april.develop.ui.startContractIntent
 import com.april.library.navigation.NavigationTestActivity
 import com.april.multiple.DefaultItemDelegate
-import com.april.multiple.GridSpanDecoration
+import com.april.multiple.decoration.GridSpanDecoration
 import com.april.multiple.MultipleAdapter
 import com.april.multiple.only
 import kotlinx.android.synthetic.main.activity_main.*
@@ -22,7 +22,10 @@ class MainActivity : AppCompatActivity() {
 
         val adapter = MultipleAdapter()
         am_rv.layoutManager = LinearLayoutManager(this)
-        am_rv.addItemDecoration(GridSpanDecoration(this).apply {
+        am_rv.addItemDecoration(
+            GridSpanDecoration(
+                this
+            ).apply {
             setHorizontalOffsetDP(10)
             setVerticalOffsetDP(16)
             setIncludeEdge(true)

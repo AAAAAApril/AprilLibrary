@@ -21,8 +21,7 @@ class Manager<T : Any> internal constructor(
     private val support: MultipleSupport
 ) {
 
-    private val delegateClassArray: SparseArray<Class<out MultipleItemDelegate<out T, *>>> =
-        SparseArray()
+    private val delegateClassArray = SparseArray<Class<out MultipleItemDelegate<out T, *>>>()
     private lateinit var delegateClasses: Array<Class<out MultipleItemDelegate<out T, *>>>
     // item 样式识别器
     private lateinit var recognizer: Recognizer<T>

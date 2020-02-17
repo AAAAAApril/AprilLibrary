@@ -21,47 +21,47 @@ interface IToastObserver : Observer<CharSequence?> {
     override fun onChanged(t: CharSequence?)
 }
 
-interface ILoadingObserver : Observer<Boolean> {
-    override fun onChanged(t: Boolean)
+interface ILoadingObserver : Observer<Boolean?> {
+    override fun onChanged(t: Boolean?)
 }
 
 /**
  * Activity 内获取 ContractViewModel
  */
-inline fun <reified VM : ContractViewModel> FragmentActivity.obtainVM(): VM {
+inline fun <reified VM : ContractViewModel> FragmentActivity.obtainViewModel(): VM {
     assert((this as? IViewContract) != null) {
         "${this.javaClass.name} 不能为 null，且必须实现 IViewContract 接口"
     }
-    return ViewModelProviders.of(this).get(VM::class.java).apply {
-        val contract = this@obtainVM as IViewContract
-        contractToastLiveData.observe(this@obtainVM, contract.toastObserver)
-        contractLoadingLiveData.observe(this@obtainVM, contract.loadingObserver)
+    return ViewModelProvider(this).get(VM::class.java).apply {
+        val contract = this@obtainViewModel as IViewContract
+        contractToastLiveData.observe(this@obtainViewModel, contract.toastObserver)
+        contractLoadingLiveData.observe(this@obtainViewModel, contract.loadingObserver)
     }
 }
 
 /**
  * Fragment 内获取 ContractViewModel
  */
-inline fun <reified VM : ContractViewModel> Fragment.obtainVM(): VM {
+inline fun <reified VM : ContractViewModel> Fragment.obtainViewModel(): VM {
     assert((this as? IViewContract) != null) {
         "${this.javaClass.name} 不能为 null，且必须实现 IViewContract 接口"
     }
-    return ViewModelProviders.of(this).get(VM::class.java).apply {
-        val contract = this@obtainVM as IViewContract
-        contractToastLiveData.observe(this@obtainVM, contract.toastObserver)
-        contractLoadingLiveData.observe(this@obtainVM, contract.loadingObserver)
+    return ViewModelProvider(this).get(VM::class.java).apply {
+        val contract = this@obtainViewModel as IViewContract
+        contractToastLiveData.observe(this@obtainViewModel, contract.toastObserver)
+        contractLoadingLiveData.observe(this@obtainViewModel, contract.loadingObserver)
     }
 }
 
 /**
  * Fragment 获取 父 Fragment 的 ContractViewModel
  */
-inline fun <reified VM : ContractViewModel> Fragment.obtainVMFromParent(): VM {
+inline fun <reified VM : ContractViewModel> Fragment.obtainViewModelFromParent(): VM {
     assert((this.parentFragment as? IViewContract) != null) {
         "${this.javaClass.name} 的 ParentFragment 不能为 null，且必须实现 IViewContract 接口"
     }
-    return ViewModelProviders.of(this.requireParentFragment()).get(VM::class.java).apply {
-        val parentFragment = this@obtainVMFromParent.parentFragment ?: return@apply
+    return ViewModelProvider(this.requireParentFragment()).get(VM::class.java).apply {
+        val parentFragment = this@obtainViewModelFromParent.parentFragment ?: return@apply
         val contract = parentFragment as IViewContract
         if (!contractToastLiveData.hasObservers()) {
             contractToastLiveData.observe(parentFragment, contract.toastObserver)
@@ -75,12 +75,12 @@ inline fun <reified VM : ContractViewModel> Fragment.obtainVMFromParent(): VM {
 /**
  * Fragment 获取 宿主 Activity 的 ContractViewModel
  */
-inline fun <reified VM : ContractViewModel> Fragment.obtainVMFromHostActivity(): VM {
+inline fun <reified VM : ContractViewModel> Fragment.obtainViewModelFromHostActivity(): VM {
     assert((this.activity as? IViewContract) != null) {
         "${this.javaClass.name} 的宿主 Activity 不能为 null，且必须实现 IViewContract 接口"
     }
-    return ViewModelProviders.of(this.requireActivity()).get(VM::class.java).apply {
-        val activity = this@obtainVMFromHostActivity.activity ?: return@apply
+    return ViewModelProvider(this.requireActivity()).get(VM::class.java).apply {
+        val activity = this@obtainViewModelFromHostActivity.activity ?: return@apply
         val contract = activity as IViewContract
         if (!contractToastLiveData.hasObservers()) {
             contractToastLiveData.observe(activity, contract.toastObserver)
@@ -97,11 +97,11 @@ inline fun <reified VM : ContractViewModel> Fragment.obtainVMFromHostActivity():
 abstract class ContractViewModel(application: Application) : AndroidViewModel(application) {
 
     val contractToastLiveData by lazy {
-        MutableLiveData<CharSequence?>("")
+        MutableLiveData<CharSequence?>()
     }
 
     val contractLoadingLiveData by lazy {
-        MutableLiveData<Boolean>(false)
+        MutableLiveData<Boolean?>()
     }
 
     protected fun onShowToast(message: CharSequence?) {

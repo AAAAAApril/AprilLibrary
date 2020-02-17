@@ -169,7 +169,8 @@ abstract class SupportBottomSheetDialogFragment : BottomSheetDialogFragment() {
                     parent.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
                     parent.post {
                         mBottomSheetBehavior?.let { behavior ->
-                            behavior.setBottomSheetCallback(mBottomSheetBehaviorCallback)
+                            behavior.removeBottomSheetCallback(mBottomSheetBehaviorCallback)
+                            behavior.addBottomSheetCallback(mBottomSheetBehaviorCallback)
                             behavior.peekHeight = fixedHeight
                         }
                     }

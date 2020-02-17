@@ -68,7 +68,7 @@ open class AutoCreateActivity : AppCompatActivity() {
 
 //==================================================================================================
 
-private fun inflateView(
+fun inflateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     autoInflate: IInflateView?

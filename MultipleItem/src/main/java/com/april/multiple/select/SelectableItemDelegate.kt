@@ -1,4 +1,4 @@
-package com.april.multiple.checkable
+package com.april.multiple.select
 
 import android.view.LayoutInflater
 import android.view.View
@@ -10,10 +10,10 @@ import com.april.multiple.MultipleItemDelegate
 /**
  * item delegate
  */
-abstract class CheckableItemDelegate<T : Any>(
+abstract class SelectableItemDelegate<T : Any>(
     @LayoutRes
     private val itemLayoutRes: Int
-) : MultipleItemDelegate<CheckableDataWrapper<T>, RecyclerView.ViewHolder>() {
+) : MultipleItemDelegate<SelectableDataWrapper<T>, RecyclerView.ViewHolder>() {
 
     final override fun onCreateItemView(parent: ViewGroup): View {
         return LayoutInflater.from(parent.context).inflate(itemLayoutRes, parent, false)
@@ -28,19 +28,20 @@ abstract class CheckableItemDelegate<T : Any>(
 
     internal fun checkableItemClicked(
         holder: RecyclerView.ViewHolder,
-        bean: CheckableDataWrapper<T>
-    ): Boolean = onCheckableItemClicked(holder, bean.checked)
+        bean: SelectableDataWrapper<T>
+    ): Boolean = onCheckableItemClicked(holder, bean.data, bean.selected)
 
     /**
      * 当 item 被点击了
      *
-     *  [oldCheckedStatus] 旧状态
+     *  [oldSelectedStatus] 旧状态
      *
      * @return newCheckedStatus
      */
     protected open fun onCheckableItemClicked(
         holder: RecyclerView.ViewHolder,
-        oldCheckedStatus: Boolean
-    ): Boolean = !oldCheckedStatus
+        data: T,
+        oldSelectedStatus: Boolean
+    ): Boolean = !oldSelectedStatus
 
 }

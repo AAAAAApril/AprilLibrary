@@ -20,7 +20,7 @@ open class MultipleAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     /**
      * 设置占位布局所需的数据
      */
-    fun resetPlaceholderData(placeholderData: Any?) {
+    fun <T : Any> resetPlaceholderData(placeholderData: T?) {
         support.placeholderBean = placeholderData
         //如果数据列是空的，并且设置了占位布局
         if (support.dataList.isEmpty()

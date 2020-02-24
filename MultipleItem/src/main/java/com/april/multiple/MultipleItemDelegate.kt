@@ -61,13 +61,13 @@ abstract class MultipleItemDelegate<T : Any, VH : RecyclerView.ViewHolder> {
      * 内部使用，用于转换类型
      *
      * [holder]   viewHolder
-     * [any]      item数据实体
+     * [itemBean]      item数据实体
      */
-    internal fun bindViewHolder(holder: RecyclerView.ViewHolder, any: Any, payloads: List<Any>) {
+    internal fun bindViewHolder(holder: RecyclerView.ViewHolder, itemBean: Any, payloads: List<Any>) {
         if (payloads.isEmpty()) {
-            onBindViewHolder(holder as VH, any as T)
+            onBindViewHolder(holder as VH, itemBean as T)
         } else {
-            onBindViewHolder(holder as VH, any as T, payloads)
+            onBindViewHolder(holder as VH, itemBean as T, payloads)
         }
     }
 
@@ -123,7 +123,7 @@ abstract class MultipleItemDelegate<T : Any, VH : RecyclerView.ViewHolder> {
     /**
      * 当使用了 [androidx.recyclerview.widget.DiffUtil] 工具类时，可能需要用到此函数
      */
-    protected open fun onBindViewHolder(holder: VH, t: T, payloads: List<Any>) {
+    protected open fun onBindViewHolder(holder: VH, bean: T, payloads: List<Any>) {
 
     }
 

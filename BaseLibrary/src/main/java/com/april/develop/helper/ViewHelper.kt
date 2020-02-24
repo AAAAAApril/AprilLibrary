@@ -38,8 +38,8 @@ import androidx.core.content.ContextCompat
  * [drawables] TextView drawable start top end bottom
  * [allowScroll] 允许滚动
  *
- * [search] EditText 软键盘搜索功能
- * [send] EditText 软键盘发送功能
+ * [searchAction] EditText 软键盘搜索功能
+ * [sendAction] EditText 软键盘发送功能
  * [showPassword] TextView 显示与隐藏密码
  *
  * [showSoftInput] View 显示与隐藏软键盘
@@ -273,12 +273,14 @@ fun TextView.allowScroll() {
 /**
  * 软键盘回车变成搜索
  */
-fun EditText.search(block: (String) -> Unit) {
+fun EditText.searchAction(autoHideSoftInput: Boolean = true, block: (String) -> Unit) {
     imeOptions = EditorInfo.IME_ACTION_SEARCH
     setSingleLine()
     setOnEditorActionListener { v, actionId, _ ->
         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-            showSoftInput(false)
+            if (autoHideSoftInput) {
+                showSoftInput(false)
+            }
             block(v.text.toString())
         }
         return@setOnEditorActionListener false
@@ -288,12 +290,14 @@ fun EditText.search(block: (String) -> Unit) {
 /**
  * 软键盘回车变成发送
  */
-fun EditText.send(block: (String) -> Unit) {
+fun EditText.sendAction(autoHideSoftInput: Boolean = true, block: (String) -> Unit) {
     imeOptions = EditorInfo.IME_ACTION_SEND
     setSingleLine()
     setOnEditorActionListener { v, actionId, _ ->
         if (actionId == EditorInfo.IME_ACTION_SEND) {
-            showSoftInput(false)
+            if (autoHideSoftInput) {
+                showSoftInput(false)
+            }
             block(v.text.toString())
         }
         return@setOnEditorActionListener false

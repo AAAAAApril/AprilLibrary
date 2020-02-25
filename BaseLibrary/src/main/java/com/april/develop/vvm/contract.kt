@@ -1,13 +1,10 @@
-package com.april.develop.vvm
+package com.april.base.vvm
 
 import android.app.Application
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 /**
  * 视图层 约束接口
@@ -28,40 +25,40 @@ interface ILoadingObserver : Observer<Boolean?> {
 /**
  * Activity 内获取 ContractViewModel
  */
-inline fun <reified VM : ContractViewModel> FragmentActivity.obtainViewModel(): VM {
+inline fun <reified VM : ContractViewModel> FragmentActivity.viewModel(): VM {
     assert((this as? IViewContract) != null) {
         "${this.javaClass.name} 不能为 null，且必须实现 IViewContract 接口"
     }
     return ViewModelProvider(this).get(VM::class.java).apply {
-        val contract = this@obtainViewModel as IViewContract
-        contractToastLiveData.observe(this@obtainViewModel, contract.toastObserver)
-        contractLoadingLiveData.observe(this@obtainViewModel, contract.loadingObserver)
+        val contract = this@viewModel as IViewContract
+        contractToastLiveData.observe(this@viewModel, contract.toastObserver)
+        contractLoadingLiveData.observe(this@viewModel, contract.loadingObserver)
     }
 }
 
 /**
  * Fragment 内获取 ContractViewModel
  */
-inline fun <reified VM : ContractViewModel> Fragment.obtainViewModel(): VM {
+inline fun <reified VM : ContractViewModel> Fragment.viewModel(): VM {
     assert((this as? IViewContract) != null) {
         "${this.javaClass.name} 不能为 null，且必须实现 IViewContract 接口"
     }
     return ViewModelProvider(this).get(VM::class.java).apply {
-        val contract = this@obtainViewModel as IViewContract
-        contractToastLiveData.observe(this@obtainViewModel, contract.toastObserver)
-        contractLoadingLiveData.observe(this@obtainViewModel, contract.loadingObserver)
+        val contract = this@viewModel as IViewContract
+        contractToastLiveData.observe(this@viewModel, contract.toastObserver)
+        contractLoadingLiveData.observe(this@viewModel, contract.loadingObserver)
     }
 }
 
 /**
  * Fragment 获取 父 Fragment 的 ContractViewModel
  */
-inline fun <reified VM : ContractViewModel> Fragment.obtainViewModelFromParent(): VM {
+inline fun <reified VM : ContractViewModel> Fragment.viewModelFromParent(): VM {
     assert((this.parentFragment as? IViewContract) != null) {
         "${this.javaClass.name} 的 ParentFragment 不能为 null，且必须实现 IViewContract 接口"
     }
     return ViewModelProvider(this.requireParentFragment()).get(VM::class.java).apply {
-        val parentFragment = this@obtainViewModelFromParent.parentFragment ?: return@apply
+        val parentFragment = this@viewModelFromParent.parentFragment ?: return@apply
         val contract = parentFragment as IViewContract
         if (!contractToastLiveData.hasObservers()) {
             contractToastLiveData.observe(parentFragment, contract.toastObserver)
@@ -75,12 +72,12 @@ inline fun <reified VM : ContractViewModel> Fragment.obtainViewModelFromParent()
 /**
  * Fragment 获取 宿主 Activity 的 ContractViewModel
  */
-inline fun <reified VM : ContractViewModel> Fragment.obtainViewModelFromHostActivity(): VM {
+inline fun <reified VM : ContractViewModel> Fragment.viewModelFromHostActivity(): VM {
     assert((this.activity as? IViewContract) != null) {
         "${this.javaClass.name} 的宿主 Activity 不能为 null，且必须实现 IViewContract 接口"
     }
     return ViewModelProvider(this.requireActivity()).get(VM::class.java).apply {
-        val activity = this@obtainViewModelFromHostActivity.activity ?: return@apply
+        val activity = this@viewModelFromHostActivity.activity ?: return@apply
         val contract = activity as IViewContract
         if (!contractToastLiveData.hasObservers()) {
             contractToastLiveData.observe(activity, contract.toastObserver)
@@ -112,42 +109,38 @@ abstract class ContractViewModel(application: Application) : AndroidViewModel(ap
         contractLoadingLiveData.postValue(show)
     }
 
-    protected open suspend fun tryLaunch(
-        onBeforeTry: (() -> Boolean)? = { true },
-        onTryLaunch: suspend (CoroutineScope) -> Unit = {},
-        onException: ((Throwable) -> Unit)? = null,
-        onFinally: (() -> Boolean)? = { true }
+    protected open fun launch(
+        onBeforeTry: () -> Unit = { onShowLoading(true) },
+        onException: (Throwable) -> Unit = {},
+        onFinally: () -> Unit = { onShowLoading(false) },
+        block: suspend CoroutineScope.() -> Unit
     ): Job {
         return viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
             throwable.printStackTrace()
-            onException?.invoke(throwable)
+            onException.invoke(throwable)
         }) {
-            if (onBeforeTry?.invoke() == true) {
-                onShowLoading(true)
-            }
+            onBeforeTry.invoke()
             try {
-                onTryLaunch.invoke(this)
+                block.invoke(this)
             } finally {
-                if (onFinally?.invoke() == true) {
-                    onShowLoading(false)
-                }
+                onFinally.invoke()
             }
         }
     }
 
-    protected open suspend fun tryLaunchDSL(block: ViewModelTryLaunch.() -> Unit): Job {
+    protected open fun launchDSL(block: ViewModelTryLaunch.() -> Unit): Job {
         return ViewModelTryLaunch().apply(block).let {
             viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
                 throwable.printStackTrace()
-                it.onException?.invoke(throwable)
+                it.onException.invoke(throwable)
             }) {
-                if (it.onBeforeTry?.invoke() == true) {
+                if (it.onBeforeTry == null) {
                     onShowLoading(true)
                 }
                 try {
-                    it.onTryLaunch.invoke(this)
+                    it.block.invoke(this)
                 } finally {
-                    if (it.onFinally?.invoke() == true) {
+                    if (it.onFinally == null) {
                         onShowLoading(false)
                     }
                 }
@@ -158,10 +151,20 @@ abstract class ContractViewModel(application: Application) : AndroidViewModel(ap
 }
 
 class ViewModelTryLaunch {
-    //是否执行默认的行为
-    var onBeforeTry: (() -> Boolean)? = { true }
-    var onTryLaunch: suspend (CoroutineScope) -> Unit = {}
-    var onException: ((Throwable) -> Unit)? = null
-    //是否执行默认的行为
-    var onFinally: (() -> Boolean)? = { true }
+    var onBeforeTry: (() -> Unit)? = null
+    var onException: (Throwable) -> Unit = {}
+    var onFinally: (() -> Unit)? = null
+    var block: suspend CoroutineScope.() -> Unit = {}
+}
+
+fun ViewModel.countDown(
+    maxCount: Int = 60,
+    block: suspend (Int) -> Unit
+): Job {
+    return viewModelScope.launch {
+        repeat(maxCount) {
+            block.invoke(maxCount - (it + 1))
+            delay(1000)
+        }
+    }
 }

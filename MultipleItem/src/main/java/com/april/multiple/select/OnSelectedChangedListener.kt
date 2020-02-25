@@ -9,5 +9,8 @@ interface OnSelectedChangedListener {
      *
      * [selectedPositionList] 所有被选中的位置列表
      */
-    fun onSelectedChanged(selectedPositionList: List<Int>)
+    fun onSelectedChanged(
+        adapter: SelectableAdapter<*>,
+        selectedPositionList: List<Int>
+    )
 }

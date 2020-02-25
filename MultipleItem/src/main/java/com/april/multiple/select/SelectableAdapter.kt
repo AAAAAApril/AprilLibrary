@@ -84,9 +84,14 @@ class SelectableAdapter<T : Any>(
             it.data == data
         }
         if (index >= 0) {
-            selectedPositionList.remove(index)
+            val result = selectedPositionList.remove(index)
             dataWrapperList.removeAt(index)
             notifyItemRemoved(index)
+            //移除成功
+            if (result) {
+                //回调选中数量变化监听
+                countChangedListener?.onSelectedChanged(this, selectedPositionList)
+            }
         }
     }
 
@@ -121,6 +126,8 @@ class SelectableAdapter<T : Any>(
         }
         selectedPositionList.clear()
         notifyItemRangeChanged(0, dataWrapperList.size)
+        //回调选中数量变化监听
+        countChangedListener?.onSelectedChanged(this, selectedPositionList)
     }
 
     /**
@@ -151,7 +158,7 @@ class SelectableAdapter<T : Any>(
         selectedPositionList.clear()
         notifyDataSetChanged()
         //回调选中数量变化监听
-        countChangedListener?.onSelectedChanged(selectedPositionList)
+        countChangedListener?.onSelectedChanged(this, selectedPositionList)
     }
 
     /**
@@ -191,7 +198,7 @@ class SelectableAdapter<T : Any>(
             }
         }
         //回调选中数量变化监听
-        countChangedListener?.onSelectedChanged(selectedPositionList)
+        countChangedListener?.onSelectedChanged(this, selectedPositionList)
     }
 
 }

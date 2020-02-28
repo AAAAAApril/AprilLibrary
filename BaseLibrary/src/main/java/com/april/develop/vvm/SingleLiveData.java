@@ -20,6 +20,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class SingleLiveData<T> extends MutableLiveData<T> {
 
+    public SingleLiveData() {
+        super();
+    }
+
+    public SingleLiveData(T value) {
+        super(value);
+    }
+
     private static final String TAG = "Google_SingleLiveEvent";
 
     private final AtomicBoolean mPending = new AtomicBoolean(false);

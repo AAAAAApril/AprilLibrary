@@ -1,7 +1,12 @@
 package com.april.multiple
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
+import com.april.multiple.diff.DiffCallBack
+import com.april.multiple.diff.MultipleDiffCallBack
+import com.april.multiple.diff.MultipleUpdateCallBack
 
 /**
  * 多样式 Adapter
@@ -131,6 +136,21 @@ open class MultipleAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     open fun <T : Any> removeDataList(dataList: List<T>) {
         support.dataList.removeAll(dataList)
         notifyDataSetChanged()
+    }
+
+    open fun <T : Any> notifyDataList(newDataList: List<T>, diffCallBack: DiffCallBack<T>) {
+        if (support.dataList.isEmpty()) {
+            resetDataList(newDataList)
+            return
+        }
+        val oldDataList = support.dataList as List<T>
+        DiffUtil.calculateDiff(object : MultipleDiffCallBack<T>(
+            oldDataList, newDataList, diffCallBack
+        ) {}).dispatchUpdatesTo(getUpdateCallBack())
+    }
+
+    protected open fun getUpdateCallBack(): ListUpdateCallback {
+        return MultipleUpdateCallBack(this, 0)
     }
 
 }

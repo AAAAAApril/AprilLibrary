@@ -1,5 +1,8 @@
 package com.april.multiple
 
+import androidx.recyclerview.widget.ListUpdateCallback
+import com.april.multiple.diff.MultipleUpdateCallBack
+
 /**
  * 支持头尾布局的 Adapter
  *
@@ -155,6 +158,10 @@ open class HeaderFooterAdapter : MultipleAdapter() {
             index + headerCount(),
             dataList.size
         )
+    }
+
+    override fun getUpdateCallBack(): ListUpdateCallback {
+        return MultipleUpdateCallBack(this, headerCount())
     }
 
 }

@@ -34,7 +34,7 @@ dependencies {
 
     compileOnly 'androidx.appcompat:appcompat:1.1.0'
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    compileOnly 'androidx.core:core-ktx:1.1.0'
+    compileOnly 'androidx.core:core-ktx:1.2.0'
 
     compileOnly 'androidx.recyclerview:recyclerview:1.1.0'
 

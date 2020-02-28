@@ -17,13 +17,20 @@ open class HeaderFooterSupport : MultipleSupport() {
     private val headerDataArray by lazy { SparseArray<Any?>() }
     private val footerDataArray by lazy { SparseArray<Any?>() }
 
+    //缓存 header 的 key，以保证 header 的显示顺序和添加顺序一致
+    private val headerKeyArray by lazy { mutableListOf<Int>() }
+    //缓存 footer 的 key，理由同上
+    private val footerKeyArray by lazy { mutableListOf<Int>() }
+
     //==============================================================================================
 
     /**
      * @param headerItemDelegate 添加 header
      */
     fun <T : SpecialItemDelegate<*>> addHeader(headerItemDelegate: T) {
-        headerArray.put(headerItemDelegate.hashCode(), headerItemDelegate)
+        val key = headerItemDelegate.hashCode()
+        headerArray.put(key, headerItemDelegate)
+        headerKeyArray.add(key)
     }
 
     /**
@@ -34,6 +41,7 @@ open class HeaderFooterSupport : MultipleSupport() {
         return if (index < 0) {
             false
         } else {
+            headerKeyArray.remove(headerArray.keyAt(index))
             headerArray.removeAt(index)
             true
         }
@@ -43,7 +51,9 @@ open class HeaderFooterSupport : MultipleSupport() {
      * @param footerItemDelegate 添加 footer
      */
     fun <T : SpecialItemDelegate<*>> addFooter(footerItemDelegate: T) {
-        footerArray.put(footerItemDelegate.hashCode(), footerItemDelegate)
+        val key = footerItemDelegate.hashCode()
+        footerArray.put(key, footerItemDelegate)
+        footerKeyArray.add(key)
     }
 
     /**
@@ -54,6 +64,7 @@ open class HeaderFooterSupport : MultipleSupport() {
         return if (index < 0) {
             false
         } else {
+            footerKeyArray.remove(footerArray.keyAt(index))
             footerArray.removeAt(index)
             true
         }
@@ -163,7 +174,7 @@ open class HeaderFooterSupport : MultipleSupport() {
     override fun getItemViewType(position: Int): Int {
         //头部
         if (isHeaderPosition(position)) {
-            return headerArray.keyAt(position)
+            return headerKeyArray[position]
         }
         //中间数据
         val adjPosition = position - headerCount()
@@ -173,7 +184,7 @@ open class HeaderFooterSupport : MultipleSupport() {
         }
         //尾部
         else {
-            footerArray.keyAt(adjPosition - adapterCount)
+            footerKeyArray[adjPosition - adapterCount]
         }
     }
 

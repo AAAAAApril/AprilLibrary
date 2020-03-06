@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
  * 可选 item adapter
  *
  * 没有头尾布局以及占位布局，只有纯粹的数据列
+ *
+ * TODO  完善多 item 支持、完善数据刷新方式(要使用DiffUtil)、提供更多的操作函数
  */
 class SelectableAdapter<T : Any>(
     //可同时选中的数量，默认 1，单选
@@ -45,10 +47,13 @@ class SelectableAdapter<T : Any>(
         position: Int,
         payloads: MutableList<Any>
     ) {
+        val wrapper = dataWrapperList[position].copy()
         //item 绑定数据
-        delegate.bindViewHolder(holder, dataWrapperList[position].copy(), payloads)
+        delegate.bindViewHolder(holder, wrapper, payloads)
         //item 设置监听
-        holder.itemView.setOnClickListener {
+        holder.itemView.apply {
+            isEnabled = wrapper.enable
+        }.setOnClickListener {
             val bean = dataWrapperList[position].copy()
             //新状态与旧状态不同
             if (bean.selected != delegate.checkableItemClicked(holder, bean)) {
@@ -63,16 +68,16 @@ class SelectableAdapter<T : Any>(
     /**
      * 添加一条数据
      */
-    fun addData(data: T) {
-        dataWrapperList.add(SelectableDataWrapper(data))
+    fun addData(data: T, enable: Boolean = true) {
+        dataWrapperList.add(SelectableDataWrapper(data, enable = enable))
         notifyItemInserted(dataWrapperList.lastIndex)
     }
 
     /**
      * 插入一条数据
      */
-    fun insertData(data: T, position: Int) {
-        dataWrapperList.add(position, SelectableDataWrapper(data))
+    fun insertData(data: T, position: Int, enable: Boolean = true) {
+        dataWrapperList.add(position, SelectableDataWrapper(data, enable = enable))
         notifyItemInserted(position)
     }
 
@@ -98,9 +103,43 @@ class SelectableAdapter<T : Any>(
     /**
      * 重设数据
      */
-    fun resetData(newData: T, position: Int) {
-        dataWrapperList[position] = dataWrapperList[position].copy(data = newData)
+    fun resetData(newData: T, position: Int, enable: Boolean = true) {
+        dataWrapperList[position] = dataWrapperList[position].copy(data = newData, enable = enable)
         notifyItemChanged(position)
+    }
+
+    /**
+     * 选中某个位置
+     *
+     * [Boolean] 是否成功
+     */
+    fun selectPosition(position: Int): Boolean {
+        val wrapper = dataWrapperList[position].copy()
+        val oldStatus = wrapper.selected
+        //不可选中
+        if (!wrapper.enable) {
+            return false
+        }
+        //已经选中
+        if (oldStatus) {
+            return false
+        }
+        //提交位置
+        onNewItemClicked(position)
+        return true
+    }
+
+    /**
+     * 选中某条数据
+     */
+    fun selectData(data: T): Boolean {
+        val index = dataWrapperList.indexOfFirst {
+            it.data == data
+        }
+        if (index < 0) {
+            return false
+        }
+        return selectPosition(index)
     }
 
     /**
@@ -133,7 +172,7 @@ class SelectableAdapter<T : Any>(
     /**
      * 获取被选中的数据列
      */
-    fun getSelectedDataList(): MutableList<T> {
+    fun getSelectedDataList(): List<T> {
         val dataList = mutableListOf<T>()
         dataWrapperList.forEach {
             if (it.selected) {

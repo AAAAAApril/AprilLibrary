@@ -56,6 +56,11 @@ abstract class SupportDialogFragment : DialogFragment() {
         return ViewGroup.LayoutParams.WRAP_CONTENT
     }
 
+    /**
+     * 是否可以被动取消
+     */
+    protected open fun supportCancelable(): Boolean = true
+
     @CallSuper
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,6 +75,10 @@ abstract class SupportDialogFragment : DialogFragment() {
     @CallSuper
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        dialog?.apply {
+            setCancelable(supportCancelable())
+            setCanceledOnTouchOutside(supportCancelable())
+        }
         dialog?.window?.apply {
             setGravity(supportDialogGravity())
             //背景透明
@@ -120,6 +129,11 @@ abstract class SupportBottomSheetDialogFragment : BottomSheetDialogFragment() {
         return null
     }
 
+    /**
+     * 是否可以被动取消
+     */
+    protected open fun supportCancelable(): Boolean = true
+
     @CallSuper
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -151,6 +165,10 @@ abstract class SupportBottomSheetDialogFragment : BottomSheetDialogFragment() {
     @CallSuper
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        dialog?.apply {
+            setCancelable(supportCancelable())
+            setCanceledOnTouchOutside(supportCancelable())
+        }
         dialog?.window?.also { window ->
             //窗口阴影
             window.setDimAmount(supportDialogWindowDarkFrameAlpha())

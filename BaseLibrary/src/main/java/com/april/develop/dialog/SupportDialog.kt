@@ -145,9 +145,16 @@ abstract class SupportBottomSheetDialogFragment : BottomSheetDialogFragment() {
         return inflater.inflate(supportDialogLayoutRes(), container, false)
     }
 
-    private val mBottomSheetBehavior: BottomSheetBehavior<View>? by lazy {
+    /**
+     * 行为控制类
+     */
+    protected val mBottomSheetBehavior: BottomSheetBehavior<View>? by lazy {
         (((view?.parent as? View)?.layoutParams as? CoordinatorLayout.LayoutParams)?.behavior) as? BottomSheetBehavior<View>?
     }
+
+    /**
+     * 行为回调
+     */
     private val mBottomSheetBehaviorCallback by lazy {
         object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(@NonNull bottomSheet: View, newState: Int) {

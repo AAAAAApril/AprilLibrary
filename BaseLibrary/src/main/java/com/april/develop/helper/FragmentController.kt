@@ -2,17 +2,14 @@ package com.april.develop.helper
 
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
-import java.lang.NullPointerException
 
 /**
  * 控制 Fragment 的显示与隐藏，并协助处理视图恢复
  */
-class FragmentController(
+class FragmentController @JvmOverloads constructor(
     //show hide 模式，或者 replace 模式
     private val replaceMode: Boolean = false,
     //用于在状态暂存时，存储当前正在显示的 Fragment 的 Class name
@@ -37,6 +34,7 @@ class FragmentController(
      * ①
      * 关联到 FragmentManger
      */
+    @JvmOverloads
     fun onCreate(
         manager: FragmentManager,
         defaultSelectIndex: Int = this.showingIndex
@@ -56,7 +54,7 @@ class FragmentController(
      *
      * @return 正在选中的位置
      */
-    fun onViewCreated(@IdRes containerViewId: Int, view: View, savedInstanceState: Bundle?): Int {
+    fun onViewCreated(@IdRes containerViewId: Int, savedInstanceState: Bundle?): Int {
         this.containerViewId = containerViewId
         var showingIndex = this.showingIndex
         savedInstanceState?.getString(savedStateKey)?.let { name ->
@@ -112,10 +110,16 @@ class FragmentController(
         if (fragmentClass == showingFragmentClass) {
             return
         }
-        val target: Fragment = creator.obtainFragment(fragmentClass)
-        manager.beginTransaction()
-            .replace(containerViewId, target, target.asTag())
-            .commit()
+        val target = creator.obtainFragment(fragmentClass)
+        if (target != null) {
+            manager.beginTransaction()
+                .replace(containerViewId, target, target.asTag())
+                .commit()
+        } else {
+            manager.beginTransaction()
+                .replace(containerViewId, fragmentClass, Bundle(), fragmentClass.asTag())
+                .commit()
+        }
         showingFragmentClass = fragmentClass
     }
 
@@ -126,49 +130,92 @@ class FragmentController(
         //要显示的 Fragment 正在显示
         if (fragmentClass == showingFragmentClass) {
             //正在显示的 Fragment
-            val showingFragment: Fragment = creator.obtainFragment(fragmentClass)
-            //如果正在显示的被隐藏了，则显示它
-            if (showingFragment.isHidden) {
-                manager.beginTransaction()
-                    .show(showingFragment)
-                    .commit()
+            val showingFragment = creator.obtainFragment(fragmentClass)
+            if (showingFragment != null) {
+                //如果正在显示的被隐藏了，则显示它
+                if (showingFragment.isHidden) {
+                    manager.beginTransaction()
+                        .show(showingFragment)
+                        .commit()
+                }
             }
+//            else {
+            // 这里似乎不需要做处理，因为正在显示的 Fragment 不可能查出来为 null
+//            }
             return
         }
         //要显示的 Fragment 没有显示
-        manager.beginTransaction().apply {
-            //要显示的
-            val targetFragment: Fragment = creator.obtainFragment(fragmentClass)
-            //正在显示的
-            val showingFragment: Fragment? = if (showingFragmentClass != null) {
-                creator.obtainFragment(showingFragmentClass!!)
-            } else {
-                null
-            }
+        //要显示的
+        val targetFragment = creator.obtainFragment(fragmentClass)
+        //正在显示的
+        val showingFragment: Fragment? = if (showingFragmentClass != null) {
+            creator.obtainFragment(showingFragmentClass!!)
+        } else {
+            null
+        }
+        //要显示的 Fragment 有实例
+        if (targetFragment != null) {
+            hideAndShow(showingFragment, targetFragment)
+        }
+        //要显示的 Fragment 没有实例
+        else {
+            hideAndShow(showingFragment, fragmentClass)
+        }
+        showingFragmentClass = fragmentClass
+    }
 
+    /**
+     * 当要显示的 Fragment 有实例时
+     */
+    private fun hideAndShow(hideFragment: Fragment?, showFragment: Fragment) {
+        manager.beginTransaction().apply {
             //要显示的 Fragment 是添加过的，此时正在显示的 Fragment 一定不为 null
-            if (targetFragment.isAdded) {
+            if (showFragment.isAdded) {
                 //如果正在显示的 Fragment 可见
-                if (showingFragment?.isVisible == true) {
-                    hide(showingFragment)
+                if (hideFragment != null) {
+                    if (hideFragment.isVisible) {
+                        hide(hideFragment)
+                    }
                 }
                 //显示需要显示的 Fragment
-                show(targetFragment)
+                show(showFragment)
             }
             //要显示的 Fragment 没添加过
             else {
                 //如果正在显示的 Fragment 不为 null，且正在显示，则隐藏
-                if (showingFragment?.isVisible == true) {
-                    hide(showingFragment)
+                if (hideFragment != null) {
+                    if (hideFragment.isVisible) {
+                        hide(hideFragment)
+                    }
                 }
                 //添加需要显示的 Fragment
                 add(
                     containerViewId,
-                    targetFragment,
-                    targetFragment.asTag()
+                    showFragment,
+                    showFragment.asTag()
                 )
             }
-            showingFragmentClass = fragmentClass
+        }.commit()
+    }
+
+    /**
+     * 当要显示的 Fragment 没有实例时，此时该 Fragment 肯定没有添加过
+     */
+    private fun hideAndShow(hideFragment: Fragment?, showFragmentClass: Class<out Fragment>) {
+        manager.beginTransaction().apply {
+            //如果正在显示的 Fragment 可见
+            if (hideFragment != null) {
+                if (hideFragment.isVisible) {
+                    hide(hideFragment)
+                }
+            }
+            //加载要显示的 Fragment
+            add(
+                containerViewId,
+                showFragmentClass,
+                Bundle(),
+                showFragmentClass.asTag()
+            )
         }.commit()
     }
 
@@ -182,14 +229,15 @@ class FragmentCreator internal constructor(
 ) {
     private val fragmentClassList = mutableListOf<Class<out Fragment>>()
     private val fragmentMap = mutableMapOf<Class<out Fragment>, Fragment?>()
-    private val creatorMap = mutableMapOf<Class<out Fragment>, Creator<out Fragment>>()
+    private val creatorMap = mutableMapOf<Class<out Fragment>, Creator<out Fragment>?>()
 
     /**
      * 添加 Fragment
      */
+    @JvmOverloads
     fun <T : Fragment> addFragment(
         fragmentClass: Class<T>,
-        creator: Creator<T>
+        creator: Creator<T>? = null
     ): FragmentCreator {
         fragmentClassList.add(fragmentClass)
         fragmentMap[fragmentClass] = manager.findFragmentByTag(fragmentClass.asTag())
@@ -200,15 +248,23 @@ class FragmentCreator internal constructor(
     /**
      * 根据 Fragment Class 获取 Fragment 实例
      */
-    internal fun <T : Fragment> obtainFragment(fragmentClass: Class<T>): T {
+    internal fun obtainFragment(fragmentClass: Class<out Fragment>): Fragment? {
         var fragment = fragmentMap[fragmentClass]
         if (fragment == null) {
             val creator = creatorMap[fragmentClass]
-                ?: throw NullPointerException("Fragment ${fragmentClass.name} 对应的构建器 FragmentCreator 不能为 null")
-            fragment = creator.createFragment()
+            if (creator != null) {
+                fragment = creator.createFragment()
+            } else {
+                val target = manager.findFragmentByTag(fragmentClass.asTag())
+                if (target != null) {
+                    fragment = target
+                } else {
+                    return null
+                }
+            }
             fragmentMap[fragmentClass] = fragment
         }
-        return fragment as T
+        return fragment
     }
 
     /**
@@ -269,68 +325,3 @@ interface Creator<T : Fragment> {
 
 private fun <F : Fragment> Class<F>.asTag(): String = name
 private fun <F : Fragment> F.asTag(): String = javaClass.asTag()
-
-/**
- * Fragment Adapter for ViewPager
- */
-class FragmentAdapter(
-    manager: FragmentManager,
-    private val destroyItem: Boolean = false
-) : FragmentPagerAdapter(
-    manager,
-    BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
-) {
-
-    private val titleList: MutableList<CharSequence> = mutableListOf()
-    private val fragmentList: MutableList<Fragment> = mutableListOf()
-
-    /**
-     * 添加 fragment
-     *
-     * [title] 对应的标题，在 ViewPager 里面的时候可能会用到
-     * [fragment] Fragment
-     */
-    fun addFragment(title: CharSequence? = null, fragment: Fragment): FragmentAdapter {
-        titleList.add(title ?: "")
-        fragmentList.add(fragment)
-        return this
-    }
-
-    /**
-     * 设置 标题
-     */
-    fun setTitles(vararg titles: CharSequence) {
-        titleList.clear()
-        titleList.addAll(titles)
-    }
-
-    /**
-     * 设置 Fragment
-     */
-    fun setFragments(vararg fragments: Fragment) {
-        fragmentList.clear()
-        fragmentList.addAll(fragments)
-    }
-
-    override fun getItem(position: Int): Fragment {
-        return fragmentList[position]
-    }
-
-    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-        if (destroyItem) {
-            super.destroyItem(container, position, `object`)
-        }
-    }
-
-    override fun getPageTitle(position: Int): CharSequence? {
-        if (titleList.size != fragmentList.size) {
-            return null
-        }
-        return titleList[position]
-    }
-
-    override fun getCount(): Int {
-        return fragmentList.size
-    }
-
-}

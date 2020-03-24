@@ -138,15 +138,31 @@ open class MultipleAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         notifyDataSetChanged()
     }
 
-    open fun <T : Any> notifyDataList(newDataList: List<T>, diffCallBack: DiffCallBack<T>) {
+    open fun <T : Any> notifyDataList(
+        newDataList: List<T>,
+        diffCallBack: DiffCallBack<T>,
+        /**
+         * 当新旧两个列表的排序方式相同时，这个值为 false 可以提高性能，
+         * 比如聊天消息列表，增加新消息时，两个列表的排序顺序其实是一样的，只是数据条数不同而已
+         */
+        detectMoves: Boolean = false
+    ) {
         if (support.dataList.isEmpty()) {
             resetDataList(newDataList)
             return
         }
+        //取出旧数据列
         val oldDataList = support.dataList as List<T>
-        DiffUtil.calculateDiff(object : MultipleDiffCallBack<T>(
+        //比对结果
+        val result = DiffUtil.calculateDiff(object : MultipleDiffCallBack<T>(
             oldDataList, newDataList, diffCallBack
-        ) {}).dispatchUpdatesTo(getUpdateCallBack())
+        ) {}, detectMoves)
+        //清除旧数列
+        support.dataList.clear()
+        //加载新数据列
+        support.dataList.addAll(newDataList)
+        //提交对比结果到 adapter，应用变化
+        result.dispatchUpdatesTo(getUpdateCallBack())
     }
 
     protected open fun getUpdateCallBack(): ListUpdateCallback {

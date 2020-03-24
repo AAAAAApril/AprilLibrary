@@ -128,8 +128,9 @@ open class HeaderFooterAdapter : MultipleAdapter() {
         support.dataList.clear()
         val count = dataList.size
         support.dataList.addAll(dataList)
-        if (headerCount() == 0
-            && footerCount() == 0
+        if ((headerCount() == 0
+                    && footerCount() == 0)
+            || dataList.isEmpty()
         ) {
             notifyDataSetChanged()
         } else {

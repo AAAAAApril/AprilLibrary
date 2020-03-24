@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
+import com.april.develop.vvm.SingleLiveData
 import kotlinx.coroutines.*
 
 /**
@@ -94,11 +95,11 @@ inline fun <reified VM : ContractViewModel> Fragment.viewModelFromHostActivity()
 abstract class ContractViewModel(application: Application) : AndroidViewModel(application) {
 
     val contractToastLiveData by lazy {
-        MutableLiveData<CharSequence?>()
+        SingleLiveData<CharSequence?>()
     }
 
     val contractLoadingLiveData by lazy {
-        MutableLiveData<Boolean?>()
+        SingleLiveData<Boolean?>()
     }
 
     protected fun onShowToast(message: CharSequence?) {

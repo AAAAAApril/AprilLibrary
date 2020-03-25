@@ -251,14 +251,21 @@ class FragmentCreator internal constructor(
     internal fun obtainFragment(fragmentClass: Class<out Fragment>): Fragment? {
         var fragment = fragmentMap[fragmentClass]
         if (fragment == null) {
-            val creator = creatorMap[fragmentClass]
-            if (creator != null) {
-                fragment = creator.createFragment()
-            } else {
-                val target = manager.findFragmentByTag(fragmentClass.asTag())
-                if (target != null) {
-                    fragment = target
-                } else {
+            //先从 manager 里面查找
+            val target = manager.findFragmentByTag(fragmentClass.asTag())
+            //不为 null，直接赋值
+            if (target != null) {
+                fragment = target
+            }
+            //为 null，让 creator 构建
+            else {
+                val creator = creatorMap[fragmentClass]
+                //结果不为 null，则赋值
+                if (creator != null) {
+                    fragment = creator.createFragment()
+                }
+                //否则返回给外部处理
+                else {
                     return null
                 }
             }

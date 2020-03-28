@@ -18,20 +18,35 @@ open class MultipleAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     /**
      * 设置占位布局 item 样式代理
      */
-    fun <T : SpecialItemDelegate<*>> setPlaceholder(placeholderItemDelegate: T?) {
-        support.placeholderItemDelegate = placeholderItemDelegate
+    fun <T, D : SpecialItemDelegate<T>> setPlaceholder(
+        placeholderItemDelegate: D,
+        placeHolderData: T? = null
+    ) {
+        support.setPlaceHolder(placeholderItemDelegate, placeHolderData)
+        if (support.dataList.isEmpty()) {
+            notifyDataSetChanged()
+        }
+    }
+
+    /**
+     * 移除占位布局
+     */
+    fun removePlaceHolder() {
+        support.removePlaceHolder()
+        if (support.dataList.isEmpty()) {
+            notifyDataSetChanged()
+        }
     }
 
     /**
      * 设置占位布局所需的数据
      */
-    fun <T : Any> resetPlaceholderData(placeholderData: T?) {
-        support.placeholderBean = placeholderData
-        //如果数据列是空的，并且设置了占位布局
-        if (support.dataList.isEmpty()
-            && support.placeholderItemDelegate != null
-        ) {
-            //就刷新一下
+    fun <T, D : SpecialItemDelegate<T>> resetPlaceholderData(
+        placeholderItemDelegate: D,
+        placeHolderData: T?
+    ) {
+        support.resetPlaceHolderData(placeholderItemDelegate, placeHolderData)
+        if (support.dataList.isEmpty()) {
             notifyDataSetChanged()
         }
     }

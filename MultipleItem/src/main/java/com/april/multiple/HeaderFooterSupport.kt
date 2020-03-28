@@ -11,14 +11,19 @@ open class HeaderFooterSupport : MultipleSupport() {
 
     //头布局
     internal val headerArray by lazy { SparseArray<SpecialItemDelegate<*>>() }
+
     //尾布局
     internal val footerArray by lazy { SparseArray<SpecialItemDelegate<*>>() }
 
+    //以 header 的 key 为 key，缓存对应 header 的数据实体
     private val headerDataArray by lazy { SparseArray<Any?>() }
+
+    //以 footer 的 key 为 key，缓存对应 footer 的数据实体
     private val footerDataArray by lazy { SparseArray<Any?>() }
 
     //缓存 header 的 key，以保证 header 的显示顺序和添加顺序一致
     private val headerKeyArray by lazy { mutableListOf<Int>() }
+
     //缓存 footer 的 key，理由同上
     private val footerKeyArray by lazy { mutableListOf<Int>() }
 
@@ -27,16 +32,17 @@ open class HeaderFooterSupport : MultipleSupport() {
     /**
      * @param headerItemDelegate 添加 header
      */
-    fun <T : SpecialItemDelegate<*>> addHeader(headerItemDelegate: T) {
+    fun <T, D : SpecialItemDelegate<T>> addHeader(headerItemDelegate: D, defaultData: T? = null) {
         val key = headerItemDelegate.hashCode()
         headerArray.put(key, headerItemDelegate)
         headerKeyArray.add(key)
+        headerDataArray.put(key, defaultData)
     }
 
     /**
      * 移除 header
      */
-    fun <T : SpecialItemDelegate<*>> removeHeader(headerItemDelegate: T): Boolean {
+    fun <D : SpecialItemDelegate<*>> removeHeader(headerItemDelegate: D): Boolean {
         val index = headerArray.indexOfValue(headerItemDelegate)
         return if (index < 0) {
             false
@@ -50,16 +56,17 @@ open class HeaderFooterSupport : MultipleSupport() {
     /**
      * @param footerItemDelegate 添加 footer
      */
-    fun <T : SpecialItemDelegate<*>> addFooter(footerItemDelegate: T) {
+    fun <T, D : SpecialItemDelegate<T>> addFooter(footerItemDelegate: D, defaultData: T? = null) {
         val key = footerItemDelegate.hashCode()
         footerArray.put(key, footerItemDelegate)
         footerKeyArray.add(key)
+        footerDataArray.put(key, defaultData)
     }
 
     /**
      * 移除 footer
      */
-    fun <T : SpecialItemDelegate<*>> removeFooter(footerItemDelegate: T): Boolean {
+    fun <D : SpecialItemDelegate<*>> removeFooter(footerItemDelegate: D): Boolean {
         val index = footerArray.indexOfValue(footerItemDelegate)
         return if (index < 0) {
             false
@@ -73,9 +80,9 @@ open class HeaderFooterSupport : MultipleSupport() {
     /**
      * 设置 header 需要的数据
      */
-    fun <T : SpecialItemDelegate<*>> resetHeaderData(
-        headerItemDelegate: T,
-        headerData: Any?
+    fun <T, D : SpecialItemDelegate<T>> resetHeaderData(
+        headerItemDelegate: D,
+        headerData: T
     ): Boolean {
         val index = headerArray.indexOfValue(headerItemDelegate)
         assert(index >= 0) {
@@ -95,9 +102,9 @@ open class HeaderFooterSupport : MultipleSupport() {
     /**
      * 设置 footer 需要的数据
      */
-    fun <T : SpecialItemDelegate<*>> resetFooterData(
-        footerItemDelegate: T,
-        footerData: Any?
+    fun <T, D : SpecialItemDelegate<T>> resetFooterData(
+        footerItemDelegate: D,
+        footerData: T
     ): Boolean {
         val index = footerArray.indexOfValue(footerItemDelegate)
         assert(index >= 0) {
@@ -127,7 +134,7 @@ open class HeaderFooterSupport : MultipleSupport() {
     /**
      * 这个 Header 在 adapter 中的位置
      */
-    fun <T : SpecialItemDelegate<*>> adapterPositionOfHeader(headerItemDelegate: T): Int {
+    fun <D : SpecialItemDelegate<*>> adapterPositionOfHeader(headerItemDelegate: D): Int {
         return headerArray.indexOfValue(headerItemDelegate)
     }
 
@@ -136,7 +143,7 @@ open class HeaderFooterSupport : MultipleSupport() {
      *
      * @param footerItemDelegate
      */
-    fun <T : SpecialItemDelegate<*>> adapterPositionOfFooter(footerItemDelegate: T): Int {
+    fun <D : SpecialItemDelegate<*>> adapterPositionOfFooter(footerItemDelegate: D): Int {
         return headerCount() + dataList.size + footerArray.indexOfValue(footerItemDelegate)
     }
 
@@ -224,10 +231,9 @@ open class HeaderFooterSupport : MultipleSupport() {
         val type = holder.itemViewType
         //是头部
         if (isHeaderPosition(position)) {
-            headerArray.get(type)?.bindSpecialViewHolder(
-                holder,
-                headerDataArray.get(type)
-            )
+            headerDataArray.get(type)?.let {
+                headerArray.get(type)?.bindViewHolder(holder, it, payloads)
+            }
             return
         }
         //交给父类处理
@@ -237,10 +243,9 @@ open class HeaderFooterSupport : MultipleSupport() {
         }
         //尾部
         else {
-            footerArray.get(type)?.bindSpecialViewHolder(
-                holder,
-                footerDataArray.get(type)
-            )
+            footerDataArray.get(type)?.let {
+                footerArray.get(type)?.bindViewHolder(holder, it, payloads)
+            }
         }
     }
 

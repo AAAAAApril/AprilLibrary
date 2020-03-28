@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 /**
  * 特殊(占位布局、头尾布局等) item 样式代理
  */
-abstract class SpecialItemDelegate<T : Any?>(
+abstract class SpecialItemDelegate<T : Any>(
     @LayoutRes private val specialItemLayoutRes: Int
-) : MultipleItemDelegate<Any, RecyclerView.ViewHolder>() {
+) : MultipleItemDelegate<T, RecyclerView.ViewHolder>() {
 
     internal var itemView: View? = null
 
@@ -35,23 +35,5 @@ abstract class SpecialItemDelegate<T : Any?>(
         this.itemView = itemView
         return object : RecyclerView.ViewHolder(itemView) {}
     }
-
-    final override fun onBindViewHolder(
-        holder: RecyclerView.ViewHolder,
-        t: Any,
-        payloads: List<Any>
-    ) {
-        super.onBindViewHolder(holder, t, payloads)
-    }
-
-    final override fun onBindViewHolder(holder: RecyclerView.ViewHolder, bean: Any) {
-
-    }
-
-    internal fun bindSpecialViewHolder(holder: RecyclerView.ViewHolder, bean: Any?) {
-        onBindSpecialViewHolder(holder, bean as? T)
-    }
-
-    protected abstract fun onBindSpecialViewHolder(holder: RecyclerView.ViewHolder, bean: T?)
 
 }

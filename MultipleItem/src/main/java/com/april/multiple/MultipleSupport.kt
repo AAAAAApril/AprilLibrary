@@ -14,22 +14,52 @@ open class MultipleSupport {
 
     //数据列
     internal val dataList = mutableListOf<Any>()
+
     //管理器
     internal val managerArray = SparseArray<Manager<*>>()
+
     // item 样式代理列表，
     // 以 itemViewType 为 key，以 item 样式代理为 value
     internal val itemDelegateArray = SparseArray<MultipleItemDelegate<*, *>>()
 
     //空视图占位布局
-    internal var placeholderBean: Any? = null
-    internal var placeholderItemDelegate: SpecialItemDelegate<*>? = null
-        internal set(value) {
-            field = value
-            placeholderItemType = value?.hashCode() ?: -1
-        }
+    private var placeholderBean: Any? = null
+    private var placeholderItemDelegate: SpecialItemDelegate<*>? = null
     private var placeholderItemType = -1
 
     //==============================================================================================
+
+    /**
+     * 添加占位布局
+     */
+    fun <T, D : SpecialItemDelegate<T>> setPlaceHolder(
+        placeholderItemDelegate: D,
+        placeHolderData: T? = null
+    ) {
+        this.placeholderBean = placeHolderData
+        this.placeholderItemType = placeholderItemDelegate.hashCode()
+        this.placeholderItemDelegate = placeholderItemDelegate
+    }
+
+    /**
+     * 重设占位布局的数据
+     */
+    fun <T, D : SpecialItemDelegate<T>> resetPlaceHolderData(
+        //这个参数只是用来做数据类型约束，并没有其他作用
+        placeholderItemDelegate: D,
+        placeHolderData: T
+    ) {
+        this.placeholderBean = placeHolderData
+    }
+
+    /**
+     * 移除占位布局
+     */
+    fun removePlaceHolder() {
+        this.placeholderBean = null
+        this.placeholderItemDelegate = null
+        this.placeholderItemType = -1
+    }
 
     internal open fun getItemCount(): Int {
         return if (dataList.isEmpty() && placeholderItemDelegate != null) {
@@ -99,9 +129,9 @@ open class MultipleSupport {
     ) {
         val type = holder.itemViewType
         if (type == placeholderItemType) {
-            placeholderItemDelegate?.bindSpecialViewHolder(
-                holder, placeholderBean
-            )
+            placeholderBean?.let {
+                placeholderItemDelegate?.bindViewHolder(holder, it, payloads)
+            }
         } else {
             itemDelegateArray.get(type)?.bindViewHolder(
                 holder, dataList[position], payloads

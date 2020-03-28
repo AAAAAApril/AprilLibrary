@@ -43,7 +43,7 @@ open class MultipleAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
      */
     fun <T, D : SpecialItemDelegate<T>> resetPlaceholderData(
         placeholderItemDelegate: D,
-        placeHolderData: T?
+        placeHolderData: T
     ) {
         support.resetPlaceHolderData(placeholderItemDelegate, placeHolderData)
         if (support.dataList.isEmpty()) {

@@ -23,6 +23,7 @@ class SelectableAdapter<T : Any>(
 
     //数据包装实体列表
     private val dataWrapperList = mutableListOf<SelectableDataWrapper<T>>()
+
     //被选中的位置列表
     private val selectedPositionList = ArrayList<Int>(selectableCount)
 
@@ -159,11 +160,17 @@ class SelectableAdapter<T : Any>(
      * 重设数据列
      */
     fun resetDataList(dataList: List<T>) {
+        //移除旧的
+        val oldSize = dataWrapperList.size
         dataWrapperList.clear()
-        dataList.forEach {
-            dataWrapperList.add(SelectableDataWrapper(it))
-        }
         selectedPositionList.clear()
+        notifyItemRangeRemoved(0, oldSize)
+        //添加新的
+        val wrapperList = mutableListOf<SelectableDataWrapper<T>>()
+        dataList.forEach { data ->
+            wrapperList.add(SelectableDataWrapper(data))
+        }
+        dataWrapperList.addAll(wrapperList)
         notifyItemRangeChanged(0, dataWrapperList.size)
         //回调选中数量变化监听
         countChangedListener?.onSelectedChanged(this, selectedPositionList)

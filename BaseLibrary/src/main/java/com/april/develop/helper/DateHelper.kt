@@ -112,4 +112,33 @@ object DateHelper {
         locale: Locale = Locale.getDefault()
     ): SimpleDateFormat = SimpleDateFormat(formatStringStyle, locale)
 
+    /**
+     * 根据开始日期和日期数量，获取对应的日期数据列
+     */
+    fun obtainDateListByCount(
+        //开始的日期
+        startDate: Date,
+        //开始日期往后移动多少天（不包含开始日期）
+        dateCount: Int
+    ): List<Date> {
+        val startCalender: Calendar = Calendar.getInstance().apply {
+            //取当前时间进行赋值
+            time = startDate
+            //初始化时间到当前
+            add(Calendar.DATE, 0)
+        }
+        val endCalender: Calendar = Calendar.getInstance().apply {
+            //取当前时间进行赋值
+            time = startDate
+            //按当前时间进行推移，正数为向后移，负数为向前移
+            add(Calendar.DATE, dateCount + 1)
+        }
+        val dateList = mutableListOf<Date>()
+        while (startCalender.before(endCalender)) {
+            dateList.add(startCalender.time)
+            startCalender.add(Calendar.DATE, 1)
+        }
+        return dateList
+    }
+
 }

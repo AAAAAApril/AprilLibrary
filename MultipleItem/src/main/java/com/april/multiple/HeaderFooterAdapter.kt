@@ -18,7 +18,7 @@ open class HeaderFooterAdapter : MultipleAdapter() {
     /**
      * @param headerItemDelegate 添加 header
      */
-    fun <T : SpecialItemDelegate<*>> addHeader(headerItemDelegate: T) {
+    fun <T, D : SpecialItemDelegate<T>> addHeader(headerItemDelegate: D) {
         support.addHeader(headerItemDelegate)
         notifyItemInserted(support.adapterPositionOfHeader(headerItemDelegate))
     }
@@ -39,7 +39,7 @@ open class HeaderFooterAdapter : MultipleAdapter() {
     /**
      * @param footerItemDelegate 添加 footer
      */
-    fun <T : SpecialItemDelegate<*>> addFooter(footerItemDelegate: T) {
+    fun <T, D : SpecialItemDelegate<T>> addFooter(footerItemDelegate: D) {
         support.addFooter(footerItemDelegate)
         notifyItemInserted(support.adapterPositionOfFooter(footerItemDelegate))
     }
@@ -61,9 +61,9 @@ open class HeaderFooterAdapter : MultipleAdapter() {
     /**
      * 设置 header 需要的数据
      */
-    fun <T : SpecialItemDelegate<*>> resetHeaderData(
-        headerItemDelegate: T,
-        headerData: Any?
+    fun <T, D : SpecialItemDelegate<T>> resetHeaderData(
+        headerItemDelegate: D,
+        headerData: T
     ) {
         if (support.resetHeaderData(headerItemDelegate, headerData)) {
             notifyItemChanged(support.adapterPositionOfHeader(headerItemDelegate))
@@ -73,9 +73,9 @@ open class HeaderFooterAdapter : MultipleAdapter() {
     /**
      * 设置 footer 需要的数据
      */
-    fun <T : SpecialItemDelegate<*>> resetFooterData(
-        footerItemDelegate: T,
-        footerData: Any?
+    fun <T, D : SpecialItemDelegate<T>> resetFooterData(
+        footerItemDelegate: D,
+        footerData: T
     ) {
         if (support.resetFooterData(footerItemDelegate, footerData)) {
             notifyItemChanged(support.adapterPositionOfFooter(footerItemDelegate))

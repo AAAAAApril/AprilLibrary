@@ -24,7 +24,7 @@ open class MultipleSupport {
 
     //空视图占位布局
     private var placeholderBean: Any? = null
-    private var placeholderItemDelegate: SpecialItemDelegate<*>? = null
+    internal var placeholderItemDelegate: SpecialItemDelegate<*>? = null
     private var placeholderItemType = -1
 
     //==============================================================================================

@@ -9,12 +9,12 @@ import androidx.fragment.app.FragmentManager
 /**
  * 控制 Fragment 的显示与隐藏，并协助处理视图恢复
  */
-class FragmentController(
+class FragmentHelper(
     //show hide 模式，或者 replace 模式
     private val replaceMode: Boolean = false
 ) {
     //用于在状态暂存时，存储当前正在显示的 Fragment 的 index
-    private val savedStateKey: String = "${FragmentController::class.java.name}_SavedStateKey"
+    private val savedStateKey: String = "${FragmentHelper::class.java.name}_SavedStateKey"
 
     private lateinit var manager: FragmentManager
 
@@ -28,8 +28,8 @@ class FragmentController(
     //正在显示的 Fragment 的 Class
     private var showingFragmentClass: Class<out Fragment>? = null
 
-    //fragment 构建器
-    private lateinit var creator: FragmentCreator
+    //fragment 池
+    private lateinit var pool: FragmentPool
 
     /**
      * ①
@@ -40,11 +40,11 @@ class FragmentController(
         manager: FragmentManager,
         savedInstanceState: Bundle?,
         defaultSelectIndex: Int = this.showingIndex
-    ): FragmentCreator {
+    ): FragmentPool {
         this.manager = manager
         showingIndex = savedInstanceState?.getInt(savedStateKey) ?: defaultSelectIndex
-        creator = FragmentCreator(manager)
-        return creator
+        pool = FragmentPool(manager)
+        return pool
     }
 
     /**
@@ -66,7 +66,7 @@ class FragmentController(
      * 显示一个 Fragment
      */
     fun <F : Fragment> showFragment(fragmentClass: Class<F>) {
-        this.showingIndex = creator.getIndexByFragmentClass(fragmentClass)
+        this.showingIndex = pool.getIndexByFragmentClass(fragmentClass)
         if (replaceMode) {
             replace(fragmentClass)
         } else {
@@ -79,7 +79,7 @@ class FragmentController(
      * 显示该位置上对应的 Fragment
      */
     fun showFragment(index: Int) {
-        showFragment(creator.getFragmentClassByIndex(index))
+        showFragment(pool.getFragmentClassByIndex(index))
     }
 
     /**
@@ -93,7 +93,7 @@ class FragmentController(
     /**
      * Fragment 的数量
      */
-    fun getFragmentCount(): Int = creator.fragmentSize()
+    fun getFragmentCount(): Int = pool.fragmentSize()
 
     /**
      * replace 模式
@@ -103,7 +103,7 @@ class FragmentController(
         if (fragmentClass == showingFragmentClass) {
             return
         }
-        val target = creator.obtainFragment(fragmentClass)
+        val target = pool.obtainFragment(fragmentClass)
         if (target != null) {
             manager.beginTransaction()
                 .replace(containerViewId, target, target.asTag())
@@ -123,7 +123,7 @@ class FragmentController(
         //要显示的 Fragment 正在显示
         if (fragmentClass == showingFragmentClass) {
             //正在显示的 Fragment
-            val showingFragment = creator.obtainFragment(fragmentClass)
+            val showingFragment = pool.obtainFragment(fragmentClass)
             if (showingFragment != null) {
                 //如果正在显示的被隐藏了，则显示它
                 if (showingFragment.isHidden) {
@@ -139,10 +139,10 @@ class FragmentController(
         }
         //要显示的 Fragment 没有显示
         //要显示的
-        val targetFragment = creator.obtainFragment(fragmentClass)
+        val targetFragment = pool.obtainFragment(fragmentClass)
         //正在显示的
         val showingFragment: Fragment? = if (showingFragmentClass != null) {
-            creator.obtainFragment(showingFragmentClass!!)
+            pool.obtainFragment(showingFragmentClass!!)
         } else {
             null
         }
@@ -217,12 +217,12 @@ class FragmentController(
 /**
  * fragment 构建器
  */
-class FragmentCreator internal constructor(
+class FragmentPool internal constructor(
     private val manager: FragmentManager
 ) {
     private val fragmentClassList = mutableListOf<Class<out Fragment>>()
     private val fragmentMap = mutableMapOf<Class<out Fragment>, Fragment?>()
-    private val creatorMap = mutableMapOf<Class<out Fragment>, Creator<out Fragment>?>()
+    private val creatorMap = mutableMapOf<Class<out Fragment>, LazyCreator<out Fragment>?>()
 
     /**
      * 添加 Fragment
@@ -230,8 +230,8 @@ class FragmentCreator internal constructor(
     @JvmOverloads
     fun <T : Fragment> addFragment(
         fragmentClass: Class<T>,
-        creator: Creator<T>? = null
-    ): FragmentCreator {
+        creator: LazyCreator<T>? = null
+    ): FragmentPool {
         fragmentClassList.add(fragmentClass)
         fragmentMap[fragmentClass] = manager.findFragmentByTag(fragmentClass.asTag())
         creatorMap[fragmentClass] = creator
@@ -288,15 +288,15 @@ class FragmentCreator internal constructor(
 /**
  * 显示 Fragment 的扩展函数
  */
-inline fun <reified T : Fragment> FragmentController.showFragment() {
+inline fun <reified T : Fragment> FragmentHelper.showFragment() {
     showFragment(T::class.java)
 }
 
 /**
  * 添加 Fragment 的扩展函数
  */
-inline fun <reified T : Fragment> FragmentCreator.addFragment(crossinline block: () -> T) {
-    addFragment(T::class.java, object : Creator<T> {
+inline fun <reified T : Fragment> FragmentPool.addFragment(crossinline block: () -> T) {
+    addFragment(T::class.java, object : LazyCreator<T> {
         override fun createFragment(): T = block.invoke()
     })
 }
@@ -304,9 +304,9 @@ inline fun <reified T : Fragment> FragmentCreator.addFragment(crossinline block:
 /**
  * 创建 Fragment
  */
-interface Creator<T : Fragment> {
+interface LazyCreator<T : Fragment> {
     fun createFragment(): T
 }
 
-private fun <F : Fragment> Class<F>.asTag(): String = "FragmentController$name"
+private fun <F : Fragment> Class<F>.asTag(): String = "FragmentHelper$name"
 private fun <F : Fragment> F.asTag(): String = javaClass.asTag()

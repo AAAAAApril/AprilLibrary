@@ -9,9 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.april.develop.helper.Creator;
-import com.april.develop.helper.FragmentController;
-import com.april.develop.helper.FragmentCreator;
+import com.april.develop.helper.LazyCreator;
+import com.april.develop.helper.FragmentHelper;
+import com.april.develop.helper.FragmentPool;
 import com.april.library.R;
 
 import org.jetbrains.annotations.NotNull;
@@ -19,25 +19,25 @@ import org.jetbrains.annotations.NotNull;
 @Deprecated
 public class TestFragment extends Fragment {
 
-    private FragmentController controller;
+    private FragmentHelper helper;
 
-    private FragmentController getController() {
-        if (controller == null) {
-            controller = new FragmentController();
+    private FragmentHelper getHelper() {
+        if (helper == null) {
+            helper = new FragmentHelper();
         }
-        return controller;
+        return helper;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FragmentCreator creator = getController().onCreate(
+        FragmentPool pool = getHelper().onCreate(
                 getChildFragmentManager(),
                 savedInstanceState
         );
         //如果不传 Fragment 构建接口，或者传 null，则表示将 Fragment 的创建委托给 FragmentManager
-        creator.addFragment(Content0Fragment.class);
-        creator.addFragment(Content1Fragment.class, null);
+        pool.addFragment(Content0Fragment.class);
+        pool.addFragment(Content1Fragment.class, null);
         /**
          *  使用 Creator 接口自己创建 Fragment 实例，可以更方便的传递 argument，
          *
@@ -46,7 +46,7 @@ public class TestFragment extends Fragment {
          *
          *      如果是要根据网络返回的数据动态创建 Fragment。自己想办法。
          */
-        creator.addFragment(Content2Fragment.class, new Creator<Content2Fragment>() {
+        pool.addFragment(Content2Fragment.class, new LazyCreator<Content2Fragment>() {
             @NotNull
             @Override
             public Content2Fragment createFragment() {
@@ -66,13 +66,13 @@ public class TestFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getController().onViewCreated(R.id.lfct_frame);
+        getHelper().onViewCreated(R.id.lfct_frame);
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        getController().onSaveInstanceState(outState);
+        getHelper().onSaveInstanceState(outState);
     }
 
 

@@ -9,12 +9,13 @@ import androidx.fragment.app.FragmentManager
 /**
  * 控制 Fragment 的显示与隐藏，并协助处理视图恢复
  */
-class FragmentController @JvmOverloads constructor(
+class FragmentController(
     //show hide 模式，或者 replace 模式
-    private val replaceMode: Boolean = false,
-    //用于在状态暂存时，存储当前正在显示的 Fragment 的 Class name
-    private val savedStateKey: String = "${FragmentController::class.java.name}_SavedStateKey"
+    private val replaceMode: Boolean = false
 ) {
+    //用于在状态暂存时，存储当前正在显示的 Fragment 的 index
+    private val savedStateKey: String = "${FragmentController::class.java.name}_SavedStateKey"
+
     private lateinit var manager: FragmentManager
 
     //装载 Fragment 的容器 View id
@@ -37,10 +38,11 @@ class FragmentController @JvmOverloads constructor(
     @JvmOverloads
     fun onCreate(
         manager: FragmentManager,
+        savedInstanceState: Bundle?,
         defaultSelectIndex: Int = this.showingIndex
     ): FragmentCreator {
         this.manager = manager
-        showingIndex = defaultSelectIndex
+        showingIndex = savedInstanceState?.getInt(savedStateKey) ?: defaultSelectIndex
         creator = FragmentCreator(manager)
         return creator
     }
@@ -48,20 +50,13 @@ class FragmentController @JvmOverloads constructor(
     /**
      * ②
      * 设置 Fragment 显示的位置
-     * [savedInstanceState] 处理视图恢复
      *
      * 视图恢复时，会默认显示曾经显示的 Fragment，不需要再手动显示
      *
      * @return 正在选中的位置
      */
-    fun onViewCreated(@IdRes containerViewId: Int, savedInstanceState: Bundle?): Int {
+    fun onViewCreated(@IdRes containerViewId: Int): Int {
         this.containerViewId = containerViewId
-        var showingIndex = this.showingIndex
-        savedInstanceState?.getString(savedStateKey)?.let { name ->
-            showingFragmentClass = creator.getFragmentClassByClassName(name)
-            showingIndex = creator.getIndexByFragmentClassName(name)
-            this.showingIndex = showingIndex
-        }
         showFragment(showingIndex)
         return showingIndex
     }
@@ -92,9 +87,7 @@ class FragmentController @JvmOverloads constructor(
      * 处理状态回收
      */
     fun onSaveInstanceState(outState: Bundle) {
-        if (showingFragmentClass != null) {
-            outState.putString(savedStateKey, showingFragmentClass!!.name)
-        }
+        outState.putInt(savedStateKey, showingIndex)
     }
 
     /**
@@ -290,21 +283,6 @@ class FragmentCreator internal constructor(
     internal fun getIndexByFragmentClass(fragmentClass: Class<out Fragment>): Int =
         fragmentClassList.indexOf(fragmentClass)
 
-    /**
-     * 根据 Fragment Class name 获取 Class
-     */
-    internal fun getFragmentClassByClassName(className: String): Class<out Fragment>? =
-        fragmentClassList.find {
-            it.name == className
-        }
-
-    /**
-     * 根据 Fragment Class name 获取 index
-     */
-    internal fun getIndexByFragmentClassName(className: String): Int =
-        fragmentClassList.indexOfFirst {
-            it.name == className
-        }
 }
 
 /**

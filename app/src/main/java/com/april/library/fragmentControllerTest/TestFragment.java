@@ -31,7 +31,10 @@ public class TestFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FragmentCreator creator = getController().onCreate(getChildFragmentManager());
+        FragmentCreator creator = getController().onCreate(
+                getChildFragmentManager(),
+                savedInstanceState
+        );
         //如果不传 Fragment 构建接口，或者传 null，则表示将 Fragment 的创建委托给 FragmentManager
         creator.addFragment(Content0Fragment.class);
         creator.addFragment(Content1Fragment.class, null);
@@ -63,7 +66,7 @@ public class TestFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getController().onViewCreated(R.id.lfct_frame, savedInstanceState);
+        getController().onViewCreated(R.id.lfct_frame);
     }
 
     @Override

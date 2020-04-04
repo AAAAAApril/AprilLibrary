@@ -330,5 +330,5 @@ interface Creator<T : Fragment> {
     fun createFragment(): T
 }
 
-private fun <F : Fragment> Class<F>.asTag(): String = name
+private fun <F : Fragment> Class<F>.asTag(): String = "FragmentController$name"
 private fun <F : Fragment> F.asTag(): String = javaClass.asTag()

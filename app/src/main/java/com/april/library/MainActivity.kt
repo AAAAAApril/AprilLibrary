@@ -6,7 +6,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.april.develop.ui.startContractIntent
-import com.april.library.navigation.NavigationTestActivity
 import com.april.multiple.DefaultItemDelegate
 import com.april.multiple.decoration.GridSpanDecoration
 import com.april.multiple.MultipleAdapter
@@ -56,9 +55,6 @@ class MainActivity : AppCompatActivity() {
                 },
                 ItemBean("AutoCreate") {
                     startContractIntent(Intent(this, AutoCreateTestActivity::class.java))
-                },
-                ItemBean("Jetpack ：Navigation") {
-                    startContractIntent(Intent(this, NavigationTestActivity::class.java))
                 }
             )
         )

@@ -42,6 +42,7 @@
         <activity
             android:name=".navigation.NavigationTestActivity"
             android:label="Jetpack ：Navigation" />
+        <activity android:name=".BannerActivity" />
     </application>
 
 </manifest>

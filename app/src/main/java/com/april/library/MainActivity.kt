@@ -52,6 +52,9 @@ class MainActivity : AppCompatActivity() {
                 },
                 ItemBean("MultipleItem") {
                     startContractIntent(Intent(this, MultipleItemActivity::class.java))
+                },
+                ItemBean("Banner") {
+                    startContractIntent(Intent(this, BannerActivity::class.java))
                 }
             )
         )

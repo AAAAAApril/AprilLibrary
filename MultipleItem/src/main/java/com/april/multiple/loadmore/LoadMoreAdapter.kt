@@ -50,7 +50,7 @@ open class LoadMoreAdapter : HeaderFooterAdapter() {
     /**
      * @return LoadMore View
      */
-    fun <T : SpecialItemDelegate<*>> setLoadMoreItemDelegate(delegate: T) {
+    fun <T,D : SpecialItemDelegate<T>> setLoadMoreItemDelegate(delegate: D) {
         this.wrapper = delegate
     }
 
@@ -69,18 +69,18 @@ open class LoadMoreAdapter : HeaderFooterAdapter() {
      * 否则可能导致 Footer 的位置与 [loadMoreView] 的位置错乱
      */
     fun showLoadMoreView(show: Boolean) {
-        wrapper?.let {
-            //是否有这个 FooterView
-            val contains = support.footerArray.containsValue(it)
-            //显示 且 不包含
-            if (show && !contains) {
-                addFooter(it)
-            }
-            //不显示 且 包含
-            if (!show && contains) {
-                removeFooter(it)
-            }
-        }
+//        wrapper?.let {
+//            //是否有这个 FooterView
+//            val contains = support.footerArray.containsValue(it)
+//            //显示 且 不包含
+//            if (show && !contains) {
+//                addFooter(it)
+//            }
+//            //不显示 且 包含
+//            if (!show && contains) {
+//                removeFooter(it)
+//            }
+//        }
     }
 
     /**

@@ -17,6 +17,16 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -41,6 +51,8 @@ dependencies {
     implementation project(':BaseLibrary')
     implementation project(':APermission')
     implementation project(':MultipleItem')
+    implementation project(':BannerView')
+    implementation project(':NetWork')
 
     //图片加载
     implementation 'com.github.bumptech.glide:glide:4.9.0'

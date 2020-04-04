@@ -25,7 +25,7 @@ abstract class DefaultItemDelegate<T : Any>(
         onBindItemView(holder.itemView, bean, holder.adapterPosition)
     }
 
-    protected abstract fun onBindItemView(itemView: View, bean: T, adapterPosition: Int)
+    protected open fun onBindItemView(itemView: View, bean: T, adapterPosition: Int){}
 
 }
 

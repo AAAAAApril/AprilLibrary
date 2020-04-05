@@ -99,6 +99,7 @@ object GrayWindowHelper : Application.ActivityLifecycleCallbacks {
     }
 
     override fun onActivityDestroyed(activity: Activity) {
+        configurationMap.remove(activity)
     }
 }
 

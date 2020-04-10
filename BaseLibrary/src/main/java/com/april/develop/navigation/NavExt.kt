@@ -4,7 +4,11 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.annotation.IdRes
+import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.createViewModelLazy
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -98,6 +102,41 @@ fun <A> A.push(
     )
 }
 
+fun <A> A.pushAndPop(
+    @IdRes pushActionId: Int,
+    @IdRes popToDestinationId: Int,
+    pushArguments: Bundle = Bundle(),
+    popInclusive: Boolean = false
+) where A : ComponentActivity,
+        A : INavActivity {
+    findNavController(getNavigationContainerViewId()).navigate(
+        pushActionId,
+        pushArguments,
+        createNavOptionsBuilder()
+            .setPopUpTo(popToDestinationId, popInclusive)
+            .build()
+    )
+}
+
+fun <A> A.pop(
+    @IdRes destinationId: Int? = null,
+    inclusive: Boolean = false,
+    force: Boolean = false
+) where A : ComponentActivity,
+        A : INavActivity {
+    if (destinationId == null) {
+        if (force) {
+            findNavController(getNavigationContainerViewId())
+                .popBackStack()
+        } else {
+            onBackPressed()
+        }
+    } else {
+        findNavController(getNavigationContainerViewId())
+            .popBackStack(destinationId, inclusive)
+    }
+}
+
 /**
  * 创建导航配置 builder
  */
@@ -108,3 +147,15 @@ private fun createNavOptionsBuilder(): NavOptions.Builder {
         .setPopEnterAnim(R.anim.nav_default_pop_enter_anim)
         .setPopExitAnim(R.anim.nav_default_pop_exit_anim)
 }
+
+/**
+ * 获取父类装载的 ViewModel
+ */
+@MainThread
+inline fun <reified VM : ViewModel> Fragment.parentFragmentViewModels(
+    noinline factoryProducer: (() -> ViewModelProvider.Factory)? = null
+) = createViewModelLazy(
+    VM::class,
+    { requireParentFragment().viewModelStore },
+    factoryProducer ?: { requireParentFragment().defaultViewModelProviderFactory }
+)

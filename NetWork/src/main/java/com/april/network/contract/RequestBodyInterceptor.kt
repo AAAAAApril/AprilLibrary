@@ -68,8 +68,8 @@ object RequestBodyInterceptor : Interceptor {
                     )
                     Log.e(
                         "April_FormBody",
-                        "请求体名(解码后)：${body.name(index)}，" +
-                                "请求体值(解码后)：${body.value(index)}"
+                        "请求体名(编码前)：${body.name(index)}，" +
+                                "请求体值(编码前)：${body.value(index)}"
                     )
                 }
             }

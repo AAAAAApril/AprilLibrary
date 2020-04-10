@@ -52,7 +52,7 @@ dependencies {
     //ViewModel 的 Kotlin 扩展
     compileOnly "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
     //Kotlin 开启携程支持
-    compileOnly 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1'
+    compileOnly 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1'
     compileOnly 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1'
     //Navigation 支持
     compileOnly 'androidx.navigation:navigation-fragment-ktx:2.2.1'

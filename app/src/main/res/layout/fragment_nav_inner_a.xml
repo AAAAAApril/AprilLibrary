@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:text="这里是内部图标 Fragment A\n\n嵌套图表并不会在内部图表 Fragment 外增加一个父 NavHostFragment，而是被直接添加在外部 NavHostFragment 中的，从始至终都只有那一个 NavHostFragment，所以虽然是嵌套图表，但实际上和外部的那些目的地 Fragment 是平级的。"
+        android:textColor="@color/colorAccent"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/fnia_etName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="填写名称"
+        android:padding="16dp"
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/fnia_btnGo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="前往填写编号" />
+
+</LinearLayout>

@@ -36,13 +36,10 @@
         <activity
             android:name=".MultipleItemActivity"
             android:label="MultipleItem" />
-        <activity
-            android:name=".AutoCreateTestActivity"
-            android:label="AutoCreate" />
-        <activity
-            android:name=".navigation.NavigationTestActivity"
-            android:label="Jetpack ：Navigation" />
         <activity android:name=".BannerActivity" />
+        <activity
+            android:name=".navigation.NavTestActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

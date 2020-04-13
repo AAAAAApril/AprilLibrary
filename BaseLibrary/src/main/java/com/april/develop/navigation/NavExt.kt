@@ -61,7 +61,9 @@ fun Fragment.pushAndPopAction(
  *
  * [destinationId] 回退到的目标导航 id，即：navigation 文件内，fragment 标签对应的 id
  * [inclusive] 是否也将对应位置上的 fragment 移除掉
- * [force] 是否强制回退(强制回退不会考虑拦截回退功能的相关逻辑)，这个值只在 [destinationId] 为 null 时才有用
+ * [force] 是否强制回退(强制回退不会考虑拦截回退功能的相关逻辑)，这个值只在 [destinationId] 为 null 时才有用，
+ * 此时表示跳过当前页面的回退拦截，直接执行回退操作。
+ * 如果是回到其他的页面，直接传入对应的页面 id，则会跳过回退拦截，不需要将 force 设置为 true
  */
 fun Fragment.pop(
     @IdRes destinationId: Int? = null,
@@ -152,7 +154,7 @@ private fun createNavOptionsBuilder(): NavOptions.Builder {
  * 获取父类装载的 ViewModel
  */
 @MainThread
-inline fun <reified VM : ViewModel> Fragment.parentFragmentViewModels(
+inline fun <reified VM : ViewModel> Fragment.parentViewModels(
     noinline factoryProducer: (() -> ViewModelProvider.Factory)? = null
 ) = createViewModelLazy(
     VM::class,

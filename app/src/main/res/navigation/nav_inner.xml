@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_inner"
+    app:startDestination="@id/nav_f_inner_a">
+
+    <fragment
+        android:id="@+id/nav_f_inner_a"
+        android:name="com.april.library.navigation.NavInnerAFragment"
+        tools:layout="@layout/fragment_nav_inner_a">
+
+        <action
+            android:id="@+id/nav_a_inner_b"
+            app:destination="@id/nav_f_inner_b" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_f_inner_b"
+        android:name="com.april.library.navigation.NavInnerBFragment"
+        tools:layout="@layout/fragment_nav_inner_b" />
+
+</navigation>

@@ -6,6 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.april.develop.ui.startContractIntent
+import com.april.library.navigation.NavTestActivity
 import com.april.multiple.DefaultItemDelegate
 import com.april.multiple.decoration.GridSpanDecoration
 import com.april.multiple.MultipleAdapter
@@ -25,10 +26,10 @@ class MainActivity : AppCompatActivity() {
             GridSpanDecoration(
                 this
             ).apply {
-            setHorizontalOffsetDP(10)
-            setVerticalOffsetDP(16)
-            setIncludeEdge(true)
-        })
+                setHorizontalOffsetDP(10)
+                setVerticalOffsetDP(16)
+                setIncludeEdge(true)
+            })
         am_rv.adapter = adapter
         adapter.only(object : DefaultItemDelegate<ItemBean>(R.layout.item_0) {
             override fun onBindItemView(itemView: View, bean: ItemBean, adapterPosition: Int) {
@@ -55,6 +56,9 @@ class MainActivity : AppCompatActivity() {
                 },
                 ItemBean("Banner") {
                     startContractIntent(Intent(this, BannerActivity::class.java))
+                },
+                ItemBean("Navigation") {
+                    startContractIntent(Intent(this, NavTestActivity::class.java))
                 }
             )
         )

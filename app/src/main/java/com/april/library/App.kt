@@ -10,6 +10,6 @@ class App : Application() {
         APermission.init(this)
 
         //窗体整体变灰
-        registerActivityLifecycleCallbacks(GrayWindowHelper)
+//        registerActivityLifecycleCallbacks(GrayWindowHelper)
     }
 }

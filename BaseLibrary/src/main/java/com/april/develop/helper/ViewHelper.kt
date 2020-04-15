@@ -1,5 +1,6 @@
 package com.april.develop.helper
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
@@ -16,6 +17,7 @@ import android.widget.Checkable
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.ColorRes
+import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 
 /**
@@ -357,4 +359,73 @@ fun View.isSoftInputShowing(): Boolean {
     val manager: InputMethodManager? =
         context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     return manager != null && manager.isActive
+}
+
+/**
+ * 从 GONE 状态透明度渐变切换到 VISIBLE 状态
+ */
+fun View.goneToVisibleWithAlpha(duration: Long = 500) {
+    visibility = View.INVISIBLE
+    ObjectAnimator.ofFloat(
+        this,
+        "alpha",
+        0f,
+        alpha
+    ).apply {
+        this.duration = duration
+        addListener(onStart = {
+            visibility = View.VISIBLE
+        })
+    }.start()
+}
+
+/**
+ * 从 VISIBLE 状态透明度渐变切换到 GONE 状态
+ */
+fun View.visibleToGoneWithAlpha(duration: Long = 500) {
+    ObjectAnimator.ofFloat(
+        this,
+        "alpha",
+        alpha,
+        0f
+    ).apply {
+        this.duration = duration
+        addListener(onEnd = {
+            visibility = View.GONE
+        })
+    }.start()
+}
+
+/**
+ * 从 VISIBLE 状态透明度渐变切换到 INVISIBLE 状态
+ */
+fun View.visibleToInvisibleWithAlpha(duration: Long = 500) {
+    ObjectAnimator.ofFloat(
+        this,
+        "alpha",
+        alpha,
+        0f
+    ).apply {
+        this.duration = duration
+        addListener(onEnd = {
+            visibility = View.INVISIBLE
+        })
+    }.start()
+}
+
+/**
+ * 从 INVISIBLE 状态透明度渐变切换到 VISIBLE 状态
+ */
+fun View.invisibleToVisibleWithAlpha(duration: Long = 500) {
+    ObjectAnimator.ofFloat(
+        this,
+        "alpha",
+        0f,
+        alpha
+    ).apply {
+        this.duration = duration
+        addListener(onStart = {
+            visibility = View.VISIBLE
+        })
+    }.start()
 }

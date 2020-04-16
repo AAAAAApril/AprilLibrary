@@ -7,6 +7,17 @@ import java.util.*
  * 计算出两个日期之间的差异
  */
 class DateDiff(private val callBack: DateDiffCallBack) {
+    companion object{
+        fun getDay(milliTime: Long) = milliTime / 1000 / 60 / 60 / 60 % 24
+
+        fun getHour(milliTime: Long) = milliTime / 1000 / 60 / 60 % 60
+
+        fun getMinute(milliTime: Long) = milliTime / 1000 / 60 % 60
+
+        fun getSecond(milliTime: Long) = milliTime / 1000 % 60
+
+        fun getMilliSecond(milliTime: Long) = milliTime % 1000
+    }
 
     //停止标记
     var stopTag: Boolean = false
@@ -30,11 +41,11 @@ class DateDiff(private val callBack: DateDiffCallBack) {
                 callBack.onEndTimeBeforeStartTime()
                 return
             }
-            val day = intervalTime / 1000 / 60 / 60 / 60 % 24
-            val hour = intervalTime / 1000 / 60 / 60 % 60
-            val minute = intervalTime / 1000 / 60 % 60
-            val second = intervalTime / 1000 % 60
-            val milliSecond = intervalTime % 1000
+            val day = getDay(intervalTime)
+            val hour = getHour(intervalTime)
+            val minute = getMinute(intervalTime)
+            val second = getSecond(intervalTime)
+            val milliSecond = getMilliSecond(intervalTime)
             callBack.onDateDiff(
                 day.toInt(),
                 hour.toInt(),

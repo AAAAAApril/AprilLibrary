@@ -13,7 +13,6 @@ import com.google.android.material.tabs.TabLayoutMediator
 class ViewPager2Helper: TabLayoutMediator.TabConfigurationStrategy {
 
     private lateinit var viewPager2: ViewPager2
-    private lateinit var tabLayout: TabLayout
     private lateinit var mediator: TabLayoutMediator
     private var strategy: TabLayoutMediator.TabConfigurationStrategy? = null
 
@@ -27,7 +26,6 @@ class ViewPager2Helper: TabLayoutMediator.TabConfigurationStrategy {
     ) {
         this.strategy = strategy
         this.viewPager2 = viewPager2
-        this.tabLayout = tabLayout
         this.mediator = TabLayoutMediator(tabLayout, viewPager2, this)
     }
 

@@ -1,10 +1,9 @@
-package com.april.base.vvm
+package com.april.develop.vvm
 
 import android.app.Application
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
-import com.april.develop.vvm.SingleLiveData
 import kotlinx.coroutines.*
 
 /**

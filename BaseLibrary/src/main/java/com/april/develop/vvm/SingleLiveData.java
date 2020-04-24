@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * 非 粘性 LiveData，观察者只会接收到开始观察之后发出的消息
  * <p>
- * 但是只支持添加一个观察者！！！
+ * 但是只支持添加一个观察者！！！如果添加多个，将无法确定哪个会收到回调。
  *
  * @param <T>
  */

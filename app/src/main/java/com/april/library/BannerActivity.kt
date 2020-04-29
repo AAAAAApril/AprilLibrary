@@ -3,9 +3,7 @@ package com.april.library
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.april.banner.CustomLayoutManagerInfinite
-import com.april.banner.LoopLayoutManager
-import com.april.banner.LoopPagerSnapHelper
+import com.april.banner.LoopLinearLayoutManager
 import com.april.multiple.DefaultItemDelegate
 import com.april.multiple.MultipleAdapter
 import com.april.multiple.only
@@ -24,7 +22,7 @@ class BannerActivity : AppCompatActivity() {
         ab_rv.apply {
             //设置横向循环滑动支持的布局管理器
 //            layoutManager = LoopLayoutManager()
-            layoutManager = CustomLayoutManagerInfinite()
+            layoutManager = LoopLinearLayoutManager()
             //设置循环滑动支持的 SnapHelper
 //            LoopPagerSnapHelper().attachToRecyclerView(this)
         }.adapter = MultipleAdapter().apply {

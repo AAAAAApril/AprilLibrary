@@ -129,7 +129,7 @@ class FragmentHelper(
                 if (showingFragment.isHidden) {
                     manager.beginTransaction()
                         .show(showingFragment)
-                        .commit()
+                        .commitNow()
                 }
             }
 //            else {
@@ -188,7 +188,7 @@ class FragmentHelper(
                     showFragment.asTag()
                 )
             }
-        }.commit()
+        }.commitNow()
     }
 
     /**
@@ -209,7 +209,7 @@ class FragmentHelper(
                 Bundle(),
                 showFragmentClass.asTag()
             )
-        }.commit()
+        }.commitNow()
     }
 
 }

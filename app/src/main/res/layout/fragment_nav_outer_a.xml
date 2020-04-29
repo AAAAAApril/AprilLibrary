@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="20dp"
-        android:text="Navigation 嵌套图表测试"
+        android:text="Navigation 嵌套图表测试\n\n这里是起点：外部 Fragment A"
         android:textColor="@color/colorAccent"
         android:textSize="20sp"
         android:textStyle="bold" />

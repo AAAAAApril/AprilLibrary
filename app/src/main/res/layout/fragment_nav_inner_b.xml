@@ -4,6 +4,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:text="内部 Fragment B\n\n值回传可以使用 LiveData 处理，并绑定在一个合适的 ViewModel 上"
+        android:textColor="@color/colorAccent"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
     <EditText
         android:id="@+id/fnib_etName"
         android:layout_width="match_parent"
@@ -24,6 +33,7 @@
         android:id="@+id/fnib_btnGoOut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="回到外部图表并传值" />
+        android:text="回到外部图表 Fragment B 并传值"
+        android:textAllCaps="false" />
 
 </LinearLayout>

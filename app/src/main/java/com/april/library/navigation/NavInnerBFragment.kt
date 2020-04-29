@@ -25,7 +25,9 @@ class NavInnerBFragment : AbsNavFragment(R.layout.fragment_nav_inner_b) {
         fnib_btnGoOut.setOnClickListener {
             viewModel.number = fnib_etName.text.toString()
 
-            //回到外部图表
+            /*
+                回到外部图表
+             */
             outerViewModel.nameLiveData.postValue(viewModel.name)
             outerViewModel.numberLiveData.postValue(viewModel.number)
             pop(R.id.nav_f_outer_b)

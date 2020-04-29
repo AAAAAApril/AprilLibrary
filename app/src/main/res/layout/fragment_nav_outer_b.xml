@@ -6,6 +6,15 @@
     android:orientation="vertical">
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:text="这里是外部 Fragment B\n\n值回传时，用来监听数据变化的 LiveData 最好是非粘性的，这样在进入这个页面时，不会被已经存在 LiveData 中的数据影响到，同时在前方页面给 LiveData 赋值之后，回到这个界面仍然能正常观察到值的变化。"
+        android:textColor="@color/colorAccent"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
         android:id="@+id/fnob_tvName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

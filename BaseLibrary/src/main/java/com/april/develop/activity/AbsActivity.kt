@@ -8,11 +8,13 @@ import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
+import com.april.develop.vvm.IContractView
+import com.april.develop.vvm.LoadingState
 
 /**
  * Activity 基类
  */
-abstract class AbsActivity : AppCompatActivity {
+abstract class AbsActivity : AppCompatActivity, IContractView {
 
     constructor() : super()
 
@@ -58,6 +60,12 @@ abstract class AbsActivity : AppCompatActivity {
                 this.statusBarColor = statusBarColor
             }
         }
+    }
+
+    override fun onShowToast(message: CharSequence?) {
+    }
+
+    override fun onShowLoading(state: LoadingState) {
     }
 
 }

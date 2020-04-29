@@ -7,11 +7,13 @@ import android.view.ViewGroup
 import android.widget.Space
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
+import com.april.develop.vvm.IContractView
+import com.april.develop.vvm.LoadingState
 
 /**
  * Fragment 基类
  */
-abstract class AbsFragment : Fragment {
+abstract class AbsFragment : Fragment, IContractView {
 
     constructor()
 
@@ -56,5 +58,12 @@ abstract class AbsFragment : Fragment {
      * 第一次创建布局时才会调用
      */
     protected open fun onViewCreated(view: View) {}
+
+
+    override fun onShowToast(message: CharSequence?) {
+    }
+
+    override fun onShowLoading(state: LoadingState) {
+    }
 
 }

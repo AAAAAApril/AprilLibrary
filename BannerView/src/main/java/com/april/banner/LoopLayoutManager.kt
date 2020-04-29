@@ -41,6 +41,9 @@ class LoopLayoutManager : RecyclerView.LayoutManager(),
         if (itemCount == 0) {
             return
         }
+        if (state.isPreLayout) {
+            return
+        }
         //横向绘制子View,则需要知道 X轴的偏移量
         var offsetX = 0
 

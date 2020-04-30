@@ -86,19 +86,26 @@ fun <VM> VM.launch(
  */
 @MainThread
 inline fun <reified VM, F> F.contractViewModels(
-    noinline whenCreated: ((VM) -> Unit)? = {
-        if (!it.toastLiveData.hasObservers()) {
-            it.toastLiveData.observe(this, this::onShowToast)
-        }
-        if (!it.loadingLiveData.hasObservers()) {
-            it.loadingLiveData.observe(this, this::onShowLoading)
-        }
-    }
+    noinline whenCreated: ((VM) -> Unit)? = {}
 ): Lazy<VM> where F : Fragment,
                   F : IContractView,
                   VM : ViewModel,
                   VM : IContractViewModel {
-    return createContractViewModelLazy(VM::class, { viewModelStore }, whenCreated)
+    return createContractViewModelLazy(
+        VM::class,
+        { viewModelStore },
+        {
+            if (whenCreated != null) {
+                if (!it.toastLiveData.hasObservers()) {
+                    it.toastLiveData.observe(this, this::onShowToast)
+                }
+                if (!it.loadingLiveData.hasObservers()) {
+                    it.loadingLiveData.observe(this, this::onShowLoading)
+                }
+                whenCreated.invoke(it)
+            }
+        }
+    )
 }
 
 /**
@@ -106,24 +113,27 @@ inline fun <reified VM, F> F.contractViewModels(
  */
 @MainThread
 inline fun <reified VM, F> F.contractParentViewModels(
-    noinline whenCreated: ((VM) -> Unit)? = {
-        val parent = requireParentFragment()
-        if (parent is IContractView) {
-            if (!it.toastLiveData.hasObservers()) {
-                it.toastLiveData.observe(parent, parent::onShowToast)
-            }
-            if (!it.loadingLiveData.hasObservers()) {
-                it.loadingLiveData.observe(parent, parent::onShowLoading)
-            }
-        }
-    }
+    noinline whenCreated: ((VM) -> Unit)? = {}
 ): Lazy<VM> where F : Fragment,
                   VM : ViewModel,
                   VM : IContractViewModel {
     return createContractViewModelLazy(
         VM::class,
         { requireParentFragment().viewModelStore },
-        whenCreated
+        {
+            if (whenCreated != null) {
+                val parent = requireParentFragment()
+                if (parent is IContractView) {
+                    if (!it.toastLiveData.hasObservers()) {
+                        it.toastLiveData.observe(parent, parent::onShowToast)
+                    }
+                    if (!it.loadingLiveData.hasObservers()) {
+                        it.loadingLiveData.observe(parent, parent::onShowLoading)
+                    }
+                }
+                whenCreated.invoke(it)
+            }
+        }
     )
 }
 
@@ -132,24 +142,27 @@ inline fun <reified VM, F> F.contractParentViewModels(
  */
 @MainThread
 inline fun <reified VM, F> F.contractActivityViewModels(
-    noinline whenCreated: ((VM) -> Unit)? = {
-        val activity = requireActivity()
-        if (activity is IContractView) {
-            if (!it.toastLiveData.hasObservers()) {
-                it.toastLiveData.observe(activity, activity::onShowToast)
-            }
-            if (!it.loadingLiveData.hasObservers()) {
-                it.loadingLiveData.observe(activity, activity::onShowLoading)
-            }
-        }
-    }
+    noinline whenCreated: ((VM) -> Unit)? = {}
 ): Lazy<VM> where F : Fragment,
                   VM : ViewModel,
                   VM : IContractViewModel {
     return createContractViewModelLazy(
         VM::class,
         { requireActivity().viewModelStore },
-        whenCreated
+        {
+            if (whenCreated != null) {
+                val activity = requireActivity()
+                if (activity is IContractView) {
+                    if (!it.toastLiveData.hasObservers()) {
+                        it.toastLiveData.observe(activity, activity::onShowToast)
+                    }
+                    if (!it.loadingLiveData.hasObservers()) {
+                        it.loadingLiveData.observe(activity, activity::onShowLoading)
+                    }
+                }
+                whenCreated.invoke(it)
+            }
+        }
     )
 }
 
@@ -158,14 +171,7 @@ inline fun <reified VM, F> F.contractActivityViewModels(
  */
 @MainThread
 inline fun <reified VM, A> A.contractViewModels(
-    noinline whenCreated: ((VM) -> Unit)? = {
-        if (!it.toastLiveData.hasObservers()) {
-            it.toastLiveData.observe(this, this::onShowToast)
-        }
-        if (!it.loadingLiveData.hasObservers()) {
-            it.loadingLiveData.observe(this, this::onShowLoading)
-        }
-    }
+    noinline whenCreated: ((VM) -> Unit)? = {}
 ): Lazy<VM> where A : ComponentActivity,
                   A : IContractView,
                   VM : ViewModel,
@@ -174,7 +180,17 @@ inline fun <reified VM, A> A.contractViewModels(
         VM::class,
         { viewModelStore },
         { defaultViewModelProviderFactory },
-        whenCreated
+        {
+            if (whenCreated != null) {
+                if (!it.toastLiveData.hasObservers()) {
+                    it.toastLiveData.observe(this, this::onShowToast)
+                }
+                if (!it.loadingLiveData.hasObservers()) {
+                    it.loadingLiveData.observe(this, this::onShowLoading)
+                }
+                whenCreated.invoke(it)
+            }
+        }
     )
 }
 

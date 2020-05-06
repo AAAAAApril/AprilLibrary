@@ -181,7 +181,7 @@ open class MultipleAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     protected open fun getUpdateCallBack(): ListUpdateCallback {
-        return MultipleUpdateCallBack(this, 0)
+        return MultipleUpdateCallBack(this)
     }
 
 }

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
  */
 class MultipleUpdateCallBack(
     private val adapter: RecyclerView.Adapter<*>,
-    private val headerCount: Int
+    private val headerCount: Int = 0
 ) : ListUpdateCallback {
 
     override fun onChanged(position: Int, count: Int, payload: Any?) {

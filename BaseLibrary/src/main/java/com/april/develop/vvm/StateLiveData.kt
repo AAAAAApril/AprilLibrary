@@ -16,7 +16,7 @@ class StateLiveData<T : Any> : MutableLiveData<T> {
     /**
      * 刷新状态
      */
-    private val refreshState = MutableLiveData<Boolean>()
+    private val refreshingState = MutableLiveData<Boolean>()
 
     /**
      * 加载更多状态
@@ -26,21 +26,21 @@ class StateLiveData<T : Any> : MutableLiveData<T> {
     /**
      * 请求状态
      *
-     * 综合刷新和加载更多两种状态
+     * 综合刷新和加载更多两种状态，满足任意一种即为正在请求
      */
     private val requestingState = MediatorLiveData<Boolean>().apply {
-        addSource(refreshState) {
-            value = loadingMoreState.value == true || it
+        addSource(refreshingState) {
+            value = isLoadingMore() || it
         }
         addSource(loadingMoreState) {
-            value = refreshState.value == true || it
+            value = isRefreshing() || it
         }
     }
 
     /**
      * 是否正在刷新
      */
-    fun isRefreshing() = refreshState.value == true
+    fun isRefreshing() = refreshingState.value == true
 
     /**
      * 是否正在加载更多
@@ -56,35 +56,56 @@ class StateLiveData<T : Any> : MutableLiveData<T> {
      * 设置是否正在刷新
      */
     fun setRefreshing(refreshing: Boolean) {
-        refreshState.value = refreshing
+        refreshingState.postValue(refreshing)
     }
 
     /**
      * 设置是否正在加载更多
      */
     fun setLoadingMore(loading: Boolean) {
-        loadingMoreState.value = loading
+        loadingMoreState.postValue(loading)
     }
 
     /**
      * 观察刷新状态
      */
-    fun refreshing(owner: LifecycleOwner, observer: Observer<Boolean>) {
-        refreshState.observe(owner, observer)
+    fun observerRefreshing(owner: LifecycleOwner, observer: Observer<Boolean>) {
+        refreshingState.observe(owner, observer)
     }
 
     /**
      * 观察加载更多状态
      */
-    fun loadingMore(owner: LifecycleOwner, observer: Observer<Boolean>) {
+    fun observerLoadingMore(owner: LifecycleOwner, observer: Observer<Boolean>) {
         loadingMoreState.observe(owner, observer)
     }
 
     /**
      * 观察请求状态
      */
-    fun requesting(owner: LifecycleOwner, observer: Observer<Boolean>) {
+    fun observerRequesting(owner: LifecycleOwner, observer: Observer<Boolean>) {
         requestingState.observe(owner, observer)
+    }
+
+    /**
+     * 移除刷新状态观察者
+     */
+    fun removeRefreshingObserver(observer: Observer<Boolean>) {
+        refreshingState.removeObserver(observer)
+    }
+
+    /**
+     * 移除加载更多状态观察者
+     */
+    fun removeLoadingMoreObserver(observer: Observer<Boolean>) {
+        loadingMoreState.removeObserver(observer)
+    }
+
+    /**
+     * 移除请求状态观察者
+     */
+    fun removeRequestingObserver(observer: Observer<Boolean>) {
+        requestingState.removeObserver(observer)
     }
 
 }

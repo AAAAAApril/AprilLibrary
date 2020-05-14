@@ -8,6 +8,13 @@ import java.util.*
  *
  * 参考文章：
  * http://c.biancheng.net/view/878.html
+ *
+ *  Tips：
+ *
+ *  某些时候，我们会把时间格式化为比较复杂的字符串，比如： on Monday,May 23, at 9:50
+ *  其中 at 包含了格式化保留字符 a (表示上午下午)，从而导致在格式化的时候无法识别和它之后的 t ，
+ *  所以要想正确显示 at 这个单词，需要用 '' 单引号将其包裹，例如：'at'
+ *
  */
 object DateHelper {
 

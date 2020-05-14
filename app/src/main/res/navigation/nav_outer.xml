@@ -27,6 +27,11 @@
 
     </fragment>
 
+    <!--
+    嵌套导航图时，
+    确保导航图的文件名和导航图根
+    navigation 标签的 id 保持一致！！！
+    -->
     <include app:graph="@navigation/nav_inner" />
 
 </navigation>

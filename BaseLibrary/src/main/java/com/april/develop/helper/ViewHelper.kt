@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
@@ -17,6 +18,8 @@ import android.widget.Checkable
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.ColorRes
+import androidx.annotation.FloatRange
+import androidx.annotation.IntRange
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 
@@ -35,7 +38,7 @@ import androidx.core.content.ContextCompat
  * [canScrollEnd]
  *
  * [trimString] TextView 去掉末尾空格的字符串
- * [halfBold] TextView 文字半粗，介于 normal 和 bold 之间
+ * [boldText] 给 TextView 文字设置粗体字
  * [textColorRes] TextView 文字颜色 资源文件
  * [drawables] TextView drawable start top end bottom
  * [allowScroll] 允许滚动
@@ -226,10 +229,17 @@ fun TextView.trimString(): String {
 }
 
 /**
- * 一半粗，介于 normal 和 bold 之间
+ * 给文字加粗
+ *
+ * 0 时，就是默认的文字粗细，
+ * 4 时，就和设置 Bold 属性的粗细一致。
+ * 值越大，字体越粗
+ *
+ * 由于是修改的 TextView 的 paint 属性，因此这个不是暂时的，而是随 TextView 的生命周期同步的。
  */
-fun TextView.halfBold(halfBold: Boolean = true) {
-    paint.isFakeBoldText = (halfBold)
+fun TextView.boldText(@FloatRange(from = 0.0, to = 6.0) boldSize: Float) {
+    paint.style = Paint.Style.FILL_AND_STROKE
+    paint.strokeWidth = boldSize
     postInvalidate()
 }
 

@@ -34,10 +34,7 @@ abstract class AbsFragment : Fragment, IContractView {
             cacheContentView = onCreateView(inflater, container)
             firstCreate = true
         }
-        //Tips：注意这里的处理
-        cacheContentView?.let {
-            (it.parent as? ViewGroup)?.removeView(it)
-        }
+        removeParentView()
         return cacheContentView
     }
 
@@ -47,6 +44,11 @@ abstract class AbsFragment : Fragment, IContractView {
             firstCreate = false
             onViewCreated(view)
         }
+    }
+
+    override fun onDestroyView() {
+        removeParentView()
+        super.onDestroyView()
     }
 
     protected open fun onCreateView(
@@ -64,6 +66,16 @@ abstract class AbsFragment : Fragment, IContractView {
     }
 
     override fun onShowLoading(state: LoadingState) {
+    }
+
+    /**
+     * 把缓存布局从父布局中移除
+     */
+    private fun removeParentView(){
+        //Tips：注意这里的处理
+        cacheContentView?.let {
+            (it.parent as? ViewGroup)?.removeView(it)
+        }
     }
 
 }

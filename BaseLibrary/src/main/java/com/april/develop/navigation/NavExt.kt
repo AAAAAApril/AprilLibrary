@@ -4,11 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.annotation.IdRes
-import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.createViewModelLazy
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -149,15 +145,3 @@ private fun createNavOptionsBuilder(): NavOptions.Builder {
         .setPopEnterAnim(R.anim.nav_default_pop_enter_anim)
         .setPopExitAnim(R.anim.nav_default_pop_exit_anim)
 }
-
-/**
- * 获取父类装载的 ViewModel
- */
-@MainThread
-inline fun <reified VM : ViewModel> Fragment.parentViewModels(
-    noinline factoryProducer: (() -> ViewModelProvider.Factory)? = null
-) = createViewModelLazy(
-    VM::class,
-    { requireParentFragment().viewModelStore },
-    factoryProducer ?: { requireParentFragment().defaultViewModelProviderFactory }
-)
